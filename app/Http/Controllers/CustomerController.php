@@ -25,10 +25,9 @@ class CustomerController extends Controller
         if ($includeServices) {
             $customers = $customers->with('services');
         }
-        return new CustomerCollection($customers->paginate()->appends($request->query()));
-
-        //$customers = Customer::all();
-        //return new CustomerCollection($customers);
+        //return new CustomerCollection($customers->paginate()->appends($request->query()));
+        $customers = Customer::all();
+        return new CustomerCollection($customers);
     }
 
     /**

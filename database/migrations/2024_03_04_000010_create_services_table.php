@@ -21,6 +21,11 @@ return new class extends Migration {
             $table->string('billing_date');
             $table->boolean('recurrent');
             $table->string('due_date');
+            $table->string('address_instalation')->nullable();
+            $table->string('reference')->nullable();
+            $table->string('city');
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->boolean('is_active');
             $table->boolean('status');
             $table->timestamps();

@@ -16,11 +16,7 @@ return new class extends Migration {
             $table->string('document_number')->unique();
             $table->string('name');
             $table->string('address');
-            $table->string('reference')->nullable();
-            $table->string('city');
-            $table->string('latitude');
-            $table->string('longitude');
-            $table->string('phone_number');
+            $table->string('phone_number')->nullable();
             $table->string('email')->nullable();
             $table->boolean('status');
             $table->timestamps();
