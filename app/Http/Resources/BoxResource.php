@@ -19,6 +19,8 @@ class BoxResource extends JsonResource
             'city' => $this->city,
             'address' => $this->address,
             'reference' => $this->reference,
+            'latitude'=> $this->latitude,
+            'longitude'=> $this->longitude,
             'total_ports' => $this->total_ports,
             'available_ports' => $this->available_ports,
             'status' => $this->status,

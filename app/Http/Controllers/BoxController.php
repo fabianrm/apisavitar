@@ -20,9 +20,12 @@ class BoxController extends Controller
         $filter = new BoxFilter();
         $queryItems = $filter->transform($request);
 
-        $plans = Box::where($queryItems);
+        $boxs = Box::where($queryItems);
 
-        return new BoxCollection($plans->paginate()->appends($request->query()));
+        $boxs = Box::all();
+        return new BoxCollection($boxs);
+
+       // return new BoxCollection($boxs->paginate()->appends($request->query()));
 
     }
 

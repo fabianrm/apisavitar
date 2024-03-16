@@ -13,6 +13,8 @@ class Box extends Model
         'city',
         'address',
         'reference',
+        'latitude',
+        'longitude',
         'total_ports',
         'available_ports',
         'status',

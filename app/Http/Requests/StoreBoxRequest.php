@@ -24,9 +24,11 @@ class StoreBoxRequest extends FormRequest
         return [
             'city' => ['required'],
             'address' => ['required'],
-            'reference' => ['required'],
+            'reference' => [''],
+            'latitude'=> [''],
+            'longitude'=> [''],
             'totalPorts' => ['required'],
-            'availablePorts' => ['required'],
+            'availablePorts' => [''],
             'status' => ['required'],
         ];
     }

@@ -24,6 +24,8 @@ class BoxFactory extends Factory
             'city' => $this->faker->city(),
             'address' => $this->faker->streetAddress(),
             'reference' => $this->faker->word(),
+            'latitude' => $this->faker->latitude(),
+            'longitude' => $this->faker->longitude(),
             'total_ports' => $ptos,
             'available_ports' => $ptosDisponibles,
             'status' => $this->faker->boolean(true),

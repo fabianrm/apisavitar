@@ -26,9 +26,11 @@ class UpdateBoxRequest extends FormRequest
             return [
                 'city' => ['required'],
                 'address' => ['required'],
-                'reference' => ['required'],
+                'reference' => [''],
+                'latitude' => [''],
+                'longitude' => [''],
                 'totalPorts' => ['required'],
-                'availablePorts' => ['required'],
+                'availablePorts' => [''],
                 'status' => ['required'],
             ];
         } else {
@@ -36,11 +38,20 @@ class UpdateBoxRequest extends FormRequest
                 'city' => ['sometimes', 'required'],
                 'address' => ['sometimes', 'required'],
                 'reference' => ['sometimes', 'required'],
+                'latitude' => ['sometimes', 'required'],
+                'longitude' => ['sometimes', 'required'],
                 'totalPorts' => ['sometimes', 'required'],
                 'availablePorts' => ['sometimes', 'required'],
                 'status' => ['sometimes', 'required'],
             ];
         }
+    }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'total_ports' => $this->totalPorts,
+            'available_ports' => $this->availablePorts,
+        ]);
     }
 }

@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('city');
             $table->string('address');
-            $table->string('reference');
+            $table->string('reference')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->integer('total_ports');
-            $table->integer('available_ports');
+            $table->integer('available_ports')->nullable();
             $table->boolean('status');
             $table->timestamps();
         });
