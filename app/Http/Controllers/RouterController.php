@@ -2,18 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\RouterFilter;
+use App\Http\Resources\RouterCollection;
+use App\Http\Resources\RouterResource;
 use App\Models\Router;
 use App\Http\Requests\StoreRouterRequest;
 use App\Http\Requests\UpdateRouterRequest;
+use Illuminate\Http\Request;
 
 class RouterController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $filter = new RouterFilter();
+        $queryItems = $filter->transform($request);
+
+        $routers = Router::where($queryItems);
+
+        $routers = Router::all();
+        return new RouterCollection($routers);
+
     }
 
     /**
@@ -29,7 +40,7 @@ class RouterController extends Controller
      */
     public function store(StoreRouterRequest $request)
     {
-        //
+        return new RouterResource(Router::create($request->all()));
     }
 
     /**
@@ -37,7 +48,7 @@ class RouterController extends Controller
      */
     public function show(Router $router)
     {
-        //
+        return new RouterResource($router);
     }
 
     /**
@@ -53,7 +64,7 @@ class RouterController extends Controller
      */
     public function update(UpdateRouterRequest $request, Router $router)
     {
-        //
+        $router->update($request->all());
     }
 
     /**

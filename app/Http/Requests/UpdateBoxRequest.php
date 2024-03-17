@@ -49,9 +49,11 @@ class UpdateBoxRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'total_ports' => $this->totalPorts,
-            'available_ports' => $this->availablePorts,
-        ]);
+        if ($this->totalPorts || $this->availablePorts) {
+            $this->merge([
+                'total_ports' => $this->totalPorts,
+                'available_ports' => $this->availablePorts
+            ]);
+        }
     }
 }

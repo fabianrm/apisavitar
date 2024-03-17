@@ -11,7 +11,7 @@ class StoreRouterRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,19 @@ class StoreRouterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'ip' => ['required'],
+            'usuario' => ['required'],
+            'password' => [''],
+            'port' => [''],
+            'apiConnection' => [''],
+            'status' => ['required'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'api_connection' => $this->apiConnection,
+        ]);
     }
 }

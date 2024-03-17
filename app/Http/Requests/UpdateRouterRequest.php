@@ -11,7 +11,7 @@ class UpdateRouterRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,34 @@ class UpdateRouterRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        $method = $this->method();
+        if ($method === "POST") {
+            return [
+                'ip' => ['required'],
+                'usuario' => ['required'],
+                'password' => [''],
+                'port' => [''],
+                'apiConnection' => [''],
+                'status' => ['required'],
+            ];
+        } else {
+            return [
+                'ip' => ['sometimes', 'required'],
+                'usuario' => ['sometimes', 'required'],
+                'password' => ['sometimes', ''],
+                'port' => ['sometimes', ''],
+                'apiConnection' => ['sometimes', ''],
+                'status' => ['sometimes', 'required'],
+            ];
+        }
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->apiConnection) {
+            $this->merge([
+                'api_connection' => $this->apiConnection
+            ]);
+        }
     }
 }
