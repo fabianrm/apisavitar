@@ -22,6 +22,7 @@ class StoreBoxRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => ['required'],
             'city' => ['required'],
             'address' => ['required'],
             'reference' => [''],

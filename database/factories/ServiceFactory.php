@@ -21,10 +21,10 @@ class ServiceFactory extends Factory
     public function definition(): array
     {
         return [
-            'customer_id' => Customer::factory(),
-            'router_id' => Router::factory(),
-            'plan_id' => Plan::factory(),
-            'box_id' => Box::factory(),
+            'customer_id' => Customer::inRandomOrder()->first()->id,
+            'router_id' => Router::inRandomOrder()->first()->id,
+            'plan_id' => Plan::inRandomOrder()->first()->id,
+            'box_id' => Box::inRandomOrder()->first()->id,
             'port_number' => $this->faker->randomDigitNotZero(),
             'registration_date' => $this->faker->dateTime(),
             'billing_date' => $this->faker->randomDigitNotZero(),

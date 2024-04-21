@@ -23,7 +23,7 @@ class Customer extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function Services()
+    public function services()
     {
         return $this->hasMany(Service::class);
     }

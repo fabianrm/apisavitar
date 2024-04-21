@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Router extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'id',
         'ip',
@@ -16,5 +17,15 @@ class Router extends Model
         'api_connection',
         'status',
     ];
-    use HasFactory;
+
+    /**
+     * Get all of the services for the Router
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
 }

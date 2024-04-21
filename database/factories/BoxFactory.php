@@ -21,6 +21,7 @@ class BoxFactory extends Factory
         $ptosDisponibles = $ptos - 3;
 
         return [
+            'name' => $this->faker->userName(),
             'city' => $this->faker->city(),
             'address' => $this->faker->streetAddress(),
             'reference' => $this->faker->word(),

@@ -15,7 +15,7 @@ class PlanSeeder extends Seeder
     {
         //
         Plan::factory()
-            ->count(4)
+            ->count(2)
             ->create();
     }
 }

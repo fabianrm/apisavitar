@@ -15,9 +15,9 @@ class Service extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function Customer()
+    public function customers()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, "customer_id");
     }
 
 
@@ -26,9 +26,9 @@ class Service extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function Plan()
+    public function plans()
     {
-        return $this->belongsTo(Plan::class);
+        return $this->belongsTo(Plan::class, "plan_id");
     }
 
 
@@ -37,10 +37,26 @@ class Service extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function Invoices()
+    public function invoices()
     {
         return $this->hasMany(Invoice::class);
     }
+
+    public function boxes()
+    {
+        return $this->belongsTo(Box::class, "box_id");
+    }
+
+    /**
+     * Get the plan that owns the Service
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function routers()
+    {
+        return $this->belongsTo(Router::class, "router_id");
+    }
+
 
 
 

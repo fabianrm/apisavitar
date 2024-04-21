@@ -17,6 +17,14 @@ class PlanController extends Controller
      */
     public function index(Request $request)
     {
+        $plans = Plan::all();
+        return new PlanCollection($plans);
+
+    }
+
+
+    public function filter(Request $request)
+    {
 
         $filter = new PlanFilter();
         $queryItems = $filter->transform($request);
@@ -26,11 +34,11 @@ class PlanController extends Controller
         if ($includeServices) {
             $plans = $plans->with('services');
         }
-        return new PlanCollection($plans->paginate()->appends($request->query()));
 
-        // $plans = Plan::all();
-        // return new PlanCollection($plans);
+        return new PlanCollection($plans->paginate(100)->appends($request->query()));
+
     }
+
 
     /**
      * Show the form for creating a new resource.

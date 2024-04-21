@@ -25,6 +25,7 @@ class PlanResource extends JsonResource
             'burst_limit'=> $this->burst_limit,
             'burst_threshold'=> $this->burst_threshold,
             'burst_time'=> $this->burst_time,
+            'status' => $this->status,
             'service' => ServiceResource::collection($this->whenLoaded('services')),
         ];
     }

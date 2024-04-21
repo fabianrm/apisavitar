@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ServiceCollection;
+use App\Models\Customer;
 use App\Models\Service;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
@@ -16,15 +17,41 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $filter = new ServiceFilter();
-        $queryItems = $filter->transform($request);
+        /*   $filter = new ServiceFilter();
+          $queryItems = $filter->transform($request);
 
-        if (count($queryItems) == 0) {
-            return new ServiceCollection(Service::paginate());
-        } else {
-            $services = Service::where($queryItems)->paginate();
-            return new ServiceCollection($services->appends($request->query()));
-        }
+          if (count($queryItems) == 0) {
+              return new ServiceCollection(Service::paginate());
+          } else {
+              $services = Service::where($queryItems)->paginate();
+              return new ServiceCollection($services->appends($request->query()));
+          } */
+
+
+
+        // $customers = Customer::all();
+
+        // $services = Service::with('customers')->get();
+        //return new ServiceCollection($services);
+
+
+        /*   $services = Service::with('customers')->get();
+          $transformedServices = $services->map(function ($service) {
+              return [
+                  'id' => $service->id,
+                  'name' => $service->router_id,
+                  'price' => $service->plan_id,
+                  'customer_name' => $service->customers->name,
+              ];
+          });
+
+          return response()->json(['data' => $transformedServices]); */
+
+
+        $services = Service::with(['customers', 'routers', 'plans'])->get();
+        return new ServiceCollection($services);
+
+
     }
 
     /**
