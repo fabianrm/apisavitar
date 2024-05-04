@@ -9,6 +9,24 @@ class Service extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'customer_id',
+        'router_id',
+        'plan_id',
+        'box_id',
+        'port_number',
+        'registration_date',
+        'billing_date',
+        'recurrent',
+        'due_date',
+        'address_instalation',
+        'city',
+        'latitude',
+        'longitude',
+        'is_active',
+        'status'
+    ];
+
 
     /**
      * Get the customer that owns the Invoice

@@ -30,14 +30,13 @@ class ServiceFactory extends Factory
             'billing_date' => $this->faker->randomDigitNotZero(),
             'recurrent' => $this->faker->boolean(),
             'due_date' => $this->faker->randomDigitNotZero(),
+            'city' => $this->faker->city(),
             'address_instalation' => $this->faker->address(),
             'reference' => $this->faker->word(),
-            'city' => $this->faker->city(),
             'latitude' => $this->faker->latitude(),
             'longitude' => $this->faker->longitude(),
             'is_active' => $this->faker->boolean(),
             'status' => $this->faker->boolean(),
-
         ];
     }
 }

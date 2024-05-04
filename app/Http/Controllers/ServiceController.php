@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ServiceCollection;
+use App\Http\Resources\ServiceResource;
 use App\Models\Customer;
 use App\Models\Service;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Filters\ServiceFilter;
+use Carbon\Carbon;
 
 class ServiceController extends Controller
 {
@@ -67,7 +70,13 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request)
     {
-        //
+        // $request->validate([
+        //     'registration_date' => 'required|date_format:yyyy-MM-dd',
+        // ]);
+       // echo($request);
+
+        return new ServiceResource(Service::create($request->all()));
+       
     }
 
     /**
@@ -100,5 +109,14 @@ class ServiceController extends Controller
     public function destroy(Service $service)
     {
         //
+    }
+
+    /**
+     * Obtener los puertos disponibles en la caja.
+     */
+    public function getPorts($box_id)
+    {
+        $results = DB::select('CALL obtenerPuertosDisponibles(?)', [$box_id]);
+        return response()->json($results);
     }
 }

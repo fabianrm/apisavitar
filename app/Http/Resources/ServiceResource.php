@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class ServiceResource extends JsonResource
 {
@@ -25,6 +26,10 @@ class ServiceResource extends JsonResource
             'billing_date' => $this->billing_date,
             'recurrent' => $this->recurrent,
             'due_date' => $this->due_date,
+            'address_instalation' => $this->address_instalation,
+            'city' => $this->city,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
             'is_active' => $this->is_active,
             'status' => $this->status
         ];
