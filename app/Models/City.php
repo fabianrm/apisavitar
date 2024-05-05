@@ -5,24 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class City extends Model
 {
     use HasFactory;
-    protected $fillable = [
-        'type',
-        'document_number',
-        'name',
-        'address',
-        'reference',
-        'latitude',
-        'longitude',
-        'phone_number',
-        'email',
-        'status',
-    ];
 
     /**
-     * Get all of the services for the Customer
+     * Get all of the services for the city
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -30,6 +18,18 @@ class Customer extends Model
     {
         return $this->hasMany(Service::class);
     }
+
+
+    /**
+     * Get all of the boxes for the city
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function boxes()
+    {
+        return $this->hasMany(Box::class);
+    }
+
 
 
 

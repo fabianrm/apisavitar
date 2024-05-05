@@ -23,7 +23,7 @@ class StoreBoxRequest extends FormRequest
     {
         return [
             'name' => ['required'],
-            'city' => ['required'],
+            'city_id' => ['required'],
             'address' => ['required'],
             'reference' => [''],
             'latitude'=> [''],

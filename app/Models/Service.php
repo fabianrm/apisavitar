@@ -20,7 +20,8 @@ class Service extends Model
         'recurrent',
         'due_date',
         'address_instalation',
-        'city',
+        'city_id',
+        'equipment_id',
         'latitude',
         'longitude',
         'is_active',
@@ -76,6 +77,26 @@ class Service extends Model
     }
 
 
+    /**
+     * Get the city that owns the Service
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function cities()
+    {
+        return $this->belongsTo(city::class);
+    }
+
+
+    /**
+     * Get the equip that owns the Service
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function equipments()
+    {
+        return $this->belongsTo(Equipment::class);
+    }
 
 
 }

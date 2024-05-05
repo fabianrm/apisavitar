@@ -17,7 +17,7 @@ class BoxResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'city' => $this->city,
+            'city_id' => $this->city_id,
             'address' => $this->address,
             'reference' => $this->reference,
             'latitude'=> $this->latitude,

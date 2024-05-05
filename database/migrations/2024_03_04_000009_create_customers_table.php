@@ -15,7 +15,12 @@ return new class extends Migration {
             $table->enum('type', ['natural', 'juridica']);
             $table->string('document_number')->unique();
             $table->string('name');
-            $table->string('address');
+
+            $table->string('address')->nullable();
+            $table->string('reference')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
+
             $table->string('phone_number')->nullable();
             $table->string('email')->nullable();
             $table->boolean('status');

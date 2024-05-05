@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('boxes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('city');
+            $table->unsignedBigInteger('city_id');
             $table->string('address');
             $table->string('reference')->nullable();
             $table->string('latitude')->nullable();
@@ -23,6 +23,8 @@ return new class extends Migration
             $table->integer('available_ports')->nullable();
             $table->boolean('status');
             $table->timestamps();
+
+            $table->foreign('city_id')->references('id')->on('cities')->onDelete('cascade');
         });
     }
 

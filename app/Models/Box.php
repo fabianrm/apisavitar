@@ -11,7 +11,7 @@ class Box extends Model
     protected $fillable = [
         'id',
         'name',
-        'city',
+        'city_id',
         'address',
         'reference',
         'latitude',
@@ -30,5 +30,17 @@ class Box extends Model
    {
        return $this->hasMany(Service::class);
    }
+
+    /**
+     * Get the city that owns the Service
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function cities()
+    {
+        return $this->belongsTo(city::class);
+    }
+
+
 
 }

@@ -27,6 +27,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('routers', RouterController::class);
     Route::apiResource('services', ServiceController::class);
     Route::apiResource('invoices', InvoiceController::class);
+    Route::apiResource('cities', CityController::class);
+    Route::apiResource('equipments', EquipmentController::class);
     Route::get('/ports/{box_id}', [ServiceController::class, 'getPorts']);
     // Route::apiResource('invoices', InvoiceController::class);
 

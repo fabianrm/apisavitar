@@ -25,7 +25,7 @@ class UpdateBoxRequest extends FormRequest
         if ($method === "POST") {
             return [
                 'name' => ['required'],
-                'city' => ['required'],
+                'city_id' => ['required'],
                 'address' => ['required'],
                 'reference' => [''],
                 'latitude' => [''],
@@ -37,7 +37,7 @@ class UpdateBoxRequest extends FormRequest
         } else {
             return [
                 'name' => ['sometimes', 'required'],
-                'city' => ['sometimes', 'required'],
+                'city_id' => ['sometimes', 'required'],
                 'address' => ['sometimes', 'required'],
                 'reference' => ['sometimes', 'required'],
                 'latitude' => ['sometimes', 'required'],

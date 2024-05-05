@@ -4,25 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Customer extends Model
+class Equipment extends Model
 {
     use HasFactory;
+
     protected $fillable = [
+        'id',
         'type',
-        'document_number',
-        'name',
-        'address',
-        'reference',
-        'latitude',
-        'longitude',
-        'phone_number',
-        'email',
-        'status',
+        'serie',
+        'model',
+        'brand',
+        'status'
     ];
 
     /**
-     * Get all of the services for the Customer
+     * Get all of the comments for the equipment
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -30,7 +28,6 @@ class Customer extends Model
     {
         return $this->hasMany(Service::class);
     }
-
 
 
 }

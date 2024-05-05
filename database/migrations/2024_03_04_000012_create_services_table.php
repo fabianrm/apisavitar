@@ -19,8 +19,11 @@ return new class extends Migration {
             $table->unsignedBigInteger('router_id');
             $table->unsignedBigInteger('box_id');
             $table->string('port_number');
+            
+            $table->unsignedBigInteger('equipment_id');
 
-            $table->string('city');
+            $table->unsignedBigInteger('city_id');
+
             $table->string('address_instalation')->nullable();
             $table->string('reference')->nullable();
             $table->date('registration_date');
@@ -39,6 +42,8 @@ return new class extends Migration {
             $table->foreign('router_id')->references('id')->on('routers')->onDelete('cascade');
             $table->foreign('box_id')->references('id')->on('boxes')->onDelete('cascade');
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
+            $table->foreign('city_id')->references('id')->on('cities')->onDelete('cascade');
+            $table->foreign('equipment_id')->references('id')->on('equipment')->onDelete('cascade');
 
         });
     }
