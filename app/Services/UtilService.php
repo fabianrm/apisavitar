@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Customer;
+use App\Models\Service;
 use Illuminate\Support\Str;
 
 class UtilService
@@ -22,7 +23,7 @@ class UtilService
     public function generateUniqueCodeSavitar(String $prefix )
     {
         // Obtiene el último código generado
-        $lastClient = Customer::latest()->first();
+        $lastClient = Service::latest()->first();
 
         if ($lastClient) {
             // Extrae el número del código existente y lo incrementa
@@ -36,7 +37,7 @@ class UtilService
         $newCode = $prefix . str_pad($lastNumber, 5, '0', STR_PAD_LEFT);
 
         // Verifica si el nuevo código ya existe en la base de datos
-        while (Customer::where('client_code', $newCode)->exists()) {
+        while (Service::where('service_code', $newCode)->exists()) {
             // Si existe, incrementa el número y vuelve a intentarlo
             $lastNumber++;
             $newCode = $prefix . str_pad($lastNumber, 5, '0', STR_PAD_LEFT);

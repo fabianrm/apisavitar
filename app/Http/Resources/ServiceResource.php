@@ -16,24 +16,23 @@ class ServiceResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            "id" => $this->id,
-            "service_code" => $this->id,
-            'customer_id' => $this->customer_id,
-            'router_id' => $this->router_id,
-            'plan_id' => $this->plan_id,
-            'box_id' => $this->box_id,
-            'port_number' => $this->port_number,
-            'registration_date' => $this->registration_date,
-            'billing_date' => $this->billing_date,
-            'recurrent' => $this->recurrent,
-            'due_date' => $this->due_date,
-            'address_instalation' => $this->address_instalation,
+            'id' => $this->id,
+            'serviceCode' => $this->service_code,
+            'customerId' => $this->customer_id,
+            'planId' => $this->plan_id,
+            'routerId' => $this->router_id,
+            'boxId' => $this->box_id,
+            'portNumber' => $this->port_number,
+            'equipmentId' => $this->equipment_id,
+            'cityId' => $this->city_id,
+            'addressInstalation' => $this->address_instalation,
             'reference' => $this->reference,
-            'city_id' => $this->city_id,
-            'equipment_id' => $this->equipment_id,
+            'registrationDate' => $this->registration_date,
+            'instalationDate' => $this->instalation_date,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
-            'is_active' => $this->is_active,
+            'billingDate' => $this->billing_date,
+            'dueDate' => $this->due_date,
             'status' => $this->status
         ];
 

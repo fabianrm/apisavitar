@@ -49,7 +49,6 @@ class ServiceController extends Controller
 
           return response()->json(['data' => $transformedServices]); */
 
-
         $services = Service::with(['customers', 'routers', 'plans', 'cities'])->get();
         return new ServiceCollection($services);
 
@@ -69,6 +68,7 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request)
     {
+
         $contractService = app(UtilService::class);
 
         // Genera un código único para el cliente

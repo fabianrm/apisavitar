@@ -22,7 +22,43 @@ class StoreServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'serviceCode' => [''],
+            'customerId'=> ['required'],
+            'planId'=> ['required'],
+            'routerId'=> ['required'],
+            'boxId'=> ['required'],
+            'portNumber'=> ['required'],
+            'equipmentId'=> ['required'],
+            'cityId'=> ['required'],
+            'addressInstalation'=> ['required'],
+            'reference' => [''],
+            'registrationDate'=> ['required'],
+            'instalationDate'=> ['required'],
+            'latitude' => [''],
+            'longitude' => [''],
+            'billingDate'=> ['required'],
+            'dueDate'=> ['required'],
+            'status'=> ['required']
         ];
     }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'service_code' => $this->serviceCode,
+            'customer_id' => $this->customerId,
+            'plan_id' => $this->planId,
+            'router_id' => $this->routerId,
+            'box_id' => $this->boxId,
+            'port_number' => $this->portNumber,
+            'equipment_id' => $this->equipmentId,
+            'city_id' => $this->cityId,
+            'address_instalation' => $this->addressInstalation,
+            'registration_date' => $this->registrationDate,
+            'instalation_date' => $this->instalationDate,
+            'billing_date' => $this->billingDate,
+            'due_date' => $this->dueDate,
+        ]);
+    }
+
 }

@@ -12,21 +12,20 @@ class Service extends Model
     protected $fillable = [
         'service_code',
         'customer_id',
-        'router_id',
         'plan_id',
+        'router_id',
         'box_id',
         'port_number',
-        'registration_date',
-        'billing_date',
-        'recurrent',
-        'due_date',
+        'equipment_id',
+        'city_id',
         'address_instalation',
         'reference',
-        'city_id',
-        'equipment_id',
+        'registration_date',
+        'instalation_date',
         'latitude',
         'longitude',
-        'is_active',
+        'billing_date',
+        'due_date',
         'status'
     ];
 
@@ -97,7 +96,7 @@ class Service extends Model
      */
     public function equipments()
     {
-        return $this->belongsTo(Equipment::class);
+        return $this->belongsTo(Equipment::class, "equipment_id");
     }
 
 

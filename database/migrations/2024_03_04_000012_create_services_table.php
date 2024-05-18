@@ -35,7 +35,7 @@ return new class extends Migration {
             $table->string('billing_date');
             $table->string('due_date');
 
-            $table->enum('status', ['active', 'inactive', 'terminated'])->default('active');
+            $table->enum('status', ['activo', 'inactivo', 'terminado'])->default('activo');
             $table->date('end_date')->nullable(); // Nuevo campo
 
             $table->timestamps();
