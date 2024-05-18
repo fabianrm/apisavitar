@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\CustomerService;
+use App\Services\UtilService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +13,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(UtilService::class, function ($app) {
+            return new UtilService();
+        });
     }
 
     /**

@@ -21,6 +21,7 @@ class EquipmentResource extends JsonResource
             'serie' => $this->serie,
             'model' => $this->model,
             'brand' => $this->brand,
+            'purchase_date' => $this->purchase_date,
             'status' => $this->status
         ];
 

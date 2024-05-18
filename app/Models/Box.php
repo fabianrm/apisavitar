@@ -38,7 +38,7 @@ class Box extends Model
      */
     public function cities()
     {
-        return $this->belongsTo(city::class);
+        return $this->belongsTo(City::class, "city_id");
     }
 
 

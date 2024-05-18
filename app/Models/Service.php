@@ -10,6 +10,7 @@ class Service extends Model
     use HasFactory;
 
     protected $fillable = [
+        'service_code',
         'customer_id',
         'router_id',
         'plan_id',
@@ -20,6 +21,7 @@ class Service extends Model
         'recurrent',
         'due_date',
         'address_instalation',
+        'reference',
         'city_id',
         'equipment_id',
         'latitude',
@@ -84,7 +86,7 @@ class Service extends Model
      */
     public function cities()
     {
-        return $this->belongsTo(city::class);
+        return $this->belongsTo(City::class, "city_id");
     }
 
 

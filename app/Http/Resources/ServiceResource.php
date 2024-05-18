@@ -17,6 +17,7 @@ class ServiceResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "service_code" => $this->id,
             'customer_id' => $this->customer_id,
             'router_id' => $this->router_id,
             'plan_id' => $this->plan_id,
@@ -27,6 +28,7 @@ class ServiceResource extends JsonResource
             'recurrent' => $this->recurrent,
             'due_date' => $this->due_date,
             'address_instalation' => $this->address_instalation,
+            'reference' => $this->reference,
             'city_id' => $this->city_id,
             'equipment_id' => $this->equipment_id,
             'latitude' => $this->latitude,

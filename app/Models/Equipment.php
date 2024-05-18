@@ -16,6 +16,7 @@ class Equipment extends Model
         'serie',
         'model',
         'brand',
+        'purchase_date',
         'status'
     ];
 

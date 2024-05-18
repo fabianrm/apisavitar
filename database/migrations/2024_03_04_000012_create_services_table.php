@@ -12,14 +12,15 @@ return new class extends Migration {
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
+            $table->string('service_code')->unique();
             $table->unsignedBigInteger('customer_id');
 
             $table->unsignedBigInteger('plan_id');
-            
+
             $table->unsignedBigInteger('router_id');
             $table->unsignedBigInteger('box_id');
             $table->string('port_number');
-            
+
             $table->unsignedBigInteger('equipment_id');
 
             $table->unsignedBigInteger('city_id');
@@ -27,15 +28,16 @@ return new class extends Migration {
             $table->string('address_instalation')->nullable();
             $table->string('reference')->nullable();
             $table->date('registration_date');
+            $table->date('instalation_date');
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
-
+            
             $table->string('billing_date');
-            $table->boolean('recurrent');
             $table->string('due_date');
 
-            $table->boolean('is_active');
-            $table->boolean('status');
+            $table->enum('status', ['active', 'inactive', 'terminated'])->default('active');
+            $table->date('end_date')->nullable(); // Nuevo campo
+
             $table->timestamps();
 
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\CustomerCollection;
+use App\Services\UtilService;
 use Illuminate\Http\Request;
 use App\Filters\CustomerFilter;
 
@@ -43,7 +44,21 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
-        return new CustomerResource(Customer::create($request->all()));
+
+        $clientService = app(UtilService::class);
+
+        // Genera un código único para el cliente
+        $uniqueCode = $clientService->generateUniqueCodeSavitar('CS');
+
+        // Almacena el nuevo cliente con el código único
+        $customer = new Customer($request->all());
+        $customer->client_code = $uniqueCode;
+        $customer->save();
+
+        // Retorna una respuesta:
+        return new CustomerResource($customer);
+
+        // return new CustomerResource(Customer::create($request->all()));
     }
 
     /**

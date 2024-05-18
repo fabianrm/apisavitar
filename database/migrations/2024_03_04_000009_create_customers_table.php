@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['natural', 'juridica']);
+            $table->string('client_code')->unique();
             $table->string('document_number')->unique();
             $table->string('name');
 

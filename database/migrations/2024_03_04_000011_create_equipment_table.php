@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('serie');
             $table->string('model');
             $table->string('brand');
+            $table->date('purchase_date');
             $table->string('status');
             $table->timestamps();
         });

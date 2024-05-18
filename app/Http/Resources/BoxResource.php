@@ -22,8 +22,8 @@ class BoxResource extends JsonResource
             'reference' => $this->reference,
             'latitude'=> $this->latitude,
             'longitude'=> $this->longitude,
-            'total_ports' => $this->total_ports,
-            'available_ports' => $this->available_ports,
+            'totalPorts' => $this->total_ports,
+            'availablePorts' => $this->available_ports,
             'status' => $this->status,
         ];
     }

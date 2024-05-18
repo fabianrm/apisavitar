@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ServiceCollection;
 use App\Http\Resources\ServiceResource;
-use App\Models\Customer;
 use App\Models\Service;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
+use App\Services\UtilService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Filters\ServiceFilter;
 use Carbon\Carbon;
 
 class ServiceController extends Controller
@@ -51,7 +50,7 @@ class ServiceController extends Controller
           return response()->json(['data' => $transformedServices]); */
 
 
-        $services = Service::with(['customers', 'routers', 'plans'])->get();
+        $services = Service::with(['customers', 'routers', 'plans', 'cities'])->get();
         return new ServiceCollection($services);
 
 
@@ -70,13 +69,18 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request)
     {
-        // $request->validate([
-        //     'registration_date' => 'required|date_format:yyyy-MM-dd',
-        // ]);
-       // echo($request);
+        $contractService = app(UtilService::class);
 
-        return new ServiceResource(Service::create($request->all()));
-       
+        // Genera un código único para el cliente
+        $uniqueCode = $contractService->generateUniqueCodeSavitar('CT');
+
+        $service = new Service($request->all());
+        $service->service_code = $uniqueCode;
+        $service->save();
+
+        return new ServiceResource($service);
+        //return new ServiceResource(Service::create($request->all()));
+
     }
 
     /**
@@ -84,7 +88,7 @@ class ServiceController extends Controller
      */
     public function show(Service $service)
     {
-        //
+        return new ServiceResource($service);
     }
 
     /**
@@ -100,7 +104,7 @@ class ServiceController extends Controller
      */
     public function update(UpdateServiceRequest $request, Service $service)
     {
-        //
+        $service->update($request->all());
     }
 
     /**

@@ -20,6 +20,7 @@ class ServiceCollection extends ResourceCollection
             'services' => $this->collection->map(function ($service) {
                 return [
                     'id' => $service->id,
+                    'service_code'=> $service->service_code,
                     'router_ip' => $service->routers->ip,
                     'customer_name' => $service->customers->name,
                     'plan_name' => $service->plans->name,
@@ -30,9 +31,11 @@ class ServiceCollection extends ResourceCollection
                     'recurrent' => $service->recurrent,
                     'due_date' => $service->due_date,
                     'address_instalation' => $service->address_instalation,
-                    'city' => $service->city,
+                    'reference' => $service->reference,
+                    'city' => $service->cities->name,
                     'latitude' => $service->latitude,
                     'longitude' => $service->longitude,
+                    'equipment_id' => $service->equipment_id,
                     'is_active' => $service->is_active,
                     'status' => $service->status,
                 ];

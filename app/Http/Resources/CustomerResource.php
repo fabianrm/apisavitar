@@ -17,6 +17,7 @@ class CustomerResource extends JsonResource
         return [
             "id" => $this->id,
             'type' => $this->type,
+            'client_code' => $this->client_code,
             'document_number' => $this->document_number,
             'name' => $this->name,
             'address' => $this->address,
@@ -26,6 +27,7 @@ class CustomerResource extends JsonResource
             'phone_number' => $this->phone_number,
             'email' => $this->email,
             'status' => $this->status,
+            'updated_at' => $this->updated_at,
             'service' => ServiceResource::collection($this->whenLoaded('services')),
         ];
 

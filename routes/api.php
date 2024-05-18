@@ -30,7 +30,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('cities', CityController::class);
     Route::apiResource('equipments', EquipmentController::class);
     Route::get('/ports/{box_id}', [ServiceController::class, 'getPorts']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::delete('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
     // Route::apiResource('invoices', InvoiceController::class);
-
 
 });

@@ -29,6 +29,7 @@ class UpdateEquipmentRequest extends FormRequest
                 'serie' => ['required'],
                 'model' => ['required'],
                 'brand' => ['required'],
+                'purchase_date' => ['required'],
                 'status' => ['required']
             ];
         } else {
@@ -37,6 +38,7 @@ class UpdateEquipmentRequest extends FormRequest
                 'serie' => ['sometimes', 'required'],
                 'model' => ['sometimes', 'required'],
                 'brand' => ['sometimes', 'required'],
+                'purchase_date' => ['sometimes', 'required'],
                 'status' => ['sometimes', 'required']
             ];
         }
