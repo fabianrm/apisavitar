@@ -30,15 +30,16 @@ class StoreServiceRequest extends FormRequest
             'portNumber'=> ['required'],
             'equipmentId'=> ['required'],
             'cityId'=> ['required'],
-            'addressInstalation'=> ['required'],
+            'addressInstallation'=> ['required'],
             'reference' => [''],
             'registrationDate'=> ['required'],
-            'instalationDate'=> ['required'],
+            'installationDate'=> ['required'],
             'latitude' => [''],
             'longitude' => [''],
             'billingDate'=> ['required'],
             'dueDate'=> ['required'],
-            'status'=> ['required']
+            'status'=> ['required'],
+            'endDate'=> ['']
         ];
     }
 
@@ -53,11 +54,12 @@ class StoreServiceRequest extends FormRequest
             'port_number' => $this->portNumber,
             'equipment_id' => $this->equipmentId,
             'city_id' => $this->cityId,
-            'address_instalation' => $this->addressInstalation,
+            'address_installation' => $this->addressInstallation,
             'registration_date' => $this->registrationDate,
-            'instalation_date' => $this->instalationDate,
+            'installation_date' => $this->installationDate,
             'billing_date' => $this->billingDate,
             'due_date' => $this->dueDate,
+            'end_date' => $this->endDate,
         ]);
     }
 

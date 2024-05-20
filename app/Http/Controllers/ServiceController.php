@@ -72,7 +72,7 @@ class ServiceController extends Controller
         $contractService = app(UtilService::class);
 
         // Genera un código único para el cliente
-        $uniqueCode = $contractService->generateUniqueCodeSavitar('CT');
+        $uniqueCode = $contractService->generateUniqueCodeService('CT');
 
         $service = new Service($request->all());
         $service->service_code = $uniqueCode;
@@ -123,4 +123,60 @@ class ServiceController extends Controller
         $results = DB::select('CALL obtenerPuertosDisponibles(?)', [$box_id]);
         return response()->json($results);
     }
+
+    /****
+     * Cambiar de Plan
+     */
+
+    public function updatePlan(Request $request, Service $contract)
+    {
+        $request->validate([
+            'plan_id' => 'required|exists:plans,id',
+        ]);
+
+        // Finalizamos el contrato actual
+        $contract->update([
+            'status' => 'terminado',
+            'end_date' => now(),
+        ]);
+
+        //Creamos un nuevo contrato con el nuevo plan
+
+        $contractService = app(UtilService::class);
+
+        // Genera un código único para el cliente
+        $uniqueCode = $contractService->generateUniqueCodeService('CT');
+
+        // $service = new Service($request->all());
+        // $service->service_code = $uniqueCode;
+
+        $newContract = Service::create([
+            'service_code' => $uniqueCode,
+            'customer_id' => $contract->customer_id,
+            'plan_id' => $request->plan_id,
+            'router_id' => $contract->router_id,
+            'box_id' => $contract->box_id,
+            'port_number' => $contract->port_number,
+            'equipment_id' => $contract->equipment_id,
+            'city_id' => $contract->city_id,
+            'address_installation' => $contract->address_installation,
+            'reference' => $contract->reference,
+            'registration_date' => now(),
+            'installation_date' => $contract->installation_date,
+            'latitude' => $contract->latitude,
+            'longitude' => $contract->longitude,
+            'billing_date' => $contract->billing_date,
+            'due_date' => $contract->due_date,
+            'status' => 'activo',
+        ]);
+
+        return response()->json([
+            'old_contract' => $contract,
+            'new_contract' => $newContract,
+        ], 201);
+
+
+    }
+
+
 }

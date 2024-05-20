@@ -18,7 +18,9 @@ return new class extends Migration
             $table->decimal('igv', 8,2);
             $table->decimal('discount', 8, 2)->default(0.00);
             $table->string('letter_amount');
-            $table->date('billed_dated');
+            $table->date('due_date');
+            $table->date('start_date');
+            $table->date('end_date');
             $table->date('paid_dated')->nullable();
             $table->enum('status', ['pending', 'paid', 'overdue'])->default('pending');
             $table->timestamps();

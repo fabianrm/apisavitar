@@ -29,6 +29,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('invoices', InvoiceController::class);
     Route::apiResource('cities', CityController::class);
     Route::apiResource('equipments', EquipmentController::class);
+    Route::patch('/services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
+    Route::post('/invoices/generate', [InvoiceController::class, 'generateInvoices']);
     Route::get('/ports/{box_id}', [ServiceController::class, 'getPorts']);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);

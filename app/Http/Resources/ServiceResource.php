@@ -25,15 +25,17 @@ class ServiceResource extends JsonResource
             'portNumber' => $this->port_number,
             'equipmentId' => $this->equipment_id,
             'cityId' => $this->city_id,
-            'addressInstalation' => $this->address_instalation,
+            'addressInstallation' => $this->address_installation,
             'reference' => $this->reference,
             'registrationDate' => $this->registration_date,
-            'instalationDate' => $this->instalation_date,
+            'installationDate' => $this->installation_date,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'billingDate' => $this->billing_date,
             'dueDate' => $this->due_date,
-            'status' => $this->status
+            'status' => $this->status,
+            'endDate' => $this->end_date,
+            
         ];
 
         // return parent::toArray($request);

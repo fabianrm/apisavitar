@@ -32,15 +32,16 @@ class UpdateServiceRequest extends FormRequest
                 'portNumber' => ['required'],
                 'equipmentId' => ['required'],
                 'cityId' => ['required'],
-                'addressInstalation' => ['required'],
+                'addressInstallation' => ['required'],
                 'reference',
                 'registrationDate' => ['required'],
-                'instalationDate' => ['required'],
+                'installationDate' => ['required'],
                 'latitude',
                 'longitude',
                 'billingDate' => ['required'],
                 'dueDate' => ['required'],
-                'status' => ['required']
+                'status' => ['required'],
+                'endDate' => ['required']
             ];
         } else {
             return [
@@ -52,15 +53,16 @@ class UpdateServiceRequest extends FormRequest
                 'portNumber' => ['sometimes','required'],
                 'equipmentId' => ['sometimes','required'],
                 'cityId' => ['sometimes','required'],
-                'addressInstalation' => ['sometimes','required'],
+                'addressInstallation' => ['sometimes','required'],
                 'reference' => ['sometimes', 'required'],
                 'registrationDate' => ['sometimes','required'],
-                'instalationDate' => ['sometimes','required'],
+                'installationDate' => ['sometimes','required'],
                 'latitude' => ['sometimes', 'required'],
                 'longitude' => ['sometimes', 'required'],
                 'billingDate' => ['sometimes','required'],
                 'dueDate' => ['sometimes','required'],
-                'status' => ['sometimes','required']
+                'status' => ['sometimes','required'],
+                'endDate' => ['sometimes','required'],
             ];
         }
     }
@@ -76,10 +78,11 @@ class UpdateServiceRequest extends FormRequest
             'port_number' => $this->portNumber,
             'equipment_id' => $this->equipmentId,
             'city_id' => $this->cityId,
-            'address_instalation' => $this->addressInstalation,
+            'address_installation' => $this->addressInstallation,
             'registration_date' => $this->registrationDate,
-            'instalation_date' => $this->instalationDate,
+            'installation_date' => $this->installationDate,
             'billing_date' => $this->billingDate,
+            'end_date' => $this->endDate,
         ]);
     }
 }

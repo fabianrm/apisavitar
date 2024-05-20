@@ -18,16 +18,29 @@ class Service extends Model
         'port_number',
         'equipment_id',
         'city_id',
-        'address_instalation',
+        'address_installation',
         'reference',
         'registration_date',
-        'instalation_date',
+        'installation_date',
         'latitude',
         'longitude',
         'billing_date',
         'due_date',
-        'status'
+        'status',
+        'end_date'
     ];
+
+
+    /**
+     * Get all of the invoices for the Service
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'service_id');
+    }
+
 
 
     /**
@@ -51,16 +64,6 @@ class Service extends Model
         return $this->belongsTo(Plan::class, "plan_id");
     }
 
-
-    /**
-     * Get all of the invoices for the Service
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function invoices()
-    {
-        return $this->hasMany(Invoice::class);
-    }
 
     public function boxes()
     {

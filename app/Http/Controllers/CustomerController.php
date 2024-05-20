@@ -48,7 +48,7 @@ class CustomerController extends Controller
         $clientService = app(UtilService::class);
 
         // Genera un código único para el cliente
-        $uniqueCode = $clientService->generateUniqueCodeSavitar('CS');
+        $uniqueCode = $clientService->generateUniqueCodeCustomer('CS');
 
         // Almacena el nuevo cliente con el código único
         $customer = new Customer($request->all());

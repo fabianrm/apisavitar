@@ -8,7 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Invoice extends Model
 {
     use HasFactory;
-    protected $fillable = [];
+    protected $fillable = [
+        'service_id',
+        'amount',
+        'igv',
+        'discount',
+        'letter_amount',
+        'due_date',
+        'start_date',
+        'end_date',
+        'paid_dated',
+        'status'
+    ];
 
 
     /**
@@ -16,9 +27,9 @@ class Invoice extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function Services()
+    public function service()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(Service::class, 'service_id');
     }
 
 }

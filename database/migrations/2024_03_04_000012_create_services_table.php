@@ -25,10 +25,10 @@ return new class extends Migration {
 
             $table->unsignedBigInteger('city_id');
 
-            $table->string('address_instalation')->nullable();
+            $table->string('address_installation')->nullable();
             $table->string('reference')->nullable();
             $table->date('registration_date');
-            $table->date('instalation_date');
+            $table->date('installation_date');
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             

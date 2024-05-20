@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateInvoiceRequest;
 use App\Http\Resources\InvoiceCollection;
 use Illuminate\Http\Request;
 use App\Filters\InvoiceFilter;
+use App\Services\InvoiceService;
+
 
 class InvoiceController extends Controller
 {
@@ -40,7 +42,7 @@ class InvoiceController extends Controller
      */
     public function store(StoreInvoiceRequest $request)
     {
-        //
+
     }
 
     /**
@@ -73,5 +75,20 @@ class InvoiceController extends Controller
     public function destroy(Invoice $invoice)
     {
         //
+    }
+
+    /***
+     * Generar facturas
+     */
+
+    public function generateInvoices()
+    {
+        $invoiceService = app(InvoiceService::class);
+
+        $invoiceService->generateMonthlyInvoices();
+
+       return response()->json(['message' => 'Monthly invoices generated successfully.']);
+
+
     }
 }
