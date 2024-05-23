@@ -9,13 +9,13 @@ class InvoiceFilter extends ApiFilter
     protected $safeParams = [
         'serviceId' => ['eq'],
         'amount' => ['eq', 'gt','gte', 'lt', 'lte'],
-        'billedDated' => ['eq'],
+        'dueDated' => ['eq'],
         'paidDated' => ['eq', 'gt', 'gte', 'lt', 'lte'],
         'status' => ['eq', 'ne'],
     ];
     protected $columnMap = [
         'serviceId' => 'service_id',
-        'billedDate' => 'billed_dated',
+        'dueDate' => 'due_dated',
         'paidDate' => 'paid_dated'
     ];
     protected $operatorMap = [

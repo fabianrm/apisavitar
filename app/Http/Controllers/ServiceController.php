@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ModelNotFoundException;
 use App\Http\Resources\ServiceCollection;
 use App\Http\Resources\ServiceResource;
 use App\Models\Service;
@@ -19,16 +20,7 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        /*   $filter = new ServiceFilter();
-          $queryItems = $filter->transform($request);
-
-          if (count($queryItems) == 0) {
-              return new ServiceCollection(Service::paginate());
-          } else {
-              $services = Service::where($queryItems)->paginate();
-              return new ServiceCollection($services->appends($request->query()));
-          } */
-
+       
 
 
         // $customers = Customer::all();
@@ -86,8 +78,14 @@ class ServiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Service $service)
+    public function show($id)
     {
+        $service = Service::find($id);
+
+        if(!$service){
+            throw new ModelNotFoundException('Service not found');
+        }
+        
         return new ServiceResource($service);
     }
 

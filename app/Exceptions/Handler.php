@@ -8,6 +8,17 @@ use Throwable;
 class Handler extends ExceptionHandler
 {
     /**
+     * A list of the exception types that are not reported.
+     *
+     * @var array<int, class-string<Throwable>>
+     */
+    protected $dontReport = [
+            // ...
+        ModelNotFoundException::class,
+    ];
+
+
+    /**
      * The list of the inputs that are never flashed to the session on validation exceptions.
      *
      * @var array<int, string>
@@ -25,6 +36,10 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        $this->renderable(function (ModelNotFoundException $e, $request) {
+            return $e->render($request);
         });
     }
 }

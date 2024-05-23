@@ -22,7 +22,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->date('paid_dated')->nullable();
-            $table->enum('status', ['pending', 'paid', 'overdue'])->default('pending');
+            $table->enum('status', ['pendiente', 'pagada', 'vencida'])->default('pendiente');
             $table->timestamps();
 
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');

@@ -14,6 +14,25 @@ class InvoiceCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        //return parent::toArray($request);
+
+        return [
+            'invoices' => $this->collection->map(function ($invoice) {
+                return [
+                    'invoiceId' => $invoice->id,
+                    'contractId' => $invoice->service->service_code,
+                    'amount' => $invoice->amount,
+                    'dueDate' => $invoice->due_date,
+                    'status' => $invoice->status,
+                    'discount' => $invoice->discount,
+                    'startDate' => $invoice->start_date,
+                    'endDate' => $invoice->end_date,
+                    'customerName' => $invoice->service->customers->name,
+                    'planName' => $invoice->service->plans->name,
+
+                ];
+
+            })
+        ];
     }
 }
