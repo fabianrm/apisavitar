@@ -38,6 +38,8 @@ class InvoiceService
                 'due_date' => $endDate->copy()->addDays(5),//due_date 5 days after end date for example
                 'start_date' => $startDate,
                 'end_date' => $endDate,
+                'receipt' => "",
+                'note' => "",
                 'status' => 'pending',
             ]);
             \Log::info("Created invoice for service_id: {$service->id} from {$startDate} to {$endDate}");
@@ -51,6 +53,7 @@ class InvoiceService
 
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
+        $totalInvoices = 0;
 
         $services = Service::where('status', 'activo')->get();
 
@@ -81,18 +84,25 @@ class InvoiceService
             // Crear la nueva factura solo si pertenece al mes en curso
             Invoice::create([
                 'service_id' => $service->id,
-                'amount' => $service->plans->price,
+                'price' => $service->plans->price,
                 'igv' => 0.00,
                 'discount' => 0.00,
-                'letter_amount' => "",
+                'amount' => 0.00,
+                'letter_amount' => null,
                 'due_date' => $endDate->copy()->addDays(5),//due_date 5 days after end date for example
                 'start_date' => $startDate,
                 'end_date' => $endDate,
+                'paid_dated' => null,
+                'receipt' => null,
+                'note' => null,
                 'status' => 'pendiente',
             ]);
 
+            $totalInvoices++;
+
             \Log::info("Factura creada para service_id: {$service->id} from {$startDate} to {$endDate}");
         }
+        return $totalInvoices;
     }
 
 

@@ -11,7 +11,7 @@ class UpdateInvoiceRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,42 @@ class UpdateInvoiceRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        $method = $this->method();
+        if ($method === "POST") {
+            return [
+                'serviceId' => ['required'],
+                'price' => ['required'],
+                'igv' => [''],
+                'discount' => [''],
+                'amount' => ['required'],
+                'letterAmount' => [''],
+                'dueDate' => [''],
+                'startDate' => [''],
+                'endDate' => [''],
+                'paidDated' => ['required'],
+                'receipt' => [''],
+                'note' => [''],
+                'status' => ['required'],
+            ];
+        } else {
+            return [
+                'serviceId' => ['sometimes'],
+                'price' => ['sometimes',],
+                'igv' => ['sometimes', ''],
+                'discount' => ['sometimes', ''],
+                'amount' => ['sometimes', 'required'],
+                'letterAmount' => ['sometimes', ''],
+                'dueDate' => ['sometimes', ''],
+                'startDate' => ['sometimes', ''],
+                'endDate' => ['sometimes', ''],
+                'paidDated' => ['sometimes', 'required'],
+                'receipt' => ['sometimes', ''],
+                'note' => ['sometimes', ''],
+                'status' => ['sometimes', 'required'],
+            ];
+        }
     }
+
+   
+
 }

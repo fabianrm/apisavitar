@@ -14,14 +14,17 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('service_id');
-            $table->decimal('amount', 8, 2);
-            $table->decimal('igv', 8,2);
+            $table->decimal('price', 8, 2)->default(0.00);
+            $table->decimal('igv', 8,2)->default(0.00);
             $table->decimal('discount', 8, 2)->default(0.00);
-            $table->string('letter_amount');
+            $table->decimal('amount', 8, 2)->default(0.00);
+            $table->string('letter_amount')->nullable();
             $table->date('due_date');
             $table->date('start_date');
             $table->date('end_date');
             $table->date('paid_dated')->nullable();
+            $table->string('receipt')->nullable();
+            $table->string('note')->nullable();
             $table->enum('status', ['pendiente', 'pagada', 'vencida'])->default('pendiente');
             $table->timestamps();
 

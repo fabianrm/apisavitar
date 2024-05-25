@@ -77,7 +77,7 @@ class InvoiceController extends Controller
      */
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)
     {
-        //
+        $invoice->update($request->all());
     }
 
     /**
@@ -105,8 +105,14 @@ class InvoiceController extends Controller
     public function generateInvoicesMonth()
     {
         $invoiceService = app(InvoiceService::class);
-        $invoiceService->generateCurrentMonthInvoices();
-        return response()->json(['message' => 'Facturas del mes generadas correctamente.']);
+        $totalInvoices = $invoiceService->generateCurrentMonthInvoices();
+        //return response()->json(['Facturas del mes generadas correctamente']);
+        return response()->json(
+            [
+                'totalInvoices' => $totalInvoices,
+                'message' => $totalInvoices . ' facturas generadas'
+            ]
+        );
     }
 
 
@@ -137,4 +143,83 @@ class InvoiceController extends Controller
 
         // return response()->json($result);
     }
+
+
+//Search
+    public function searchInvoices2(Request $request)
+    {
+        $query = Invoice::query();
+        $perPage = $request->input('perPage', 10);
+
+        // Filtrar por estado de la factura
+        if ($request->has('status')) {
+            $query->where('status', $request->input('status'))
+            ->orderBy('start_date', 'desc');
+        }
+
+        // Filtrar por rango de fechas
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('start_date', [
+                $request->input('start_date'),
+                $request->input('start_date')
+            ]);
+        }
+
+        // Filtrar por nombre de cliente
+        if ($request->has('customer_name')) {
+            $customerName = $request->input('customer_name');
+            $query->whereHas('service.customers', function ($query) use ($customerName) {
+                $query->where('name', 'like', "%{$customerName}%");
+            });
+        }
+
+        //return response()->json($invoices);
+
+        // Usar la paginación de Laravel
+        $invoices = $query->with(['service.customers', 'service.plans'])->paginate($perPage);
+        return new InvoiceCollection($invoices);
+//       
+    }
+
+
+
+
+
+    public function searchInvoices(Request $request)
+    {
+        $query = Invoice::query();
+
+        //Join with the Service and Customer tables to allow filtering by customer name
+        $query->join('services', 'invoices.service_id', '=', 'services.id')
+            ->join('customers', 'services.customer_id', '=', 'customers.id')
+            ->select('invoices.*');
+
+        // Filtrar por estado si se proporciona
+        if ($request->has('status') && $request->input('status') !== null) {
+            $query->where('invoices.status', $request->input('status'));
+        }
+
+        // Filtrar por rango de fechas si se proporciona
+        if ($request->has('start_date') && $request->has('end_date') && $request->input('start_date') !== null && $request->input('end_date') !== null) {
+            $query->whereBetween('invoices.start_date', [
+                $request->input('start_date'),
+                $request->input('start_date')
+            ]);
+        }
+
+        // Filtrar por nombre del cliente si se proporciona
+        if ($request->has('customer_name') && $request->input('customer_name') !== null) {
+            $query->where('customers.name', 'like', '%' . $request->input('customer_name') . '%');
+        }
+
+        // Usar la paginación de Laravel
+        $invoices = $query->with(['service.customers', 'service.plans'])->paginate(10);
+
+       // return response()->json($invoices);
+        return new InvoiceCollection($invoices);
+    }
+
+
+
+
 }

@@ -15,24 +15,32 @@ class InvoiceCollection extends ResourceCollection
     public function toArray(Request $request): array
     {
         //return parent::toArray($request);
-
+        //Forma corta(debe usarse)
         return [
-            'invoices' => $this->collection->map(function ($invoice) {
-                return [
-                    'invoiceId' => $invoice->id,
-                    'contractId' => $invoice->service->service_code,
-                    'amount' => $invoice->amount,
-                    'dueDate' => $invoice->due_date,
-                    'status' => $invoice->status,
-                    'discount' => $invoice->discount,
-                    'startDate' => $invoice->start_date,
-                    'endDate' => $invoice->end_date,
-                    'customerName' => $invoice->service->customers->name,
-                    'planName' => $invoice->service->plans->name,
-
-                ];
-
-            })
+            'data' => $this->collection
         ];
+
+        // return [
+        //     'invoices' => $this->collection->map(function ($invoice) {
+        //         return [
+        //             'invoiceId' => $invoice->id,
+        //             'contractId' => $invoice->service->service_code,
+        //             'customerName' => $invoice->service->customers->name,
+        //             'planName' => $invoice->service->plans->name,
+        //             'price' => $invoice->price,
+        //             'discount' => $invoice->discount,
+        //             'amount' => $invoice->amount,
+        //             'startDate' => $invoice->start_date,
+        //             'endDate' => $invoice->end_date,
+        //             'dueDate' => $invoice->due_date,
+        //             'paidDated' => $invoice->paid_dated,
+        //             'receipt' => $invoice->receipt,
+        //             'note' => $invoice->note,
+        //             'status' => $invoice->status,
+
+        //         ];
+
+        //     })
+        // ];
     }
 }

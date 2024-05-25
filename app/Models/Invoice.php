@@ -11,14 +11,17 @@ class Invoice extends Model
     protected $fillable = [
         'id',
         'service_id',
-        'amount',
+        'price',
         'igv',
         'discount',
+        'amount',
         'letter_amount',
         'due_date',
         'start_date',
         'end_date',
         'paid_dated',
+        'receipt',
+        'note',
         'status'
     ];
 
