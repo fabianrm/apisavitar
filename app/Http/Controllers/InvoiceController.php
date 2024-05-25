@@ -203,7 +203,7 @@ class InvoiceController extends Controller
         if ($request->has('start_date') && $request->has('end_date') && $request->input('start_date') !== null && $request->input('end_date') !== null) {
             $query->whereBetween('invoices.start_date', [
                 $request->input('start_date'),
-                $request->input('start_date')
+                $request->input('end_date')
             ]);
         }
 
