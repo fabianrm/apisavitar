@@ -126,26 +126,10 @@ class InvoiceController extends Controller
 
         return new InvoiceCollection($invoices);
 
-        // $result = $invoices->map(function ($invoice) {
-        //     return [
-        //         'invoice_id' => $invoice->id,
-        //         'contract_id' => $invoice->service->service_code,
-        //         'amount' => $invoice->amount,
-        //         'due_date' => $invoice->due_date,
-        //         'status' => $invoice->status,
-        //         'discount' => $invoice->discount,
-        //         'start_date' => $invoice->start_date,
-        //         'end_date' => $invoice->end_date,
-        //         'customer_name' => $invoice->service->customers->name,
-        //         'plan_name' => $invoice->service->plans->name,
-        //     ];
-        // });
-
-        // return response()->json($result);
     }
 
 
-//Search
+    //Search
     public function searchInvoices2(Request $request)
     {
         $query = Invoice::query();
@@ -154,7 +138,7 @@ class InvoiceController extends Controller
         // Filtrar por estado de la factura
         if ($request->has('status')) {
             $query->where('status', $request->input('status'))
-            ->orderBy('start_date', 'desc');
+                ->orderBy('start_date', 'desc');
         }
 
         // Filtrar por rango de fechas
@@ -178,16 +162,15 @@ class InvoiceController extends Controller
         // Usar la paginación de Laravel
         $invoices = $query->with(['service.customers', 'service.plans'])->paginate($perPage);
         return new InvoiceCollection($invoices);
-//       
+        //       
     }
 
 
-
-
-
+    //Funcion para listar invoices, con parametros de busqueda
     public function searchInvoices(Request $request)
     {
         $query = Invoice::query();
+        $perPage = $request->input('perPage', 15);
 
         //Join with the Service and Customer tables to allow filtering by customer name
         $query->join('services', 'invoices.service_id', '=', 'services.id')
@@ -213,9 +196,9 @@ class InvoiceController extends Controller
         }
 
         // Usar la paginación de Laravel
-        $invoices = $query->with(['service.customers', 'service.plans'])->paginate(10);
+        $invoices = $query->with(['service.customers', 'service.plans'])->paginate($perPage);
 
-       // return response()->json($invoices);
+        // return response()->json($invoices);
         return new InvoiceCollection($invoices);
     }
 
