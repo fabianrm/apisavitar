@@ -25,6 +25,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
     Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
     Route::get('invoices/search', [InvoiceController::class, 'searchInvoices']);
+    Route::get('invoices/export', [InvoiceController::class, 'exportInvoices']);
+
+    Route::get('services/by-customer/{customer_id}', [ServiceController::class, 'getServicesByCustomer']);
    // Route::get('invoices/searchq', [InvoiceController::class, 'searchInvoices2']);
 
     Route::apiResource('customers', CustomerController::class);

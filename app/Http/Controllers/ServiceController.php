@@ -177,4 +177,27 @@ class ServiceController extends Controller
     }
 
 
+    /**
+     * Retrieve contracts by customer ID.
+     *
+     * @param int $customer_id
+     * 
+     */
+    public function getServicesByCustomer($customer_id)
+    {
+        // Validar el ID del cliente
+        if (!is_numeric($customer_id)) {
+            return response()->json(['error' => 'Invalid customer ID'], 400);
+        }
+
+        // Obtener los contratos asociados al ID del cliente
+        $services = Service::where('customer_id', $customer_id)->get();
+
+        // Retornar los contratos en formato JSON
+        return new ServiceCollection($services);
+       // return response()->json($contracts, 200);
+    }
+
+
+
 }

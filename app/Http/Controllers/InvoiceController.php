@@ -11,6 +11,8 @@ use App\Http\Resources\InvoiceCollection;
 use Illuminate\Http\Request;
 use App\Filters\InvoiceFilter;
 use App\Services\InvoiceService;
+use App\Exports\InvoicesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class InvoiceController extends Controller
@@ -202,6 +204,13 @@ class InvoiceController extends Controller
         return new InvoiceCollection($invoices);
     }
 
+
+    //Exportar facturas
+    public function exportInvoices(Request $request)
+    {
+        $filters = $request->only(['status', 'start_date', 'end_date', 'customer_name']);
+        return Excel::download(new InvoicesExport($filters), 'invoices.xlsx');
+    }
 
 
 
