@@ -18,17 +18,23 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        $filter = new CustomerFilter();
-        $queryItems = $filter->transform($request);
-        $includeServices = $request->query('includeServices');
-        $customers = Customer::where($queryItems);
-
-        if ($includeServices) {
-            $customers = $customers->with('services');
-        }
-        //return new CustomerCollection($customers->paginate()->appends($request->query()));
-        $customers = Customer::all();
+        // Obtener los clientes junto con el total de contratos
+        $customers = Customer::withCount('services')->get();
+        // Retornar la colección de clientes con el total de contratos
         return new CustomerCollection($customers);
+
+
+        // $filter = new CustomerFilter();
+        // $queryItems = $filter->transform($request);
+        // $includeServices = $request->query('includeServices');
+        // $customers = Customer::where($queryItems);
+
+        // if ($includeServices) {
+        //     $customers = $customers->with('services');
+        // }
+        // //return new CustomerCollection($customers->paginate()->appends($request->query()));
+        // $customers = Customer::all();
+        // return new CustomerCollection($customers);
     }
 
     /**
@@ -96,5 +102,19 @@ class CustomerController extends Controller
     public function destroy(Customer $customer)
     {
         //
+    }
+
+
+    /**
+     * Retrieve customers with their total number of contracts.
+     *
+     */
+    public function getCustomersWithContracts()
+    {
+        // Obtener los clientes junto con el total de contratos
+        $customers = Customer::withCount('services')->get();
+
+        // Retornar la colección de clientes con el total de contratos
+        return new CustomerCollection($customers);
     }
 }

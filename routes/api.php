@@ -28,6 +28,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('invoices/export', [InvoiceController::class, 'exportInvoices']);
 
     Route::get('services/by-customer/{customer_id}', [ServiceController::class, 'getServicesByCustomer']);
+    Route::get('/customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
+
    // Route::get('invoices/searchq', [InvoiceController::class, 'searchInvoices2']);
 
     Route::apiResource('customers', CustomerController::class);
