@@ -8,8 +8,10 @@ use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\CustomerCollection;
 use App\Services\UtilService;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
-use App\Filters\CustomerFilter;
+use App\Exports\CustomersExport;
+
 
 class CustomerController extends Controller
 {
@@ -116,5 +118,14 @@ class CustomerController extends Controller
 
         // Retornar la colección de clientes con el total de contratos
         return new CustomerCollection($customers);
+    }
+
+
+    /***
+     * Retornar listado de clientes para boot en excel
+     */
+    public function exportCustomers()
+    {
+        return Excel::download(new CustomersExport, 'customers.xlsx');
     }
 }
