@@ -12,8 +12,6 @@ class RouterSeeder extends Seeder
      */
     public function run(): void
     {
-        Router::factory()
-        ->count(2)
-        ->create();
+       
     }
 }

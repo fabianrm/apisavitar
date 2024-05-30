@@ -12,8 +12,6 @@ class BoxSeeder extends Seeder
      */
     public function run(): void
     {
-        Box::factory()
-        ->count(20)
-        ->create();
+      
     }
 }

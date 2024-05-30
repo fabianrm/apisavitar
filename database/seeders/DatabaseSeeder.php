@@ -24,12 +24,17 @@ class DatabaseSeeder extends Seeder
             $this->call(RouterSeeder::class);
             $this->call(BoxSeeder::class); */
 
+        // $this->call([
+        //     RouterSeeder::class,
+        //     BoxSeeder::class,
+        //     PlanSeeder::class,
+        //     CustomerSeeder::class,
+        //     ServiceSeeder::class
+        // ]);
+
         $this->call([
-            RouterSeeder::class,
-            BoxSeeder::class,
-            PlanSeeder::class,
-            CustomerSeeder::class,
-            ServiceSeeder::class
+           NumberSeeder::class,
+          
         ]);
 
 
