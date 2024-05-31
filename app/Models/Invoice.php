@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Invoice extends Model
 {
@@ -22,7 +23,9 @@ class Invoice extends Model
         'paid_dated',
         'receipt',
         'note',
-        'status'
+        'status',
+        'created_by',
+        'updated_by',
     ];
 
 
@@ -34,6 +37,24 @@ class Invoice extends Model
     public function service()
     {
         return $this->belongsTo(Service::class, 'service_id');
+    }
+
+    /**
+     * Capturar usuario
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->created_by = Auth::id();
+            $model->updated_by = Auth::id();
+        });
+
+        static::updating(function ($model) {
+            $model->updated_by = Auth::id();
+        });
     }
 
 }

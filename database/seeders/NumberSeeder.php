@@ -19,7 +19,7 @@ class NumberSeeder extends Seeder
         // Insertar cada número en la tabla 'numbers'
         foreach ($numbers as $number) {
             DB::table('numbers')->insert([
-                'port_number' => $number,
+                'num' => $number,
             ]);
         }
     }

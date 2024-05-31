@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Customer extends Model
 {
@@ -19,7 +20,30 @@ class Customer extends Model
         'phone_number',
         'email',
         'status',
+        'created_by',
+        'updated_by',
     ];
+
+
+    /**
+     * Capturar usuario
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->created_by = Auth::id();
+            $model->updated_by = Auth::id();
+        });
+
+        static::updating(function ($model) {
+            $model->updated_by = Auth::id();
+        });
+    }
+
+
 
     /**
      * Get all of the services for the Customer
@@ -30,6 +54,8 @@ class Customer extends Model
     {
         return $this->hasMany(Service::class);
     }
+
+
 
 
 

@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\EquipmentCollection;
 use App\Http\Resources\EquipmentResource;
-use App\Models\equipment;
-use App\Http\Requests\StoreequipmentRequest;
-use App\Http\Requests\UpdateequipmentRequest;
+use App\Models\Equipment;
+use App\Http\Requests\StoreEquipmentRequest;
+use App\Http\Requests\UpdateEquipmentRequest;
 
 class EquipmentController extends Controller
 {

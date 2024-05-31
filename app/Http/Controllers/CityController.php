@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CityCollection;
-use App\Models\city;
+use App\Models\City;
 use App\Http\Requests\StorecityRequest;
 use App\Http\Requests\UpdatecityRequest;
 

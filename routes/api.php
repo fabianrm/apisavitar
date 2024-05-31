@@ -28,12 +28,21 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('invoices/export', [InvoiceController::class, 'exportInvoices']);
 
     Route::get('services/by-customer/{customer_id}', [ServiceController::class, 'getServicesByCustomer']);
-    Route::get('/customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
-    Route::get('/export-customers', [CustomerController::class, 'exportCustomers']);
+    Route::get('customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
+    Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
 
-   // Route::get('invoices/searchq', [InvoiceController::class, 'searchInvoices2']);
+    Route::middleware(['auth:sanctum'])->group(function () {
 
-    Route::apiResource('customers', CustomerController::class);
+        Route::apiResource('customers', CustomerController::class);
+        // Route::get('/protected-route', 'ProtectedController@protectedMethod');
+        //Route::post('/protected-route', 'ProtectedController@store');
+        // Otras rutas protegidas...
+    });
+
+
+    // Route::get('invoices/searchq', [InvoiceController::class, 'searchInvoices2']);
+
+    // Route::apiResource('customers', CustomerController::class);
     Route::apiResource('plans', PlanController::class);
     Route::apiResource('boxs', BoxController::class);
     Route::apiResource('routers', RouterController::class);
@@ -41,11 +50,11 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('invoices', InvoiceController::class);
     Route::apiResource('cities', CityController::class);
     Route::apiResource('equipments', EquipmentController::class);
-    
+
     Route::get('/ports/{box_id}', [ServiceController::class, 'getPorts']);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::delete('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-  
+
 
 });
