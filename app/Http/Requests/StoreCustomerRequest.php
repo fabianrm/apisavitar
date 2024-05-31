@@ -26,7 +26,8 @@ class StoreCustomerRequest extends FormRequest
             'type' => ['required', Rule::in(['natural', 'juridica'])],
             'documentNumber' => ['required'],
             'name' => ['required'],
-            'client_code' => [''],
+            'clientCode' => [''],
+            'cityId' => ['required'],
             'address' => ['required'],
             'reference' => ['required'],
             'latitude' => ['required'],
@@ -40,6 +41,8 @@ class StoreCustomerRequest extends FormRequest
     {
         $this->merge([
             'document_number' => $this->documentNumber,
+            'client_code' => $this->clientCode,
+            'city_id' => $this->cityId,
             'phone_number' => $this->phoneNumber
         ]);
 

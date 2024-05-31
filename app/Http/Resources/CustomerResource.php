@@ -17,17 +17,19 @@ class CustomerResource extends JsonResource
         return [
             "id" => $this->id,
             'type' => $this->type,
-            'client_code' => $this->client_code,
-            'document_number' => $this->document_number,
-            'name' => $this->name,
+            'customerCode' => $this->client_code,
+            'documentNumber' => $this->document_number,
+            'customerName' => $this->name,
+            'city' => $this->cities->name,
             'address' => $this->address,
             'reference' => $this->reference,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
-            'phone_number' => $this->phone_number,
+            'phoneNumber' => $this->phone_number,
             'email' => $this->email,
             'status' => $this->status,
             'updated_at' => $this->updated_at,
+            'totalContracts' => $this->services_count,
             'service' => ServiceResource::collection($this->whenLoaded('services')),
         ];
 

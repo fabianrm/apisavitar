@@ -13,6 +13,7 @@ class Customer extends Model
         'type',
         'document_number',
         'name',
+        'city_id',
         'address',
         'reference',
         'latitude',
@@ -55,6 +56,10 @@ class Customer extends Model
         return $this->hasMany(Service::class);
     }
 
+    public function cities()
+    {
+        return $this->belongsTo(City::class, "city_id");
+    }
 
 
 

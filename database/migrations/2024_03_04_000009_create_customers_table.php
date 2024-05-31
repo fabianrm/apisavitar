@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('document_number')->unique();
             $table->string('name');
 
+            $table->unsignedBigInteger('city_id');
             $table->string('address')->nullable();
             $table->string('reference')->nullable();
             $table->string('latitude')->nullable();
@@ -26,6 +27,7 @@ return new class extends Migration {
             $table->string('email')->nullable();
             $table->boolean('status');
             $table->timestamps();
+            $table->foreign('city_id')->references('id')->on('cities');
 
         });
     }

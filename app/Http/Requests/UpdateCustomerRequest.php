@@ -28,6 +28,7 @@ class UpdateCustomerRequest extends FormRequest
                 'type' => ['required', Rule::in(['natural', 'juridica'])],
                 'documentNumber' => ['required'],
                 'name' => ['required'],
+                'cityId' => ['required'],
                 'address' => ['required'],
                 'reference' => ['required'],
                 'latitude' => ['required'],
@@ -41,6 +42,7 @@ class UpdateCustomerRequest extends FormRequest
                 'type' => ['sometimes', 'required', Rule::in(['natural', 'juridica'])],
                 'documentNumber' => ['sometimes', 'required'],
                 'name' => ['sometimes', 'required'],
+                'cityId' => ['sometimes','required'],
                 'address' => ['sometimes', 'required'],
                 'reference' => ['sometimes', 'required'],
                 'latitude' => ['sometimes', 'required'],
@@ -54,10 +56,11 @@ class UpdateCustomerRequest extends FormRequest
     }
     protected function prepareForValidation(): void
     {
-        if ($this->documentNumber || $this->phoneNumber) {
+        if ($this->documentNumber || $this->phoneNumber || $this->cityId) {
             $this->merge([
                 'document_number' => $this->documentNumber,
-                'phone_number' => $this->phoneNumber
+                'phone_number' => $this->phoneNumber,
+                'city_id' => $this->cityId
             ]);
         }
     }

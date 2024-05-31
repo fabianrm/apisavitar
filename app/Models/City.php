@@ -30,7 +30,15 @@ class City extends Model
         return $this->hasMany(Box::class);
     }
 
-
+    /**
+     * Get all of the boxes for the city
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
 
 
 }
