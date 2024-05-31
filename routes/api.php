@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function () {
 
     Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
+    
     Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
     Route::get('invoices/search', [InvoiceController::class, 'searchInvoices']);
     Route::get('invoices/export', [InvoiceController::class, 'exportInvoices']);
@@ -34,8 +35,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::apiResource('customers', CustomerController::class);
-        // Route::get('/protected-route', 'ProtectedController@protectedMethod');
-        //Route::post('/protected-route', 'ProtectedController@store');
+        Route::apiResource('services', ServiceController::class);
+        Route::apiResource('invoices', InvoiceController::class);
         // Otras rutas protegidas...
     });
 
@@ -46,12 +47,10 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('plans', PlanController::class);
     Route::apiResource('boxs', BoxController::class);
     Route::apiResource('routers', RouterController::class);
-    Route::apiResource('services', ServiceController::class);
-    Route::apiResource('invoices', InvoiceController::class);
     Route::apiResource('cities', CityController::class);
     Route::apiResource('equipments', EquipmentController::class);
 
-    Route::get('/ports/{box_id}', [ServiceController::class, 'getPorts']);
+    Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::delete('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');

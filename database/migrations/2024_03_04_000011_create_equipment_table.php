@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('equipment', function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->string('serie');
+            $table->string('serie')->unique();
             $table->string('model');
             $table->string('brand');
             $table->date('purchase_date');

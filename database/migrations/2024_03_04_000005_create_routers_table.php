@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('routers', function (Blueprint $table) {
             $table->id();
             $table->string('ip');
+            $table->string('vlan');
             $table->string('usuario');
             $table->string('password');
             $table->string('port');
