@@ -22,9 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function () {
 
-    Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
-    
-    Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
     Route::get('invoices/search', [InvoiceController::class, 'searchInvoices']);
     Route::get('invoices/export', [InvoiceController::class, 'exportInvoices']);
 
@@ -32,18 +29,21 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
 
+    //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
+        Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
+        Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
 
         Route::apiResource('customers', CustomerController::class);
         Route::apiResource('services', ServiceController::class);
         Route::apiResource('invoices', InvoiceController::class);
+
+        Route::get('summary', [DashboardController::class, 'getSummary']);
+
         // Otras rutas protegidas...
     });
 
 
-    // Route::get('invoices/searchq', [InvoiceController::class, 'searchInvoices2']);
-
-    // Route::apiResource('customers', CustomerController::class);
     Route::apiResource('plans', PlanController::class);
     Route::apiResource('boxs', BoxController::class);
     Route::apiResource('routers', RouterController::class);
