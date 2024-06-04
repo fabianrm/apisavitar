@@ -112,23 +112,29 @@ class InvoiceService
         $endOfCurrentMonth = $currentDate->copy()->addMonth();
         $totalInvoices = 0;
 
-        \Log::info("Generando facturas desde {$threeMonthsAgo->toDateString()} a {$endOfCurrentMonth->toDateString()}");
+        \Log::info("####Generando facturas desde {$threeMonthsAgo->toDateString()} a {$endOfCurrentMonth->toDateString()}");
 
         $services = Service::where('status', 'activo')->get();
 
         foreach ($services as $service) {
             $lastInvoice = $service->invoices()->orderBy('end_date', 'desc')->first();
+            \Log::info("lastInvoice=> {$lastInvoice}" );
             $startDate = $lastInvoice ? Carbon::parse($lastInvoice->end_date)->addDay() : Carbon::parse($service->installation_date);
+
+            \Log::info("startdateI=> {$startDate}");
 
             // Asegurarse de que el startDate esté dentro del rango de tres meses
             if ($startDate->lessThan($threeMonthsAgo)) {
+               
                 $startDate = $threeMonthsAgo;
+               // \Log::info("startdateX=> {$startDate}");
             }
 
             // Corrección para incluir las instalaciones del mes actual
-            if ($startDate->greaterThan($endOfCurrentMonth)) {
-                $startDate = $threeMonthsAgo;
-            }
+            // if ($startDate->greaterThan($endOfCurrentMonth)) {
+            //     $startDate = $threeMonthsAgo;
+            //     \Log::info("startdateZ=> {$startDate}");
+            // }
 
             while ($startDate->lessThanOrEqualTo($endOfCurrentMonth)) {
                 $endDate = $startDate->copy()->addMonth()->subDay();
@@ -138,6 +144,10 @@ class InvoiceService
                     ->where('start_date', $startDate)
                     ->where('end_date', $endDate)
                     ->first();
+
+               // \Log::info("startdateM=> {$startDate}");
+               // \Log::info("endate=> {$endDate}");
+                
 
                 if ($existingInvoice) {
                     \Log::info("Factura existe para el service_id: {$service->id} desde {$startDate->toDateString()} to {$endDate->toDateString()}");
