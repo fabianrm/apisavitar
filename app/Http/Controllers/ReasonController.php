@@ -7,15 +7,15 @@ use App\Models\Reason;
 use App\Http\Requests\StorecityRequest;
 use App\Http\Requests\UpdatecityRequest;
 
-class CityController extends Controller
+class ReasonController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $cities = Reason::all();
-        return new ReasonCollection($cities);
+        $reasons = Reason::all();
+        return new ReasonCollection($reasons);
     }
 
     /**
@@ -37,7 +37,7 @@ class CityController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Reason $city)
+    public function show(Reason $reason)
     {
         //
     }

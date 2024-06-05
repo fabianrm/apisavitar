@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Plan;
-use App\Models\Service;
 use App\Models\Invoice;
 
 class DashboardController extends Controller

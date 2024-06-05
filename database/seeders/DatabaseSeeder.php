@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             NumberSeeder::class,
             CitySeeder::class,
             AdminUserSeeder::class,
+            ReasonSeeder::class,
 
         ]);
 

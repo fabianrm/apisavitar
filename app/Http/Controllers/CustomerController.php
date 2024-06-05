@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Expense;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Resources\CustomerResource;
@@ -94,8 +95,8 @@ class CustomerController extends Controller
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        $customer->update($request->all());
-        // dd($customer);
+       $customer->update($request->all());
+        dd($customer);
     }
 
     /**
@@ -103,9 +104,34 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        //
+        $customer->deleteOrFail();
+
+        return response()->json([
+            'data' => [
+                'status' => true,
+                'message' => 'Cliente eliminado correctamente'
+            ]
+        ]);
     }
 
+
+    /**
+     * Check if a customer exists by document number.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkIfExistsByDocumentNumber(Request $request)
+    {
+        $request->validate([
+            'document_number' => 'required|string',
+        ]);
+
+        $exists = Customer::where('document_number', $request->document_number)->exists();
+
+        return response()->json(['exists' => $exists]);
+    }
+     
 
     /**
      * Retrieve customers with their total number of contracts.

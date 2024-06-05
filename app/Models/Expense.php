@@ -12,20 +12,27 @@ class Expense extends Model
 
     protected $fillable = [
         'description',
+        'reason_id',
         'amount',
         'date',
-        'reason',
         'voutcher',
         'note',
-        'user_id',
+        'date_paid',
         'created_by',
-        'updated_by',
+        'updated_by'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+
+    public function reasons()
+    {
+        return $this->belongsTo(Reason::class, "reason_id");
+    }
+
 
     protected static function boot()
     {

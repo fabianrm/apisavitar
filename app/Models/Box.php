@@ -21,15 +21,15 @@ class Box extends Model
         'status',
     ];
 
-   /**
-    * Get all of the services for the Box
-    *
-    * @return \Illuminate\Database\Eloquent\Relations\HasMany
-    */
-   public function services()
-   {
-       return $this->hasMany(Service::class);
-   }
+    /**
+     * Get all of the services for the Box
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
 
     /**
      * Get the city that owns the Service
@@ -38,7 +38,7 @@ class Box extends Model
      */
     public function cities()
     {
-        return $this->belongsTo(City::class, "city_id");
+        return $this->belongsTo(Reason::class, "city_id");
     }
 
 

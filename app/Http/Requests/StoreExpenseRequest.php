@@ -25,17 +25,18 @@ class StoreExpenseRequest extends FormRequest
             'description' => ['required'],
             'amount' => ['required'],
             'date' => ['required'],
-            'reason' => ['required'],
+            'reasonId' => ['required'],
             'voutcher' => [''],
             'note' => [''],
-            'userId' => ['required'],
+            'datePaid' => [''],
         ];
     }
-
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'user_id' => $this->userId,
+            'reason_id' => $this->reasonId,
+            'date_paid' => $this->datePaid,
         ]);
+
     }
 }

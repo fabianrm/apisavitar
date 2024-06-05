@@ -13,17 +13,17 @@ class CreateExpensesTable extends Migration
             $table->string('description');
             $table->decimal('amount', 10, 2);
             $table->date('date');
-            $table->string('reason')->nullable();
+            $table->unsignedBigInteger('reason_id');
             $table->string('voutcher')->nullable();
             $table->string('note')->nullable();
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->date('date_paid')->nullable();
             $table->timestamps();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
 
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('reason_id')->references('id')->on('reasons');
         });
     }
 

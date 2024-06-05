@@ -29,14 +29,18 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
 
+
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('customers/check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);
         Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
 
-        Route::apiResource('customers', CustomerController::class);
         Route::apiResource('services', ServiceController::class);
         Route::apiResource('invoices', InvoiceController::class);
+        Route::apiResource('customers', CustomerController::class);
+        Route::apiResource('expenses', ExpenseController::class);
+        Route::apiResource('reasons', ReasonController::class);
 
         Route::get('summary', [DashboardController::class, 'getSummary']);
 
@@ -49,7 +53,6 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('routers', RouterController::class);
     Route::apiResource('cities', CityController::class);
     Route::apiResource('equipments', EquipmentController::class);
-    Route::apiResource('expenses', ExpenseController::class);
 
     Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);
     Route::post('login', [AuthController::class, 'login']);

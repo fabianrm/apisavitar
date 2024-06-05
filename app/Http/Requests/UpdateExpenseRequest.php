@@ -21,37 +21,40 @@ class UpdateExpenseRequest extends FormRequest
      */
     public function rules(): array
     {
-
         $method = $this->method();
-        if ($method === "POST") {
-            return [
-                'description' => ['required'],
-                'amount' => ['required'],
-                'date' => ['required'],
-                'reason' => ['required'],
-                'voutcher' => [''],
-                'note' => [''],
-                'userId' => ['required'],
-            ];
-        } else {
-            return [
-                'description' => ['sometimes', 'required'],
-                'amount' => ['sometimes', 'required'],
-                'date' => ['sometimes', 'required'],
-                'reason' => ['sometimes', 'required'],
-                'voutcher' => ['sometimes', 'required'],
-                'note' => ['sometimes', 'required'],
-                'userId' => ['sometimes', 'required'],
-            ];
+
+        $rules = [
+            'description' => ['required', 'string'],
+            'amount' => ['required', 'numeric'],
+            'date' => ['required', 'date'],
+            'reason_id' => ['required', 'integer'],
+            'voutcher' => ['nullable', 'string'],
+            'note' => ['nullable', 'string'],
+            'date_paid' => ['nullable', 'date'],
+        ];
+
+        if ($method === 'PATCH') {
+            foreach ($rules as $key => $rule) {
+                $rules[$key] = array_merge(['sometimes'], $rule);
+            }
         }
+
+        return $rules;
     }
 
     protected function prepareForValidation(): void
     {
-        if ($this->userId) {
-            $this->merge([
-                'user_id' => $this->userId,
-            ]);
+        $data = [];
+        if ($this->has('reasonId')) {
+            $data['reason_id'] = $this->input('reasonId');
         }
+        if ($this->has('datePaid')) {
+            $data['date_paid'] = $this->input('datePaid');
+        }
+
+        if (!empty($data)) {
+            $this->merge($data);
+        }
+
     }
 }

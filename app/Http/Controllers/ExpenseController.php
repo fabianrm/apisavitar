@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ExpenseCollection;
-use App\Http\Resources\ExpenseResource;
 use App\Models\Expense;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
+use App\Http\Resources\ExpenseResource;
+use App\Http\Resources\ExpenseCollection;
 
 class ExpenseController extends Controller
 {
@@ -56,8 +56,8 @@ class ExpenseController extends Controller
      */
     public function update(UpdateExpenseRequest $request, Expense $expense)
     {
-        $expense->update($request->all());
-        return new ExpenseResource($expense);
+         $expense->update($request->all());
+         return new ExpenseResource($expense);
     }
 
     /**
