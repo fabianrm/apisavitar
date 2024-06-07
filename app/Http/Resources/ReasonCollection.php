@@ -14,6 +14,10 @@ class ReasonCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'data' => $this->collection,
+            'total' => count($this->collection)
+        ];
+        //return parent::toArray($request);
     }
 }

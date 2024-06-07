@@ -21,6 +21,7 @@ class ServiceResource extends JsonResource
             'customerName' => $this->customers->name,
             'planName' => $this->plans->name,
             'routerIp' => $this->routers->ip,
+            'vlan' => $this->routers->vlan,
             'boxName' => $this->boxes->name,
             'portNumber' => $this->port_number,
             'equipmentSerie' => $this->equipments->serie,

@@ -11,6 +11,7 @@ class Expense extends Model
     use HasFactory;
 
     protected $fillable = [
+        'expense_code',
         'description',
         'reason_id',
         'amount',
@@ -30,7 +31,7 @@ class Expense extends Model
 
     public function reasons()
     {
-        return $this->belongsTo(Reason::class, "reason_id");
+        return $this->belongsTo(City::class, "reason_id");
     }
 
 

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expense;
+use App\Services\ExpenseService;
+use App\Services\UtilService;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Http\Resources\ExpenseResource;
@@ -32,7 +35,22 @@ class ExpenseController extends Controller
      */
     public function store(StoreExpenseRequest $request)
     {
-        return new ExpenseResource(Expense::create($request->all()));
+
+        $expenseService = app(UtilService::class);
+
+        // Genera un código único para el cliente
+        $uniqueCode = $expenseService->generateUniqueCodeExpense('EC');
+
+        // Almacena el nuevo cliente con el código único
+        $expense = new Expense($request->all());
+        $expense->expense_code = $uniqueCode;
+        $expense->save();
+
+        // Retorna una respuesta:
+        return new ExpenseResource($expense);
+
+
+        //return new ExpenseResource(Expense::create($request->all()));
     }
 
     /**
@@ -56,8 +74,8 @@ class ExpenseController extends Controller
      */
     public function update(UpdateExpenseRequest $request, Expense $expense)
     {
-         $expense->update($request->all());
-         return new ExpenseResource($expense);
+        $expense->update($request->all());
+        return new ExpenseResource($expense);
     }
 
     /**
@@ -67,4 +85,26 @@ class ExpenseController extends Controller
     {
         //
     }
+
+    /**
+     * Generar gastos fijos
+     */
+
+    public function generateFixedExpensesInvoices()
+    {
+        Artisan::call('invoices:generate-fixed-expenses');
+        return response()->json(['message' => 'Fixed expenses invoices generated successfully']);
+    }
+
+
+    public function generateNextMonthFixedExpenses()
+    {
+        $expenseService = app(ExpenseService::class);
+
+        $result = $expenseService->generateNextMonthFixedExpenses();
+        return response()->json($result);
+    }
+
+
+
 }

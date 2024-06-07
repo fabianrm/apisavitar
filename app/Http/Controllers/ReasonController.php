@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ReasonCollection;
+use App\Http\Resources\ReasonResource;
 use App\Models\Reason;
-use App\Http\Requests\StorecityRequest;
-use App\Http\Requests\UpdatecityRequest;
+use App\Http\Requests\StoreReasonRequest;
+use App\Http\Requests\UpdateReasonRequest;
 
 class ReasonController extends Controller
 {
@@ -29,9 +30,9 @@ class ReasonController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorecityRequest $request)
+    public function store(StoreReasonRequest $request)
     {
-        //
+        return new ReasonResource(Reason::create($request->all()));
     }
 
     /**
@@ -39,13 +40,13 @@ class ReasonController extends Controller
      */
     public function show(Reason $reason)
     {
-        //
+        return new ReasonResource($reason);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Reason $city)
+    public function edit(Reason $reason)
     {
         //
     }
@@ -53,15 +54,15 @@ class ReasonController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatecityRequest $request, Reason $city)
+    public function update(UpdateReasonRequest $request, Reason $reason)
     {
-        //
+        $reason->update($request->all());
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Reason $city)
+    public function destroy(Reason $reason)
     {
         //
     }

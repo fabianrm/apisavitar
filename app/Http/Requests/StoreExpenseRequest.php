@@ -22,6 +22,7 @@ class StoreExpenseRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'expenseCode' => [''],
             'description' => ['required'],
             'amount' => ['required'],
             'date' => ['required'],
@@ -36,6 +37,7 @@ class StoreExpenseRequest extends FormRequest
         $this->merge([
             'reason_id' => $this->reasonId,
             'date_paid' => $this->datePaid,
+            'expense_code' => $this->expenseCode,
         ]);
 
     }

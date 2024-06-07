@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ReasonCollection;
-use App\Models\Reason;
-use App\Http\Requests\StorecityRequest;
-use App\Http\Requests\UpdatecityRequest;
+use App\Http\Resources\CityCollection;
+use App\Models\City;
+use App\Http\Requests\StoreCityRequest;
+use App\Http\Requests\UpdateCityRequest;
 
 class CityController extends Controller
 {
@@ -14,8 +14,8 @@ class CityController extends Controller
      */
     public function index()
     {
-        $cities = Reason::all();
-        return new ReasonCollection($cities);
+        $cities = City::all();
+        return new CityCollection($cities);
     }
 
     /**
@@ -29,7 +29,7 @@ class CityController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorecityRequest $request)
+    public function store(StoreCityRequest $request)
     {
         //
     }
@@ -37,7 +37,7 @@ class CityController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Reason $city)
+    public function show(City $city)
     {
         //
     }
@@ -45,7 +45,7 @@ class CityController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Reason $city)
+    public function edit(City $city)
     {
         //
     }
@@ -53,7 +53,7 @@ class CityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatecityRequest $request, Reason $city)
+    public function update(UpdateCityRequest $request, City $city)
     {
         //
     }
@@ -61,7 +61,7 @@ class CityController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Reason $city)
+    public function destroy(City $city)
     {
         //
     }

@@ -58,7 +58,7 @@ class Customer extends Model
 
     public function cities()
     {
-        return $this->belongsTo(Reason::class, "city_id");
+        return $this->belongsTo(City::class, "city_id");
     }
 
 

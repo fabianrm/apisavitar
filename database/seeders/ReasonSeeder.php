@@ -18,8 +18,8 @@ class ReasonSeeder extends Seeder
         $reasons = [
             ['name' => 'COMBUSTIBLE', 'type' => 'VARIABLE', 'status' => true],
             ['name' => 'VIATICOS', 'type' => 'VARIABLE', 'status' => true],
-            ['name' => 'RECIBOS DE LUZ', 'type' => 'FIJO', 'status' => true],
-            ['name' => 'INTERNET', 'type' => 'FIJO', 'status' => true],
+            ['name' => 'PAGO DE SERVICIOS', 'type' => 'VARIABLE', 'status' => true],
+            ['name' => 'PAGO DE INTERNET', 'type' => 'FIJO', 'status' => true],
             ['name' => 'UTILES DE OFICINA', 'type' => 'VARIABLE', 'status' => true],
             ['name' => 'RECIBOS DE CLIENTES', 'type' => 'VARIABLE', 'status' => true],
             ['name' => 'PLANILLAS', 'type' => 'FIJO', 'status' => true],

@@ -21,6 +21,7 @@ class ExpenseResource extends JsonResource
             'date' => $this->date ,
             'reasonId' => $this->reason_id,
             'reason' => $this->reasons->name,
+            'type' => $this->reasons->type,
             'voutcher' => $this->voutcher,
             'note' => $this->note,
             'datePaid' => $this->date_paid,

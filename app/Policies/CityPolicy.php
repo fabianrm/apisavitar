@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Reason;
+use App\Models\City;
 use Illuminate\Auth\Access\Response;
 
 class CityPolicy

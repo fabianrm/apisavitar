@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\ExpenseService;
 use App\Services\InvoiceService;
 use App\Services\UtilService;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(InvoiceService::class, function ($app) {
             return new InvoiceService();
+        });
+
+        $this->app->singleton(ExpenseService::class, function ($app) {
+            return new ExpenseService();
         });
 
 
