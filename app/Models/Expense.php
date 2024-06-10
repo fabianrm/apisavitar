@@ -19,6 +19,7 @@ class Expense extends Model
         'voutcher',
         'note',
         'date_paid',
+        'status',
         'created_by',
         'updated_by'
     ];
@@ -31,7 +32,7 @@ class Expense extends Model
 
     public function reasons()
     {
-        return $this->belongsTo(City::class, "reason_id");
+        return $this->belongsTo(Reason::class, "reason_id");
     }
 
 

@@ -31,6 +31,7 @@ class UpdateExpenseRequest extends FormRequest
             'voutcher' => ['nullable', 'string'],
             'note' => ['nullable', 'string'],
             'date_paid' => ['nullable', 'date'],
+            'status' => ['nullable', 'boolean'],
         ];
 
         if ($method === 'PATCH') {

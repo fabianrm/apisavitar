@@ -18,6 +18,7 @@ class CreateExpensesTable extends Migration
             $table->string('voutcher')->nullable();
             $table->string('note')->nullable();
             $table->date('date_paid')->nullable();
+            $table->boolean('status');
             $table->timestamps();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

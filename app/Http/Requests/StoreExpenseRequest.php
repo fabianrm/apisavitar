@@ -30,6 +30,7 @@ class StoreExpenseRequest extends FormRequest
             'voutcher' => [''],
             'note' => [''],
             'datePaid' => [''],
+            'status' => [''],
         ];
     }
     protected function prepareForValidation(): void

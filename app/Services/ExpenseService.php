@@ -26,6 +26,7 @@ class ExpenseService
         foreach ($fixedExpenseCodes as $fixedExpenseCode) {
             // Obtener la última factura generada para este código de gasto
             $lastExpense = Expense::where('expense_code', $fixedExpenseCode->expense_code)
+                ->where('status', true)
                 ->orderBy('date', 'desc')
                 ->first();
 
@@ -58,10 +59,11 @@ class ExpenseService
                     'amount' => $lastExpense->amount,
                     'reason_id' => $lastExpense->reason_id,
                     'expense_code' => $lastExpense->expense_code,
-                    'voutcher' => null, // Aquí puedes ajustar según sea necesario
+                    'voutcher' => '-', // Aquí puedes ajustar según sea necesario
                     'note' => 'Factura generada automáticamente',
                     'date' => $nextMonthExpenseDate->toDateString(),
                     'date_paid' => null,
+                    'status' => true,
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
@@ -69,8 +71,10 @@ class ExpenseService
             }
         }
         return [
-            'total' => $total,
-            'message' => 'Fixed expenses for next month generated successfully'
+           'data' => [
+                'total' => $total,
+                'message' => 'Fixed expenses for next month generated successfully'
+           ]
         ];
 
     }

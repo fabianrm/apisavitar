@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Expense;
 use App\Services\ExpenseService;
 use App\Services\UtilService;
-use Illuminate\Support\Facades\Artisan;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Http\Resources\ExpenseResource;
 use App\Http\Resources\ExpenseCollection;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 
 class ExpenseController extends Controller
 {
@@ -83,20 +85,19 @@ class ExpenseController extends Controller
      */
     public function destroy(Expense $expenses)
     {
-        //
+        $expenses->deleteOrFail();
+
+        return response()->json([
+            'data' => [
+                'status' => true,
+                'message' => 'Gasto eliminado correctamente'
+            ]
+        ]);
     }
 
     /**
      * Generar gastos fijos
      */
-
-    public function generateFixedExpensesInvoices()
-    {
-        Artisan::call('invoices:generate-fixed-expenses');
-        return response()->json(['message' => 'Fixed expenses invoices generated successfully']);
-    }
-
-
     public function generateNextMonthFixedExpenses()
     {
         $expenseService = app(ExpenseService::class);
@@ -104,6 +105,42 @@ class ExpenseController extends Controller
         $result = $expenseService->generateNextMonthFixedExpenses();
         return response()->json($result);
     }
+
+
+    /***
+     * Reporte de egresos
+     */
+
+    public function expenseReport(Request $request)
+    {
+        // Validar las fechas
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $startDate = Carbon::parse($request->query('start_date'))->startOfDay();
+        $endDate = Carbon::parse($request->query('end_date'))->endOfDay();
+
+        // Obtener los gastos en el rango de fechas
+        $expenses = Expense::whereBetween('date_paid', [$startDate, $endDate])
+            ->with('reasons') // Asegurarse de cargar la relación necesaria
+            ->get();
+
+        // Calcular la suma de la columna amount
+        $totalAmount = $expenses->sum('amount');
+
+        // Formatear la respuesta
+        $expenseResource = ExpenseResource::collection($expenses);
+
+        return response()->json([
+            'data' => $expenseResource,
+            'totalAmount' => $totalAmount,
+        ]);
+    }
+
+ 
+
 
 
 

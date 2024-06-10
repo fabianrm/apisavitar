@@ -29,17 +29,15 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
 
-    Route::post('expenses/generate-fixed-invoices', [ExpenseController::class, 'generateFixedExpensesInvoices']);
-
-    Route::post('expenses/generate-next-month-fixed', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
-
-
+    Route::get('expenses/report', [ExpenseController::class, 'expenseReport']);
 
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('customers/check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);
         Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
+        Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
+        Route::post('expenses/generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
 
 
         Route::apiResource('services', ServiceController::class);

@@ -13,6 +13,8 @@ use App\Filters\InvoiceFilter;
 use App\Services\InvoiceService;
 use App\Exports\InvoicesExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
+
 
 
 class InvoiceController extends Controller
@@ -210,6 +212,38 @@ class InvoiceController extends Controller
     {
         $filters = $request->only(['status', 'start_date', 'end_date', 'customer_name']);
         return Excel::download(new InvoicesExport($filters), 'invoices.xlsx');
+    }
+
+
+    //Reporte de facturas
+    public function getPaidInvoicesReport(Request $request)
+    {
+        // Validar los parámetros de fecha
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        // Obtener las fechas del request
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        // Obtener las facturas pagadas entre las fechas especificadas
+        $invoices = Invoice::with(['service.customers'])
+            ->where('status', 'pagada')
+            ->whereBetween('paid_dated', [$startDate, $endDate])
+            ->get();
+
+        // Calcular la suma de la columna amount
+        $totalAmount = $invoices->sum('amount');
+
+        // Transformar las facturas usando el recurso
+        $invoiceResource = InvoiceResource::collection($invoices);
+
+        return response()->json([
+            'data' => $invoiceResource,
+            'totalAmount' => $totalAmount,
+        ]);
     }
 
 
