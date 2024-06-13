@@ -25,10 +25,18 @@ class StoreEquipmentRequest extends FormRequest
             'type' => ['required'],
             'serie' => ['required'],
             'model' => ['required'],
-            'brand' => ['required'],
-            'purchase_date' => ['required'],
+            'brandId' => ['required'],
+            'purchaseDate' => ['required'],
             'status' => ['required']
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'brand_id' => $this->brandId,
+            'purchase_date' => $this->purchaseDate
+        ]);
 
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,7 +30,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
 
-    Route::get('expenses/report', [ExpenseController::class, 'expenseReport']);
+    Route::apiResource('brands', BrandController::class);
+
 
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
@@ -38,14 +40,14 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
         Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
         Route::post('expenses/generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
-
+        Route::get('expenses/report', [ExpenseController::class, 'expenseReport']);
 
         Route::apiResource('services', ServiceController::class);
         Route::apiResource('invoices', InvoiceController::class);
         Route::apiResource('customers', CustomerController::class);
         Route::apiResource('expenses', ExpenseController::class);
         Route::apiResource('reasons', ReasonController::class);
-
+      
         Route::get('summary', [DashboardController::class, 'getSummary']);
 
         // Otras rutas protegidas...

@@ -15,7 +15,7 @@ class Equipment extends Model
         'type',
         'serie',
         'model',
-        'brand',
+        'brand_id',
         'purchase_date',
         'status'
     ];
@@ -28,6 +28,16 @@ class Equipment extends Model
     public function services()
     {
         return $this->hasMany(Service::class);
+    }
+
+    /**
+     * Get the brand that owns the Equipment
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 
 

@@ -23,13 +23,13 @@ class UpdateEquipmentRequest extends FormRequest
     {
         $method = $this->method();
 
-        if ($method === "POST") {
+        if ($method === "PUT") {
             return [
                 'type' => ['required'],
                 'serie' => ['required'],
                 'model' => ['required'],
-                'brand' => ['required'],
-                'purchase_date' => ['required'],
+                'brandId' => ['required'],
+                'purchaseDate' => ['required'],
                 'status' => ['required']
             ];
         } else {
@@ -37,10 +37,20 @@ class UpdateEquipmentRequest extends FormRequest
                 'type' => ['sometimes', 'required'],
                 'serie' => ['sometimes', 'required'],
                 'model' => ['sometimes', 'required'],
-                'brand' => ['sometimes', 'required'],
-                'purchase_date' => ['sometimes', 'required'],
+                'brandId' => ['sometimes', 'required'],
+                'purchaseDate' => ['sometimes', 'required'],
                 'status' => ['sometimes', 'required']
             ];
+        }
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->purchaseDate || $this->brandId) {
+            $this->merge([
+                'purchase_date' => $this->documentNumber,
+                'brand_id' => $this->brandId
+            ]);
         }
     }
 }

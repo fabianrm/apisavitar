@@ -32,8 +32,8 @@ return new class extends Migration {
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             
-            $table->string('billing_date');
-            $table->string('due_date');
+            $table->string('billing_date')->nullable();
+            $table->string('due_date')->nullable();
 
             $table->enum('status', ['activo', 'inactivo', 'terminado'])->default('activo');
             $table->date('end_date')->nullable(); // Nuevo campo

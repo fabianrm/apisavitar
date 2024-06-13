@@ -95,7 +95,7 @@ class CustomerController extends Controller
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
        $customer->update($request->all());
-        dd($customer);
+       
     }
 
     /**

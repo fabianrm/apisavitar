@@ -16,10 +16,11 @@ return new class extends Migration
             $table->string('type');
             $table->string('serie')->unique();
             $table->string('model');
-            $table->string('brand');
+            $table->unsignedBigInteger('brand_id');
             $table->date('purchase_date');
             $table->string('status');
             $table->timestamps();
+            $table->foreign('brand_id')->references('id')->on('brands');
         });
     }
 

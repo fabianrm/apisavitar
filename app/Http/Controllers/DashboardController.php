@@ -20,9 +20,7 @@ class DashboardController extends Controller
         })->count();
 
         // Número de planes activos
-        $activePlans = Plan::whereHas('services', function ($query) {
-            $query->where('status', 'activo');
-        })->count();
+        $activePlans = Plan::where('status', true)->count();
 
         // Número de contratos activos
         //$activeServices = Service::where('status', 'activo')->count();

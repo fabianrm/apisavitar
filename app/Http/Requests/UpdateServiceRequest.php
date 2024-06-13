@@ -38,8 +38,8 @@ class UpdateServiceRequest extends FormRequest
                 'installationDate' => ['required'],
                 'latitude',
                 'longitude',
-                'billingDate' => ['required'],
-                'dueDate' => ['required'],
+                'billingDate' => [''],
+                'dueDate' => [''],
                 'status' => ['required'],
                 'endDate' => ['required']
             ];
