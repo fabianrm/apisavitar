@@ -41,6 +41,13 @@ class Box extends Model
         return $this->belongsTo(City::class, "city_id");
     }
 
+    public function calculateAvailablePorts()
+    {
+        $usedPorts = Service::where('box_id', $this->id)->where('status', 1)->count();
+        $this->available_ports = $this->total_ports - $usedPorts;
+        $this->save();
+    }
+
 
 
 }

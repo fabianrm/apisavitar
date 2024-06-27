@@ -14,18 +14,17 @@ class EquipmentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
         return [
             'id' => $this->id,
             'type' => $this->type,
             'serie' => $this->serie,
             'model' => $this->model,
+            'brandId' => $this->brand_id,
             'brand' => $this->brand->name,
             'purchaseDate' => $this->purchase_date,
-            'status' => $this->status
+            'contractCode' => $this->service ? $this->service->service_code : null,
+            'status' => $this->status,
         ];
-
-
         // return parent::toArray($request);
     }
 }

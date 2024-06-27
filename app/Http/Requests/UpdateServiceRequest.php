@@ -63,6 +63,9 @@ class UpdateServiceRequest extends FormRequest
                 'dueDate' => ['sometimes','required'],
                 'status' => ['sometimes','required'],
                 'endDate' => ['sometimes','required'],
+                'userPppoe' => ['sometimes', 'required'],
+                'passPppoe' => ['sometimes', 'required'],
+                'observation' => ['sometimes', 'required'],
             ];
         }
     }
@@ -83,6 +86,8 @@ class UpdateServiceRequest extends FormRequest
             'installation_date' => $this->installationDate,
             'billing_date' => $this->billingDate,
             'end_date' => $this->endDate,
+            'user_pppoe' => $this->userPppoe,
+            'pass_pppoe' => $this->passPppoe,
         ]);
     }
 }

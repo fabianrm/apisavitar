@@ -6,6 +6,7 @@ use App\Exceptions\ModelNotFoundException;
 use App\Http\Resources\ServiceCollection;
 use App\Http\Resources\ServiceResource;
 use App\Models\Service;
+use App\Models\Box;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Services\UtilService;
@@ -20,14 +21,9 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-       
-
-
         // $customers = Customer::all();
-
         // $services = Service::with('customers')->get();
         //return new ServiceCollection($services);
-
 
         /*   $services = Service::with('customers')->get();
           $transformedServices = $services->map(function ($service) {
@@ -38,13 +34,10 @@ class ServiceController extends Controller
                   'customer_name' => $service->customers->name,
               ];
           });
-
           return response()->json(['data' => $transformedServices]); */
 
         $services = Service::with(['customers', 'routers', 'plans', 'cities'])->get();
         return new ServiceCollection($services);
-
-
     }
 
     /**
@@ -60,19 +53,18 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request)
     {
-
         $contractService = app(UtilService::class);
-
         // Genera un código único para el cliente
         $uniqueCode = $contractService->generateUniqueCodeService('CT');
-
+        //Actualiza los puertos disponibles de las cajas
         $service = new Service($request->all());
         $service->service_code = $uniqueCode;
         $service->save();
-
+        // Calcular los puertos disponibles
+        $box = Box::find($service->box_id);
+        $box->calculateAvailablePorts();
         return new ServiceResource($service);
         //return new ServiceResource(Service::create($request->all()));
-
     }
 
     /**
@@ -82,10 +74,9 @@ class ServiceController extends Controller
     {
         $service = Service::find($id);
 
-        if(!$service){
+        if (!$service) {
             throw new ModelNotFoundException('Service not found');
         }
-        
         return new ServiceResource($service);
     }
 
@@ -139,7 +130,6 @@ class ServiceController extends Controller
         ]);
 
         //Creamos un nuevo contrato con el nuevo plan
-
         $contractService = app(UtilService::class);
 
         // Genera un código único para el cliente
@@ -172,9 +162,95 @@ class ServiceController extends Controller
             'old_contract' => $contract,
             'new_contract' => $newContract,
         ], 201);
-
-
     }
+
+
+    /**
+     * Cambiar caja y puerto
+     */
+    public function updateBoxAndPort(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'boxId' => 'required|exists:boxes,id',
+            'portNumber' => 'required|integer',
+        ]);
+
+        $contract = Service::findOrFail($id);
+        $oldBoxId = $contract->box_id;
+
+        // Actualizar el contrato con la nueva caja y puerto
+        $contract->box_id = $validatedData['boxId'];
+        $contract->port_number = $validatedData['portNumber'];
+        $contract->router_id = $request->routerId;
+        $contract->save();
+
+        // Actualizar los puertos disponibles en la caja antigua
+        if ($oldBoxId != $contract->box_id) {
+            $oldBox = Box::find($oldBoxId);
+            if ($oldBox) {
+                $oldBox->calculateAvailablePorts();
+            }
+        }
+
+        // Actualizar los puertos disponibles en la nueva caja
+        $newBox = Box::find($contract->box_id);
+        if ($newBox) {
+            $newBox->calculateAvailablePorts();
+        }
+
+        return response()->json($contract, 200);
+    }
+
+
+    /**
+     * Cambiar caja y puerto
+     */
+    public function updateEquipment(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'equipmentId' => 'required|exists:equipment,id',
+            'userPppoe' => 'nullable|string',
+            'passPppoe' => 'nullable|string',
+        ]);
+
+        $contract = Service::findOrFail($id);
+     
+        // Actualizar el contrato con los nuevos datos del equipo
+        $contract->equipment_id = $validatedData['equipmentId'];
+        $contract->user_pppoe = $validatedData['userPppoe'];
+        $contract->pass_pppoe = $validatedData['passPppoe'];
+        $contract->save();
+
+        return response()->json([
+            'message' => 'Ok',
+            'contract' => $contract
+        ], 200);
+    }
+
+
+
+    /**
+     * Suspender contrato
+     */
+    public function suspend(Request $request, $id)
+    {
+        $request->validate([
+            'observation' => 'nullable|string',
+        ]);
+
+        $contract = Service::findOrFail($id);
+
+        $contract->status = 'terminado';
+        $contract->end_date = Carbon::now();
+        $contract->observation = $request->input('observation');
+        $contract->save();
+
+        return response()->json([
+            'message' => 'El contrato ha sido suspendido',
+            'contract' => $contract,
+        ], 200);
+    }
+
 
 
     /**
@@ -195,7 +271,29 @@ class ServiceController extends Controller
 
         // Retornar los contratos en formato JSON
         return new ServiceCollection($services);
-       // return response()->json($contracts, 200);
+        // return response()->json($contracts, 200);
+    }
+
+
+    /**
+     * Check if a equipment exists in Services.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkServicesByEquipment(Request $request)
+    {
+        $request->validate([
+            'equipmentId' => 'required|int',
+        ]);
+
+        $exists = Service::where('equipment_id', $request->equipmentId)->exists();
+
+        return response()->json(
+            [
+                'exists' => $exists
+            ]
+        );
     }
 
 

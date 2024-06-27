@@ -28,6 +28,8 @@ class Service extends Model
         'billing_date',
         'due_date',
         'end_date',
+        'user_pppoe',
+        'pass_pppoe',
         'status',
         'created_by',
         'updated_by',

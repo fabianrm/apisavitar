@@ -123,14 +123,37 @@ class CustomerController extends Controller
     public function checkIfExistsByDocumentNumber(Request $request)
     {
         $request->validate([
-            'document_number' => 'required|string',
+            'documentNumber' => 'required|string',
         ]);
 
-        $exists = Customer::where('document_number', $request->document_number)->exists();
+        $exists = Customer::where('document_number', $request->documentNumber)->exists();
 
         return response()->json(['exists' => $exists]);
     }
-     
+
+    /**
+     * Suspender contrato
+     */
+    public function suspend(Request $request, $id)
+    {
+        $request->validate([
+            'observation' => 'nullable|string',
+        ]);
+
+        $customer = Customer::findOrFail($id);
+
+        $customer->status = $request->input('status');;
+        $customer->observation = $request->input('observation');
+        $customer->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Operación realizada con exito',
+            'customer' => $customer,
+        ], 200);
+    }
+
+
 
     /**
      * Retrieve customers with their total number of contracts.

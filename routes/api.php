@@ -30,13 +30,21 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
 
-    Route::apiResource('brands', BrandController::class);
+
+
+  
 
 
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('customers/check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);
+        Route::get('services/check-equipment', [ServiceController::class, 'checkServicesByEquipment']);
         Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
+        Route::patch('services/{id}/update-box-port', [ServiceController::class, 'updateBoxAndPort']);
+        Route::patch('services/{id}/suspend', [ServiceController::class, 'suspend']);
+        Route::patch('services/{id}/update-equipment', [ServiceController::class, 'updateEquipment']);
+        Route::patch('customer/{id}/suspend', [CustomerController::class, 'suspend']);
+
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
         Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
         Route::post('expenses/generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
@@ -47,6 +55,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('customers', CustomerController::class);
         Route::apiResource('expenses', ExpenseController::class);
         Route::apiResource('reasons', ReasonController::class);
+        Route::apiResource('brands', BrandController::class);
       
         Route::get('summary', [DashboardController::class, 'getSummary']);
 

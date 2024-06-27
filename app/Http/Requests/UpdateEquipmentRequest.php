@@ -48,7 +48,7 @@ class UpdateEquipmentRequest extends FormRequest
     {
         if ($this->purchaseDate || $this->brandId) {
             $this->merge([
-                'purchase_date' => $this->documentNumber,
+                'purchase_date' => $this->purchaseDate,
                 'brand_id' => $this->brandId
             ]);
         }

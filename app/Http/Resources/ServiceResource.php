@@ -20,10 +20,12 @@ class ServiceResource extends JsonResource
             'serviceCode' => $this->service_code,
             'customerName' => $this->customers->name,
             'planName' => $this->plans->name,
+            'routerId' => $this->router_id,
             'routerIp' => $this->routers->ip,
             'vlan' => $this->routers->vlan,
             'boxName' => $this->boxes->name,
             'portNumber' => $this->port_number,
+            'equipmentId' => $this->equipment_id,
             'equipmentSerie' => $this->equipments->serie,
             'city' => $this->cities->name,
             'addressInstallation' => $this->address_installation,
@@ -34,8 +36,11 @@ class ServiceResource extends JsonResource
             'longitude' => $this->longitude,
             'billingDate' => $this->billing_date,
             'dueDate' => $this->due_date,
-            'status' => $this->status,
             'endDate' => $this->end_date,
+            'userPppoe' => $this->user_pppoe,
+            'passPppoe' => $this->pass_pppoe,
+            'observation' => $this->observation,
+            'status' => $this->status,
             
         ];
 

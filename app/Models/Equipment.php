@@ -41,4 +41,10 @@ class Equipment extends Model
     }
 
 
+    public function service()
+    {
+        return $this->hasOne(Service::class, 'equipment_id');
+    }
+
+
 }

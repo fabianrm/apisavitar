@@ -25,7 +25,7 @@ return new class extends Migration
             $table->date('paid_dated')->nullable();
             $table->string('receipt')->nullable();
             $table->string('note')->nullable();
-            $table->enum('status', ['pendiente', 'pagada', 'vencida'])->default('pendiente');
+            $table->enum('status', ['pendiente', 'pagada', 'vencida',  'anulada'])->default('pendiente');
             $table->timestamps();
 
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');

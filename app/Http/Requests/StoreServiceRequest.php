@@ -23,23 +23,26 @@ class StoreServiceRequest extends FormRequest
     {
         return [
             'serviceCode' => [''],
-            'customerId'=> ['required'],
-            'planId'=> ['required'],
-            'routerId'=> ['required'],
-            'boxId'=> ['required'],
-            'portNumber'=> ['required'],
-            'equipmentId'=> ['required'],
-            'cityId'=> ['required'],
-            'addressInstallation'=> ['required'],
+            'customerId' => ['required'],
+            'planId' => ['required'],
+            'routerId' => ['required'],
+            'boxId' => ['required'],
+            'portNumber' => ['required'],
+            'equipmentId' => ['required'],
+            'cityId' => ['required'],
+            'addressInstallation' => ['required'],
             'reference' => [''],
-            'registrationDate'=> ['required'],
-            'installationDate'=> ['required'],
+            'registrationDate' => ['required'],
+            'installationDate' => ['required'],
             'latitude' => [''],
             'longitude' => [''],
-            'billingDate'=> [''],
-            'dueDate'=> [''],
-            'status'=> ['required'],
-            'endDate'=> ['']
+            'billingDate' => [''],
+            'dueDate' => [''],
+            'endDate' => [''],
+            'userPppoe' => [''],
+            'passPppoe' => [''],
+            'observation' => [''],
+            'status' => ['required']
         ];
     }
 
@@ -59,7 +62,9 @@ class StoreServiceRequest extends FormRequest
             'installation_date' => $this->installationDate,
             'billing_date' => $this->billingDate,
             'due_date' => $this->dueDate,
-            'end_date' => $this->endDate,
+            'end_date' => $this->endDate, 
+            'user_pppoe' => $this->userPppoe, 
+            'pass_pppoe' => $this->passPppoe, 
         ]);
     }
 
