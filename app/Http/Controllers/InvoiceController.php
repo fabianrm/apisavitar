@@ -174,7 +174,7 @@ class InvoiceController extends Controller
     public function searchInvoices(Request $request)
     {
         $query = Invoice::query();
-        $perPage = $request->input('perPage', 15);
+        $perPage = $request->input('perPage', 10);
 
         //Join with the Service and Customer tables to allow filtering by customer name
         $query->join('services', 'invoices.service_id', '=', 'services.id')

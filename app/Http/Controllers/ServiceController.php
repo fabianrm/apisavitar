@@ -7,6 +7,7 @@ use App\Http\Resources\ServiceCollection;
 use App\Http\Resources\ServiceResource;
 use App\Models\Service;
 use App\Models\Box;
+use App\Models\Invoice;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Services\UtilService;
@@ -101,7 +102,24 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
-        //
+        //Buscamos que el contrato no tenga facturas
+        $hasInvoices = Invoice::where('service_id', $service->id)->exists();
+
+        if ($hasInvoices) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No se puede eliminar el contrato. Tiene facturas asociadas.'
+            ], 400);
+        }
+
+       
+        //Eliminar el contrato
+        $service->deleteOrFail();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Contrato eliminado correctamente'
+        ]);
     }
 
     /**
@@ -214,7 +232,7 @@ class ServiceController extends Controller
         ]);
 
         $contract = Service::findOrFail($id);
-     
+
         // Actualizar el contrato con los nuevos datos del equipo
         $contract->equipment_id = $validatedData['equipmentId'];
         $contract->user_pppoe = $validatedData['userPppoe'];
@@ -295,7 +313,4 @@ class ServiceController extends Controller
             ]
         );
     }
-
-
-
 }

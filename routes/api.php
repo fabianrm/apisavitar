@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
@@ -31,10 +32,6 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
 
 
-
-  
-
-
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('customers/check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);
@@ -56,7 +53,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('expenses', ExpenseController::class);
         Route::apiResource('reasons', ReasonController::class);
         Route::apiResource('brands', BrandController::class);
-      
+
         Route::get('summary', [DashboardController::class, 'getSummary']);
 
         // Otras rutas protegidas...
@@ -73,6 +70,4 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::delete('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-
-
 });
