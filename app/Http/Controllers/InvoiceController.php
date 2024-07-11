@@ -14,8 +14,7 @@ use App\Services\InvoiceService;
 use App\Exports\InvoicesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
-
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -51,7 +50,6 @@ class InvoiceController extends Controller
      */
     public function store(StoreInvoiceRequest $request)
     {
-
     }
 
     /**
@@ -127,9 +125,7 @@ class InvoiceController extends Controller
     public function getInvoicesWithDetails()
     {
         $invoices = Invoice::with(['service.customers', 'service.plans'])->get();
-
         return new InvoiceCollection($invoices);
-
     }
 
 
@@ -246,6 +242,26 @@ class InvoiceController extends Controller
         ]);
     }
 
+    // Recibo en PDF
+    public function generateReceiptPDF($id)
+    {
+        $invoice = Invoice::findOrFail($id);
 
+        $data = [
+            'receipt' => $invoice->receipt,
+            'service_id' => $invoice->service->service_code,
+            'plan_name' => $invoice->service->plans->name,
+            'customer_name' => $invoice->service->customers->name,
+            'price' => $invoice->price,
+            'discount' => $invoice->discount,
+            'total' => $invoice->amount,
+            'start_date' => Carbon::parse($invoice->start_date)->format('d-m-Y'),
+            'end_date' => Carbon::parse($invoice->end_date)->format('d-m-Y'),
+            'paid_dated' => Carbon::parse($invoice->paid_dated)->format('d-m-Y'),
+        ];
 
+        $pdf = PDF::loadView('invoice.receipt', $data)->setPaper([0, 0, 226, 654], 'portrait');
+        //$pdf = PDF::loadView('invoice.receipt', compact('invoice'))->setPaper([0, 0, 226, 654], 'portrait'); // 58mm x 140mm
+        return $pdf->download('recibo_nro_' . $invoice->receipt . '.pdf');
+    }
 }
