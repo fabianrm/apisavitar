@@ -258,6 +258,7 @@ class InvoiceController extends Controller
             'start_date' => Carbon::parse($invoice->start_date)->format('d-m-Y'),
             'end_date' => Carbon::parse($invoice->end_date)->format('d-m-Y'),
             'paid_dated' => Carbon::parse($invoice->paid_dated)->format('d-m-Y'),
+            'note' => $invoice->note,
         ];
 
         $pdf = PDF::loadView('invoice.receipt', $data)->setPaper([0, 0, 226, 654], 'portrait');
