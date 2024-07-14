@@ -33,7 +33,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
     Route::get('invoices/{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
 
-
+ 
 
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
@@ -44,6 +44,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::patch('services/{id}/suspend', [ServiceController::class, 'suspend']);
         Route::patch('services/{id}/update-equipment', [ServiceController::class, 'updateEquipment']);
         Route::patch('customer/{id}/suspend', [CustomerController::class, 'suspend']);
+      
 
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
         Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);

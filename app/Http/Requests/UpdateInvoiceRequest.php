@@ -22,7 +22,7 @@ class UpdateInvoiceRequest extends FormRequest
     public function rules(): array
     {
         $method = $this->method();
-        if ($method === "POST") {
+        if ($method === "PUT") {
             return [
                 'serviceId' => ['required'],
                 'price' => ['required'],

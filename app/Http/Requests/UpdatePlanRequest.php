@@ -22,7 +22,7 @@ class UpdatePlanRequest extends FormRequest
     public function rules(): array
     {
         $method = $this->method();
-        if ($method === "POST") {
+        if ($method === "PUT") {
             return [
                 'name' => ['required'],
                 'download' => ['required'],

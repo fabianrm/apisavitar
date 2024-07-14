@@ -10,6 +10,7 @@ use App\Http\Requests\StoreBoxRequest;
 use App\Http\Requests\UpdateBoxRequest;
 use Illuminate\Http\Request;
 
+
 class BoxController extends Controller
 {
     /**

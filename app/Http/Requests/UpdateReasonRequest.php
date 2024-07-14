@@ -23,7 +23,7 @@ class UpdateReasonRequest extends FormRequest
     {
         $method = $this->method();
 
-        if ($method === "POST") {
+        if ($method === "PUT") {
             return [
                 'name' => ['required'],
                 'status' => ['required'],

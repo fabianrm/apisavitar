@@ -14,6 +14,7 @@ use App\Services\UtilService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ServiceController extends Controller
 {
@@ -95,6 +96,7 @@ class ServiceController extends Controller
     public function update(UpdateServiceRequest $request, Service $service)
     {
         $service->update($request->all());
+        //Log::info($request->all());
     }
 
     /**

@@ -27,6 +27,7 @@ class ServiceResource extends JsonResource
             'portNumber' => $this->port_number,
             'equipmentId' => $this->equipment_id,
             'equipmentSerie' => $this->equipments->serie,
+            'cityId' => $this->city_id,
             'city' => $this->cities->name,
             'addressInstallation' => $this->address_installation,
             'reference' => $this->reference,

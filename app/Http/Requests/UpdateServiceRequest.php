@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class UpdateServiceRequest extends FormRequest
 {
@@ -22,72 +23,92 @@ class UpdateServiceRequest extends FormRequest
     public function rules(): array
     {
         $method = $this->method();
-        if ($method === "POST") {
-            return [
-                'service_code',
-                'customerId' => ['required'],
-                'planId' => ['required'],
-                'routerId' => ['required'],
-                'boxId' => ['required'],
-                'portNumber' => ['required'],
-                'equipmentId' => ['required'],
-                'cityId' => ['required'],
-                'addressInstallation' => ['required'],
-                'reference',
-                'registrationDate' => ['required'],
-                'installationDate' => ['required'],
-                'latitude',
-                'longitude',
-                'billingDate' => [''],
-                'dueDate' => [''],
-                'status' => ['required'],
-                'endDate' => ['required']
-            ];
-        } else {
-            return [
-                'service_code' => ['sometimes', 'required'],
-                'customerId' => ['sometimes','required'],
-                'planId' => ['sometimes','required'],
-                'routerId' => ['sometimes','required'],
-                'boxId' => ['sometimes','required'],
-                'portNumber' => ['sometimes','required'],
-                'equipmentId' => ['sometimes','required'],
-                'cityId' => ['sometimes','required'],
-                'addressInstallation' => ['sometimes','required'],
-                'reference' => ['sometimes', 'required'],
-                'registrationDate' => ['sometimes','required'],
-                'installationDate' => ['sometimes','required'],
-                'latitude' => ['sometimes', 'required'],
-                'longitude' => ['sometimes', 'required'],
-                'billingDate' => ['sometimes','required'],
-                'dueDate' => ['sometimes','required'],
-                'status' => ['sometimes','required'],
-                'endDate' => ['sometimes','required'],
-                'userPppoe' => ['sometimes', 'required'],
-                'passPppoe' => ['sometimes', 'required'],
-                'observation' => ['sometimes', 'required'],
-            ];
+
+        $rules = [
+            'customer_id' => ['required'],
+            'plan_id' => ['required'],
+            'router_id' => ['required'],
+            'box_id' => ['required'],
+            'port_number' => ['required'],
+            'equipment_id' => ['required'],
+            'city_id' => ['required'],
+            'address_installation' => ['required'],
+            'reference' => ['required'],
+            'registration_date' => ['required'],
+            'installation_date' => ['required'],
+            'latitude' => ['required'],
+            'longitude' => ['required'],
+            'billing_date' => [''],
+            'due_date' => [''],
+            'status' => ['required'],
+            'end_date' => ['required']
+        ];
+
+        if ($method === 'PATCH') {
+            foreach ($rules as $key => $rule) {
+                $rules[$key] = array_merge(['sometimes'], $rule);
+            }
         }
+        return $rules;
     }
 
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'service_code' => $this->serviceCode,
-            'customer_id' => $this->customerId,
-            'plan_id' => $this->planId,
-            'router_id' => $this->routerId,
-            'box_id' => $this->boxId,
-            'port_number' => $this->portNumber,
-            'equipment_id' => $this->equipmentId,
-            'city_id' => $this->cityId,
-            'address_installation' => $this->addressInstallation,
-            'registration_date' => $this->registrationDate,
-            'installation_date' => $this->installationDate,
-            'billing_date' => $this->billingDate,
-            'end_date' => $this->endDate,
-            'user_pppoe' => $this->userPppoe,
-            'pass_pppoe' => $this->passPppoe,
-        ]);
+        $data = [];
+        if ($this->has('customerId')) {
+            $data['customer_id'] = $this->customerId;
+        }
+        if ($this->has('planId')) {
+            $data['plan_id'] = $this->planId;
+        }
+        if ($this->has('routerId')) {
+            $data['router_id'] = $this->routerId;
+        }
+        if ($this->has('boxId')) {
+            $data['box_id'] = $this->boxId;
+        }
+        if ($this->has('portNumber')) {
+            $data['port_number'] = $this->portNumber;
+        }
+        if ($this->has('equipmentId')) {
+            $data['equipment_id'] = $this->equipmentId;
+        }
+        if ($this->has('cityId')) {
+            $data['city_id'] = $this->cityId;
+        }
+        if ($this->has('addressInstallation')) {
+            $data['address_installation'] = $this->addressInstallation;
+        }
+        if ($this->has('registrationDate')) {
+            $data['registration_date'] = $this->registrationDate;
+        }
+        if ($this->has('installationDate')) {
+            $data['installation_date'] = $this->installationDate;
+        }
+        if ($this->has('billingDate')) {
+            $data['billing_date'] = $this->billingDate;
+        }
+        if ($this->has('dueDate')) {
+            $data['due_date'] = $this->dueDate;
+        }
+        if ($this->has('status')) {
+            $data['status'] = $this->status;
+        }
+        if ($this->has('endDate')) {
+            $data['end_date'] = $this->endDate;
+        }
+        if ($this->has('userPppoe')) {
+            $data['user_pppoe'] = $this->userPppoe;
+        }
+        if ($this->has('passPppoe')) {
+            $data['pass_pppoe'] = $this->passPppoe;
+        }
+        if ($this->has('observation')) {
+            $data['observation'] = $this->observation;
+        }
+
+        if (!empty($data)) {
+            $this->merge($data);
+        }
     }
 }
