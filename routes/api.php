@@ -33,6 +33,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
     Route::get('invoices/{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
 
+   
+
  
 
     //Rutas autenticadas
@@ -44,6 +46,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::patch('services/{id}/suspend', [ServiceController::class, 'suspend']);
         Route::patch('services/{id}/update-equipment', [ServiceController::class, 'updateEquipment']);
         Route::patch('customer/{id}/suspend', [CustomerController::class, 'suspend']);
+
+        Route::get('/user/permissions', [PermissionController::class, 'getUserPermissions']);
       
 
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
