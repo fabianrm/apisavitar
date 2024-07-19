@@ -33,9 +33,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
     Route::get('invoices/{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
 
-   
 
- 
 
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
