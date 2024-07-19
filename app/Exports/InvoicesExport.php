@@ -3,11 +3,10 @@
 namespace App\Exports;
 
 use App\Models\Invoice;
-use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use App\Http\Resources\InvoiceCollection;
+
 
 class InvoicesExport implements FromQuery, WithHeadings, WithMapping
 {
