@@ -35,6 +35,7 @@ class ServiceResource extends JsonResource
             'installationDate' => $this->installation_date,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
+            'coordinates' => [$this->latitude, $this->longitude],
             'billingDate' => $this->billing_date,
             'dueDate' => $this->due_date,
             'endDate' => $this->end_date,

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCityRequest extends FormRequest
+class UpdateEnterpriseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,17 +26,29 @@ class UpdateCityRequest extends FormRequest
         if ($method === "PUT") {
             return [
                 'name' => ['required'],
-                'latitude' => ['required'],
-                'longitude' => ['required'],
-                'status' => ['required'],
+                'cityId' => ['required'],
+                'address' => ['required'],
+                'phone' => [''],
+                'logo' => ['']
             ];
         } else {
             return [
-                'name' => ['sometimes', 'required'],
-                'latitude' => ['sometimes', 'required'],
-                'longitude' => ['sometimes', 'required'],
-                'status' => ['sometimes', 'required'],
+                'name' => ['sometimes'],
+                'cityId' => ['sometimes'],
+                'address' => ['sometimes'],
+                'phone' => ['sometimes'],
+                'logo' => ['sometimes']
             ];
+        }
+    }
+
+    protected function prepareForValidation(): void
+    {
+
+        if ($this->cityId ) {
+            $this->merge([
+                'city_id' => $this->cityId,
+            ]);
         }
     }
 }

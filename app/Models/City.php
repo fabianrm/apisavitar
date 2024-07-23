@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class City extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'latitude',
+        'longitude',
+        'status',
+    ];
 
     /**
      * Get all of the services for the city
@@ -40,6 +46,14 @@ class City extends Model
         return $this->hasMany(Customer::class);
     }
 
-
+    /**
+     * Get all of the enterprises for the city
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function enterprises()
+    {
+        return $this->hasMany(Enterprise::class);
+    }
 
 }

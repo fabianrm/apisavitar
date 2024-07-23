@@ -26,6 +26,7 @@ class CustomerResource extends JsonResource
             'reference' => $this->reference,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
+            'coordinates' => [$this->latitude, $this->longitude],
             'phoneNumber' => $this->phone_number,
             'email' => $this->email,
             'status' => $this->status,
