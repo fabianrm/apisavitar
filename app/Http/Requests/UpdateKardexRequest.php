@@ -11,7 +11,7 @@ class UpdateKardexRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,14 @@ class UpdateKardexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'entry_detail_id' => 'sometimes|required|exists:entry_details,id',
+            'date' => 'sometimes|required|date',
+            'operation' => 'sometimes|required|in:entry,exit',
+            'quantity' => 'sometimes|required|integer',
+            'price' => 'sometimes|required|numeric',
+            'total' => 'sometimes|required|numeric',
+            'comment' => 'nullable|string|max:255',
+            'status' => 'sometimes|required|boolean',
         ];
     }
 }

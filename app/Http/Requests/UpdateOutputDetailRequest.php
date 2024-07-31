@@ -11,7 +11,7 @@ class UpdateOutputDetailRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,11 @@ class UpdateOutputDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'output_id' => 'sometimes|required|exists:exits,id',
+            'entry_detail_id' => 'sometimes|required|exists:entry_details,id',
+            'quantity' => 'sometimes|required|integer',
+            'subtotal' => 'sometimes|required|numeric',
+            'status' => 'sometimes|required|boolean',
         ];
     }
 }

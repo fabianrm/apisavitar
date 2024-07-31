@@ -13,7 +13,17 @@ return new class extends Migration
     {
         Schema::create('entry_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('entry_id')->constrained('entries');
+            $table->date('date');
+            $table->foreignId('material_id')->constrained('materials');
+            $table->integer('quantity');
+            $table->integer('current_stock');
+            $table->decimal('price', 8, 2);
+            $table->decimal('subtotal', 8, 2);
+            $table->foreignId('warehouse_id')->constrained('warehouses');
+            $table->string('location')->nullable();
             $table->timestamps();
+
         });
     }
 

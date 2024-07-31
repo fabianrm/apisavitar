@@ -11,7 +11,7 @@ class StorePresentationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class StorePresentationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'prefix' => 'required|string|max:255',
+            'status' => 'required|boolean',
         ];
     }
 }

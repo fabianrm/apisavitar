@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('presentations', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('prefix');
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

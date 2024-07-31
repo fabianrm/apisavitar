@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Presentation extends Model
 {
     use HasFactory;
+    protected $fillable = ['name', 'prefix', 'status'];
+
+    public function materials()
+    {
+        return $this->hasMany(Material::class);
+    }
 }

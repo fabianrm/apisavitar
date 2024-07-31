@@ -11,7 +11,7 @@ class UpdateMaterialRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,17 @@ class UpdateMaterialRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'code' => 'sometimes|required|string|max:255',
+            'name' => 'sometimes|required|string|max:255',
+            'category_id' => 'sometimes|required|exists:categories,id',
+            'presentation_id' => 'sometimes|required|exists:presentations,id',
+            'serial' => 'sometimes|nullable|string|max:255',
+            'model' => 'sometimes|nullable|string|max:255',
+            'brand_id' => 'sometimes|required|exists:brands,id',
+            'min' => 'sometimes|required|integer',
+            'type' => 'sometimes|required|string|in:material,tool',
+            'image' => 'sometimes|nullable|string|max:255',
+            'status' => 'sometimes|required|boolean',
         ];
     }
 }

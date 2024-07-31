@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('outputs', function (Blueprint $table) {
             $table->id();
+            $table->string('number');
+            $table->date('date');
+            $table->foreignId('destination_id')->constrained('destinations');
+            $table->foreignId('employee_id')->constrained('employees');
+            $table->decimal('total', 8, 2);
+            $table->string('comment')->nullable();
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

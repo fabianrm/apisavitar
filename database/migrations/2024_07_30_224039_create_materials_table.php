@@ -13,7 +13,19 @@ return new class extends Migration
     {
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->foreignId('category_id')->constrained('categories');
+            $table->foreignId('presentation_id')->constrained('presentations');
+            $table->foreignId('brand_id')->constrained('brands');
+            $table->string('serial')->nullable();
+            $table->string('model')->nullable();
+            $table->integer('min');
+            $table->enum('type', ['material', 'herramienta']);
+            $table->string('image')->nullable();
+            $table->boolean('status')->default(true);
             $table->timestamps();
+
         });
     }
 

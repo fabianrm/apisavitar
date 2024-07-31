@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('output_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('output_id')->constrained('outputs');
+            $table->foreignId('entry_detail_id')->constrained('entry_details');
+            $table->integer('quantity');
+            $table->decimal('subtotal', 8, 2);
             $table->timestamps();
         });
     }

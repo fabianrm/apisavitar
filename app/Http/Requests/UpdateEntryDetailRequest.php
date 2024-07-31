@@ -11,7 +11,7 @@ class UpdateEntryDetailRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,16 @@ class UpdateEntryDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'entry_id' => 'sometimes|required|exists:entries,id',
+            'date' => 'sometimes|required|date',
+            'material_id' => 'sometimes|required|exists:materials,id',
+            'quantity' => 'sometimes|required|integer',
+            'current_stock' => 'sometimes|required|integer',
+            'price' => 'sometimes|required|numeric',
+            'subtotal' => 'sometimes|required|numeric',
+            'warehouse_id' => 'sometimes|required|exists:warehouses,id',
+            'location' => 'sometimes|required|string|max:255',
+            'status' => 'sometimes|required|boolean',
         ];
     }
 }

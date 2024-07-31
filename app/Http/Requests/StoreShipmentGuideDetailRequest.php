@@ -11,7 +11,7 @@ class StoreShipmentGuideDetailRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class StoreShipmentGuideDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'transfer_guide_id' => 'required|exists:transfer_guides,id',
+            'output_id' => 'required|exists:exits,id',
+            'status' => 'required|boolean',
         ];
     }
 }

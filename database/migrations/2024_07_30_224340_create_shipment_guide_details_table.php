@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('shipment_guide_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('shipment_guide_id')->constrained('shipment_guides');
+            $table->foreignId('output_id')->constrained('outputs');
             $table->timestamps();
         });
     }

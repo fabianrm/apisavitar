@@ -11,7 +11,7 @@ class UpdateEntryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class UpdateEntryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'date' => 'sometimes|required|date',
+            'series' => 'sometimes|required|string|max:255',
+            'correlative' => 'sometimes|required|string|max:255',
+            'provider_id' => 'sometimes|required|exists:providers,id',
+            'document_id' => 'sometimes|required|exists:documents,id',
+            'entry_type_id' => 'sometimes|required|exists:entry_types,id',
+            'status' => 'sometimes|required|boolean',
         ];
     }
 }

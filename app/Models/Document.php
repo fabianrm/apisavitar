@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Document extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['name', 'status'];
+
+    public function entries()
+    {
+        return $this->hasMany(Entry::class);
+    }
+
 }

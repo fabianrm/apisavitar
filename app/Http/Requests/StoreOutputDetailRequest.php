@@ -11,7 +11,7 @@ class StoreOutputDetailRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,11 @@ class StoreOutputDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'output_id' => 'required|exists:exits,id',
+            'entry_detail_id' => 'required|exists:entry_details,id',
+            'quantity' => 'required|integer',
+            'subtotal' => 'required|numeric',
+            'status' => 'required|boolean',
         ];
     }
 }

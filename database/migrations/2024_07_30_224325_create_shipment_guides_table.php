@@ -13,6 +13,17 @@ return new class extends Migration
     {
         Schema::create('shipment_guides', function (Blueprint $table) {
             $table->id();
+            $table->string('number');
+            $table->date('emission_date');
+            $table->date('transfer_date');
+            $table->string('origin_address');
+            $table->string('destination_address');
+            $table->string('driver_name');
+            $table->string('vehicle_plate');
+            $table->foreignId('warehouse_id')->constrained('warehouses');
+            $table->string('sender_name');
+            $table->string('receiver_name');
+            $table->string('comment')->nullable();
             $table->timestamps();
         });
     }

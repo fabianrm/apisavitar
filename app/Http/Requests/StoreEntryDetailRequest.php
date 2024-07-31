@@ -11,7 +11,7 @@ class StoreEntryDetailRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,16 @@ class StoreEntryDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'entry_id' => 'required|exists:entries,id',
+            'date' => 'required|date',
+            'material_id' => 'required|exists:materials,id',
+            'quantity' => 'required|integer',
+            'current_stock' => 'required|integer',
+            'price' => 'required|numeric',
+            'subtotal' => 'required|numeric',
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'location' => 'required|string|max:255',
+            'status' => 'required|boolean',
         ];
     }
 }

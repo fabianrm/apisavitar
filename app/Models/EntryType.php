@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class EntryType extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['name', 'abbreviation', 'status'];
+
+    public function entries()
+    {
+        return $this->hasMany(Entry::class);
+    }
 }

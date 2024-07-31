@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Warehouse extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['name', 'address', 'status'];
+
+    public function entryDetails()
+    {
+        return $this->hasMany(EntryDetail::class);
+    }
 }

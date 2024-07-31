@@ -11,7 +11,7 @@ class StoreKardexRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,14 @@ class StoreKardexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'entry_detail_id' => 'required|exists:entry_details,id',
+            'date' => 'required|date',
+            'operation' => 'required|in:entry,exit',
+            'quantity' => 'required|integer',
+            'price' => 'required|numeric',
+            'total' => 'required|numeric',
+            'comment' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
         ];
     }
 }
