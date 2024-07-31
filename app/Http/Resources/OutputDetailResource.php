@@ -14,6 +14,14 @@ class OutputDetailResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'exit' => new OutputResource($this->whenLoaded('output')),
+            'entry_detail' => new EntryDetailResource($this->whenLoaded('entry_detail')),
+            'quantity' => $this->quantity,
+            'subtotal' => $this->subtotal,
+            'status' => $this->status,
+        ];
+
     }
 }

@@ -14,6 +14,11 @@ class ShipmentGuideDetailResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'transfer_guide' => new ShipmentGuideResource($this->whenLoaded('shipmentGuide')),
+            'output' => new OutputResource($this->whenLoaded('output')),
+            'status' => $this->status,
+        ];
     }
 }

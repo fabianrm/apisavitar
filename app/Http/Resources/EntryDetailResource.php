@@ -14,6 +14,18 @@ class EntryDetailResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'entry' => new EntryResource($this->whenLoaded('entry')),
+            'date' => $this->date,
+            'material' => new MaterialResource($this->whenLoaded('material')),
+            'quantity' => $this->quantity,
+            'current_stock' => $this->current_stock,
+            'price' => $this->price,
+            'subtotal' => $this->subtotal,
+            'warehouse' => new WarehouseResource($this->whenLoaded('warehouse')),
+            'location' => $this->location,
+            'status' => $this->status,
+        ];
     }
 }

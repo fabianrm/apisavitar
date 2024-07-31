@@ -14,6 +14,15 @@ class EntryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'date' => $this->date,
+            'series' => $this->series,
+            'correlative' => $this->correlative,
+            'provider' => new SupplierResource($this->whenLoaded('supplier')),
+            'document' => new DocumentResource($this->whenLoaded('document')),
+            'entry_type' => new EntryTypeResource($this->whenLoaded('entry_type')),
+            'status' => $this->status,
+        ];
     }
 }

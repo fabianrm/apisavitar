@@ -14,6 +14,19 @@ class MaterialResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'code' => $this->code,
+            'name' => $this->name,
+            'category' => new CategoryResource($this->whenLoaded('category')),
+            'presentation' => new PresentationResource($this->whenLoaded('presentation')),
+            'series' => $this->series,
+            'model' => $this->model,
+            'brand' => new BrandResource($this->whenLoaded('brand')),
+            'min' => $this->min,
+            'type' => $this->type,
+            'image' => $this->image,
+            'status' => $this->status,
+        ];
     }
 }
