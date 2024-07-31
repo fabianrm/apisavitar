@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\OutputDetail;
 use App\Http\Requests\StoreOutputDetailRequest;
 use App\Http\Requests\UpdateOutputDetailRequest;
+use App\Http\Resources\OutputDetailCollection;
+use App\Http\Resources\OutputDetailResource;
 
 class OutputDetailController extends Controller
 {
@@ -13,7 +15,7 @@ class OutputDetailController extends Controller
      */
     public function index()
     {
-        //
+        return new OutputDetailCollection(OutputDetail::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class OutputDetailController extends Controller
      */
     public function store(StoreOutputDetailRequest $request)
     {
-        //
+        $outputDetail = OutputDetail::create($request->validated());
+        return new OutputDetailResource($outputDetail);
     }
 
     /**
@@ -37,7 +40,7 @@ class OutputDetailController extends Controller
      */
     public function show(OutputDetail $outputDetail)
     {
-        //
+        return new OutputDetailResource($outputDetail);
     }
 
     /**
@@ -53,7 +56,8 @@ class OutputDetailController extends Controller
      */
     public function update(UpdateOutputDetailRequest $request, OutputDetail $outputDetail)
     {
-        //
+        $outputDetail->update($request->validated());
+        return new OutputDetailResource($outputDetail);
     }
 
     /**
@@ -61,6 +65,7 @@ class OutputDetailController extends Controller
      */
     public function destroy(OutputDetail $outputDetail)
     {
-        //
+        $outputDetail->delete();
+        return response()->noContent();
     }
 }

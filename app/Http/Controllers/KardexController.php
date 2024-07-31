@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Kardex;
 use App\Http\Requests\StoreKardexRequest;
 use App\Http\Requests\UpdateKardexRequest;
+use App\Http\Resources\KardexCollection;
+use App\Http\Resources\KardexResource;
 
 class KardexController extends Controller
 {
@@ -13,7 +15,7 @@ class KardexController extends Controller
      */
     public function index()
     {
-        //
+        return new KardexCollection(Kardex::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class KardexController extends Controller
      */
     public function store(StoreKardexRequest $request)
     {
-        //
+        $kardex = Kardex::create($request->validated());
+        return new KardexResource($kardex);
     }
 
     /**
@@ -37,7 +40,7 @@ class KardexController extends Controller
      */
     public function show(Kardex $kardex)
     {
-        //
+        return new KardexResource($kardex);
     }
 
     /**
@@ -53,7 +56,8 @@ class KardexController extends Controller
      */
     public function update(UpdateKardexRequest $request, Kardex $kardex)
     {
-        //
+        $kardex->update($request->validated());
+        return new KardexResource($kardex);
     }
 
     /**
@@ -61,6 +65,7 @@ class KardexController extends Controller
      */
     public function destroy(Kardex $kardex)
     {
-        //
+        $kardex->delete();
+        return response()->noContent();
     }
 }

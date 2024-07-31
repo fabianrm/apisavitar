@@ -18,6 +18,10 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained('suppliers');
             $table->foreignId('document_id')->constrained('documents');
             $table->foreignId('entry_type_id')->constrained('entry_types');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->foreign('created_by')->references('id')->on('users');
+            $table->foreign('updated_by')->references('id')->on('users');
             $table->timestamps();
         });
     }

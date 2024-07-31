@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Document;
 use App\Http\Requests\StoreDocumentRequest;
 use App\Http\Requests\UpdateDocumentRequest;
+use App\Http\Resources\DocumentCollection;
+use App\Http\Resources\DocumentResource;
 
 class DocumentController extends Controller
 {
@@ -13,7 +15,7 @@ class DocumentController extends Controller
      */
     public function index()
     {
-        //
+        return new DocumentCollection(Document::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class DocumentController extends Controller
      */
     public function store(StoreDocumentRequest $request)
     {
-        //
+        $document = Document::create($request->validated());
+        return new DocumentResource($document);
     }
 
     /**
@@ -37,7 +40,7 @@ class DocumentController extends Controller
      */
     public function show(Document $document)
     {
-        //
+        return new DocumentResource($document);
     }
 
     /**
@@ -53,7 +56,8 @@ class DocumentController extends Controller
      */
     public function update(UpdateDocumentRequest $request, Document $document)
     {
-        //
+        $document->update($request->validated());
+        return new DocumentResource($document);
     }
 
     /**
@@ -61,6 +65,7 @@ class DocumentController extends Controller
      */
     public function destroy(Document $document)
     {
-        //
+        $document->delete();
+        return response()->noContent();
     }
 }

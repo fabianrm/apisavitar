@@ -24,6 +24,9 @@ return new class extends Migration
             $table->string('sender_name');
             $table->string('receiver_name');
             $table->string('comment')->nullable();
+            $table->string('status')->nullable();
+            $table->foreign('created_by')->references('id')->on('users');
+            $table->foreign('updated_by')->references('id')->on('users');
             $table->timestamps();
         });
     }

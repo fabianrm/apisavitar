@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Destination;
 use App\Http\Requests\StoreDestinationRequest;
 use App\Http\Requests\UpdateDestinationRequest;
+use App\Http\Resources\DestinationCollection;
+use App\Http\Resources\DestinationResource;
 
 class DestinationController extends Controller
 {
@@ -13,7 +15,7 @@ class DestinationController extends Controller
      */
     public function index()
     {
-        //
+        return new DestinationCollection(Destination::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class DestinationController extends Controller
      */
     public function store(StoreDestinationRequest $request)
     {
-        //
+        $destination = Destination::create($request->validated());
+        return new DestinationResource($destination);
     }
 
     /**
@@ -37,7 +40,7 @@ class DestinationController extends Controller
      */
     public function show(Destination $destination)
     {
-        //
+        return new DestinationResource($destination);
     }
 
     /**
@@ -53,7 +56,8 @@ class DestinationController extends Controller
      */
     public function update(UpdateDestinationRequest $request, Destination $destination)
     {
-        //
+        $destination->update($request->validated());
+        return new DestinationResource($destination);
     }
 
     /**
@@ -61,6 +65,7 @@ class DestinationController extends Controller
      */
     public function destroy(Destination $destination)
     {
-        //
+        $destination->delete();
+        return response()->noContent();
     }
 }

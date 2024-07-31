@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Entry;
 use App\Http\Requests\StoreEntryRequest;
 use App\Http\Requests\UpdateEntryRequest;
+use App\Http\Resources\EntryCollection;
+use App\Http\Resources\EntryResource;
 
 class EntryController extends Controller
 {
@@ -13,7 +15,7 @@ class EntryController extends Controller
      */
     public function index()
     {
-        //
+        return new EntryCollection(Entry::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class EntryController extends Controller
      */
     public function store(StoreEntryRequest $request)
     {
-        //
+        $entry = Entry::create($request->validated());
+        return new EntryResource($entry);
     }
 
     /**
@@ -37,7 +40,7 @@ class EntryController extends Controller
      */
     public function show(Entry $entry)
     {
-        //
+        return new EntryResource($entry);
     }
 
     /**
@@ -53,7 +56,8 @@ class EntryController extends Controller
      */
     public function update(UpdateEntryRequest $request, Entry $entry)
     {
-        //
+        $entry->update($request->validated());
+        return new EntryResource($entry);
     }
 
     /**
@@ -61,6 +65,7 @@ class EntryController extends Controller
      */
     public function destroy(Entry $entry)
     {
-        //
+        $entry->delete();
+        return response()->noContent();
     }
 }

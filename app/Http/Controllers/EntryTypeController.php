@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\EntryType;
 use App\Http\Requests\StoreEntryTypeRequest;
 use App\Http\Requests\UpdateEntryTypeRequest;
+use App\Http\Resources\EntryTypeCollection;
+use App\Http\Resources\EntryTypeResource;
 
 class EntryTypeController extends Controller
 {
@@ -13,7 +15,7 @@ class EntryTypeController extends Controller
      */
     public function index()
     {
-        //
+        return new EntryTypeCollection(EntryType::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class EntryTypeController extends Controller
      */
     public function store(StoreEntryTypeRequest $request)
     {
-        //
+        $entryType = EntryType::create($request->validated());
+        return new EntryTypeResource($entryType);
     }
 
     /**
@@ -37,7 +40,7 @@ class EntryTypeController extends Controller
      */
     public function show(EntryType $entryType)
     {
-        //
+        return new EntryTypeResource($entryType);
     }
 
     /**
@@ -53,7 +56,8 @@ class EntryTypeController extends Controller
      */
     public function update(UpdateEntryTypeRequest $request, EntryType $entryType)
     {
-        //
+        $entryType->update($request->validated());
+        return new EntryTypeResource($entryType);
     }
 
     /**
@@ -61,6 +65,7 @@ class EntryTypeController extends Controller
      */
     public function destroy(EntryType $entryType)
     {
-        //
+        $entryType->delete();
+        return response()->noContent();
     }
 }

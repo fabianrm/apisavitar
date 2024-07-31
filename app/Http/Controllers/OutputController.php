@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Output;
 use App\Http\Requests\StoreOutputRequest;
 use App\Http\Requests\UpdateOutputRequest;
+use App\Http\Resources\OutputCollection;
+use App\Http\Resources\OutputResource;
 
 class OutputController extends Controller
 {
@@ -13,7 +15,7 @@ class OutputController extends Controller
      */
     public function index()
     {
-        //
+        return new OutputCollection(Output::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class OutputController extends Controller
      */
     public function store(StoreOutputRequest $request)
     {
-        //
+        $output = Output::create($request->validated());
+        return new OutputResource($output);
     }
 
     /**
@@ -37,7 +40,7 @@ class OutputController extends Controller
      */
     public function show(Output $output)
     {
-        //
+        return new OutputResource($output);
     }
 
     /**
@@ -53,7 +56,8 @@ class OutputController extends Controller
      */
     public function update(UpdateOutputRequest $request, Output $output)
     {
-        //
+        $output->update($request->validated());
+        return new OutputResource($output);
     }
 
     /**
@@ -61,6 +65,7 @@ class OutputController extends Controller
      */
     public function destroy(Output $output)
     {
-        //
+        $output->delete();
+        return response()->noContent();
     }
 }

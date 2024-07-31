@@ -14,9 +14,12 @@ return new class extends Migration
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('name');
             $table->string('address');
             $table->string('phone');
+            $table->string('position');
+            $table->string('department');
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

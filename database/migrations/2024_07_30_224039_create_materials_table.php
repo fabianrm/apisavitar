@@ -24,6 +24,10 @@ return new class extends Migration
             $table->enum('type', ['material', 'herramienta']);
             $table->string('image')->nullable();
             $table->boolean('status')->default(true);
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->foreign('created_by')->references('id')->on('users');
+            $table->foreign('updated_by')->references('id')->on('users');
             $table->timestamps();
 
         });

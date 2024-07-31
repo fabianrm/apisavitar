@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Kardex extends Model
 {
@@ -16,5 +17,23 @@ class Kardex extends Model
     public function entryDetail()
     {
         return $this->belongsTo(EntryDetail::class);
+    }
+
+    /**
+     * Capturar usuario
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->created_by = Auth::id();
+            $model->updated_by = Auth::id();
+        });
+
+        static::updating(function ($model) {
+            $model->updated_by = Auth::id();
+        });
     }
 }

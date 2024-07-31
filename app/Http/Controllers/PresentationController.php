@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Presentation;
 use App\Http\Requests\StorePresentationRequest;
 use App\Http\Requests\UpdatePresentationRequest;
+use App\Http\Resources\PresentationCollection;
+use App\Http\Resources\PresentationResource;
 
 class PresentationController extends Controller
 {
@@ -13,7 +15,7 @@ class PresentationController extends Controller
      */
     public function index()
     {
-        //
+        return new PresentationCollection(Presentation::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class PresentationController extends Controller
      */
     public function store(StorePresentationRequest $request)
     {
-        //
+        $presentation = Presentation::create($request->validated());
+        return new PresentationResource($presentation);
     }
 
     /**
@@ -37,7 +40,7 @@ class PresentationController extends Controller
      */
     public function show(Presentation $presentation)
     {
-        //
+        return new PresentationResource($presentation);
     }
 
     /**
@@ -53,7 +56,8 @@ class PresentationController extends Controller
      */
     public function update(UpdatePresentationRequest $request, Presentation $presentation)
     {
-        //
+        $presentation->update($request->validated());
+        return new PresentationResource($presentation);
     }
 
     /**
@@ -61,6 +65,7 @@ class PresentationController extends Controller
      */
     public function destroy(Presentation $presentation)
     {
-        //
+        $presentation->delete();
+        return response()->noContent();
     }
 }

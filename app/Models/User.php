@@ -43,6 +43,11 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
+
 
     public function roles()
     {

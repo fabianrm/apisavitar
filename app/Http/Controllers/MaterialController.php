@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Material;
 use App\Http\Requests\StoreMaterialRequest;
 use App\Http\Requests\UpdateMaterialRequest;
+use App\Http\Resources\MaterialCollection;
+use App\Http\Resources\MaterialResource;
 
 class MaterialController extends Controller
 {
@@ -13,7 +15,7 @@ class MaterialController extends Controller
      */
     public function index()
     {
-        //
+        return new MaterialCollection(Material::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class MaterialController extends Controller
      */
     public function store(StoreMaterialRequest $request)
     {
-        //
+        $material = Material::create($request->validated());
+        return new MaterialResource($material);
     }
 
     /**
@@ -37,7 +40,7 @@ class MaterialController extends Controller
      */
     public function show(Material $material)
     {
-        //
+        return new MaterialResource($material);
     }
 
     /**
@@ -53,7 +56,8 @@ class MaterialController extends Controller
      */
     public function update(UpdateMaterialRequest $request, Material $material)
     {
-        //
+        $material->update($request->validated());
+        return new MaterialResource($material);
     }
 
     /**
@@ -61,6 +65,7 @@ class MaterialController extends Controller
      */
     public function destroy(Material $material)
     {
-        //
+        $material->delete();
+        return response()->noContent();
     }
 }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\EntryDetail;
 use App\Http\Requests\StoreEntryDetailRequest;
 use App\Http\Requests\UpdateEntryDetailRequest;
+use App\Http\Resources\EntryDetailCollection;
+use App\Http\Resources\EntryDetailResource;
 
 class EntryDetailController extends Controller
 {
@@ -13,7 +15,7 @@ class EntryDetailController extends Controller
      */
     public function index()
     {
-        //
+        return new EntryDetailCollection(EntryDetail::all());
     }
 
     /**
@@ -29,7 +31,8 @@ class EntryDetailController extends Controller
      */
     public function store(StoreEntryDetailRequest $request)
     {
-        //
+        $entryDetail = EntryDetail::create($request->validated());
+        return new EntryDetailResource($entryDetail);
     }
 
     /**
@@ -37,7 +40,7 @@ class EntryDetailController extends Controller
      */
     public function show(EntryDetail $entryDetail)
     {
-        //
+        return new EntryDetailResource($entryDetail);
     }
 
     /**
@@ -53,7 +56,8 @@ class EntryDetailController extends Controller
      */
     public function update(UpdateEntryDetailRequest $request, EntryDetail $entryDetail)
     {
-        //
+        $entryDetail->update($request->validated());
+        return new EntryDetailResource($entryDetail);
     }
 
     /**
@@ -61,6 +65,7 @@ class EntryDetailController extends Controller
      */
     public function destroy(EntryDetail $entryDetail)
     {
-        //
+        $entryDetail->delete();
+        return response()->noContent();
     }
 }
