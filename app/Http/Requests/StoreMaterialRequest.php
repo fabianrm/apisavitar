@@ -26,11 +26,11 @@ class StoreMaterialRequest extends FormRequest
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'presentation_id' => 'required|exists:presentations,id',
+            'brand_id' => 'required|exists:brands,id',
             'serial' => 'nullable|string|max:255',
             'model' => 'nullable|string|max:255',
-            'brand_id' => 'required|exists:brands,id',
             'min' => 'required|integer',
-            'type' => 'required|string|in:material,tool',
+            'type' => 'required|string|in:M,H',
             'image' => 'nullable|string|max:255',
             'status' => 'required|boolean',
         ];

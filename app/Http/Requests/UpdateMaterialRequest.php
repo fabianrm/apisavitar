@@ -30,7 +30,7 @@ class UpdateMaterialRequest extends FormRequest
             'model' => 'sometimes|nullable|string|max:255',
             'brand_id' => 'sometimes|required|exists:brands,id',
             'min' => 'sometimes|required|integer',
-            'type' => 'sometimes|required|string|in:material,tool',
+            'type' => 'sometimes|required|string|in:M,H',
             'image' => 'sometimes|nullable|string|max:255',
             'status' => 'sometimes|required|boolean',
         ];

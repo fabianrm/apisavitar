@@ -24,18 +24,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function () {
 
+    //Módulo ISP
     Route::get('invoices/search', [InvoiceController::class, 'searchInvoices']);
     Route::get('invoices/export', [InvoiceController::class, 'exportInvoices']);
-
     Route::get('services/by-customer/{customer_id}', [ServiceController::class, 'getServicesByCustomer']);
     Route::get('customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
-
     Route::get('invoices/{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
-
-
-
-
 
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
@@ -49,7 +44,6 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
         Route::get('/user/permissions', [PermissionController::class, 'getUserPermissions']);
       
-
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
         Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
         Route::post('expenses/generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
@@ -64,9 +58,12 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
         Route::get('summary', [DashboardController::class, 'getSummary']);
 
-        // Otras rutas protegidas...
-    });
+        //Módulo almacen
+        Route::apiResource('materials', MaterialController::class);
 
+
+    });
+    Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);
 
     Route::apiResource('plans', PlanController::class);
     Route::apiResource('boxs', BoxController::class);
@@ -75,7 +72,12 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('equipments', EquipmentController::class);
     Route::apiResource('enterprises', EnterpriseController::class);
 
-    Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);
+    //Módulo almacen
+    //Route::apiResource('materials', MaterialController::class);
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('presentations', PresentationController::class);
+
+
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::delete('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');

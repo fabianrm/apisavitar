@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -13,7 +14,7 @@ class Handler extends ExceptionHandler
      * @var array<int, class-string<Throwable>>
      */
     protected $dontReport = [
-            // ...
+        // ...
         ModelNotFoundException::class,
     ];
 
@@ -42,4 +43,7 @@ class Handler extends ExceptionHandler
             return $e->render($request);
         });
     }
+
+
+   
 }

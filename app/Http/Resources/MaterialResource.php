@@ -20,7 +20,7 @@ class MaterialResource extends JsonResource
             'name' => $this->name,
             'category' => new CategoryResource($this->whenLoaded('category')),
             'presentation' => new PresentationResource($this->whenLoaded('presentation')),
-            'series' => $this->series,
+            'serie' => $this->serial,
             'model' => $this->model,
             'brand' => new BrandResource($this->whenLoaded('brand')),
             'min' => $this->min,

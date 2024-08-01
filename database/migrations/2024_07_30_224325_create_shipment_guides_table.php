@@ -25,6 +25,8 @@ return new class extends Migration
             $table->string('receiver_name');
             $table->string('comment')->nullable();
             $table->string('status')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');
             $table->timestamps();

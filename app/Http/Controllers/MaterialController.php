@@ -15,7 +15,8 @@ class MaterialController extends Controller
      */
     public function index()
     {
-        return new MaterialCollection(Material::all());
+        $material = Material::with(['category', 'presentation', 'brand'])->get();
+        return new MaterialCollection($material);
     }
 
     /**
@@ -40,6 +41,7 @@ class MaterialController extends Controller
      */
     public function show(Material $material)
     {
+        $material = Material::with(['category', 'presentation', 'brand'])->findOrFail($material->id);
         return new MaterialResource($material);
     }
 
