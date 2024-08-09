@@ -2,8 +2,12 @@
 <html>
 
 <head>
-    <title>Receipt</title>
+    <title>Comprobante</title>
     <style>
+        @page {
+            margin-left: 0.2cm;
+            margin-right: 0.2cm;
+        }
         body {
             font-family: Arial, sans-serif;
             width: 58mm;
@@ -20,13 +24,13 @@
             background-position: center center;
             background-size: contain;
             background-repeat: no-repeat;
-            font-size: 11px;
+            font-size: 9px;
         }
 
 
         .totales {
             text-align: right;
-            margin-right: 5mm;
+            margin-right: 15mm;
         }
 
         .receipt-header,
@@ -44,7 +48,7 @@
         .datos-head {
             text-align: center;
             line-height: .5;
-            font-size: 12px;
+            font-size: 10px;
             margin-top: -5px;
         }
 
@@ -86,7 +90,8 @@
         <p class="divider">..................................................................</p>
     </div>
     <div class="receipt-footer">
-        <p style="font-size:11px">Gracias por navegar con Savitar Perú!</p>
+        <p style="font-size:9px">Gracias por navegar con Savitar Perú!</p>
+        <p style="font-size:9px">*************************************</p>
     </div>
 </body>
 

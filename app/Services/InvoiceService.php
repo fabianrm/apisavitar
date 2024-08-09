@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Service;
 use App\Models\Invoice;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class InvoiceService
 {
@@ -15,9 +16,9 @@ class InvoiceService
 
         foreach ($contracts as $service) {
 
-            \Log::info("Processing service_id: {$service->id}");
+            Log::info("Processing service_id: {$service->id}");
             $lastInvoice = $service->invoices()->orderBy('end_date', 'desc')->first();
-            \Log::info("Last invoice: " . ($lastInvoice ? $lastInvoice->id : 'none'));
+            Log::info("Last invoice: " . ($lastInvoice ? $lastInvoice->id : 'none'));
 
             if ($lastInvoice) {
                 $startDate = Carbon::parse($lastInvoice->end_date)->addDay();
@@ -42,7 +43,7 @@ class InvoiceService
                 'note' => "",
                 'status' => 'pending',
             ]);
-            \Log::info("Created invoice for service_id: {$service->id} from {$startDate} to {$endDate}");
+            Log::info("Created invoice for service_id: {$service->id} from {$startDate} to {$endDate}");
         }
     }
 
@@ -57,28 +58,28 @@ class InvoiceService
         $services = Service::where('status', 'activo')->get();
 
         foreach ($services as $service) {
-            \Log::info("Processing service_id: {$service->id}");
+            Log::info("Processing service_id: {$service->id}");
 
             $lastInvoice = $service->invoices()->orderBy('end_date', 'desc')->first();
-            \Log::info("Last invoice: " . ($lastInvoice ? $lastInvoice->id : 'none'));
+            Log::info("Last invoice: " . ($lastInvoice ? $lastInvoice->id : 'none'));
 
             if ($lastInvoice) {
                 $startDate = Carbon::parse($lastInvoice->end_date)->addDay();
             } else {
                 $startDate = Carbon::parse($service->installation_date);
-                \Log::info("Start date: {$startDate}");
+                Log::info("Start date: {$startDate}");
             }
 
             // Ajustar la fecha de fin al mismo día del próximo mes
             $endDate = $startDate->copy()->addMonth()->subDay();
-            \Log::info("End date: {$endDate}");
+            Log::info("End date: {$endDate}");
             // Verificar si la fecha de fin pertenece al mes y año actuales
             if ($startDate->month != $currentMonth || $startDate->year != $currentYear) {
-                \Log::info("Skipping creación de factura para service_id: {$service->id}, no pertenece al mes en curso o ya existe.");
+                Log::info("Skipping creación de factura para service_id: {$service->id}, no pertenece al mes en curso o ya existe.");
                 continue;
             }
 
-            \Log::info("Start date: {$startDate}, End date: {$endDate}");
+            Log::info("Start date: {$startDate}, End date: {$endDate}");
 
             // Crear la nueva factura solo si pertenece al mes en curso
             Invoice::create([
@@ -99,7 +100,7 @@ class InvoiceService
 
             $totalInvoices++;
 
-            \Log::info("Factura creada para service_id: {$service->id} from {$startDate} to {$endDate}");
+            Log::info("Factura creada para service_id: {$service->id} from {$startDate} to {$endDate}");
         }
         return $totalInvoices;
     }
@@ -112,22 +113,20 @@ class InvoiceService
         $endOfCurrentMonth = $currentDate->copy()->addMonth();
         $totalInvoices = 0;
 
-        \Log::info("####Generando facturas desde {$threeMonthsAgo->toDateString()} a {$endOfCurrentMonth->toDateString()}");
+        Log::info("####Generando facturas desde {$threeMonthsAgo->toDateString()} a {$endOfCurrentMonth->toDateString()}");
 
         $services = Service::where('status', 'activo')->get();
 
         foreach ($services as $service) {
             $lastInvoice = $service->invoices()->orderBy('end_date', 'desc')->first();
-            \Log::info("lastInvoice=> {$lastInvoice}" );
+            Log::info("lastInvoice=> {$lastInvoice}" );
             $startDate = $lastInvoice ? Carbon::parse($lastInvoice->end_date)->addDay() : Carbon::parse($service->installation_date);
 
-            \Log::info("startdateI=> {$startDate}");
+            Log::info("startdateI=> {$startDate}");
 
             // Asegurarse de que el startDate esté dentro del rango de tres meses
             if ($startDate->lessThan($threeMonthsAgo)) {
-               
                 $startDate = $threeMonthsAgo;
-               // \Log::info("startdateX=> {$startDate}");
             }
 
             // Corrección para incluir las instalaciones del mes actual
@@ -145,16 +144,12 @@ class InvoiceService
                     ->where('end_date', $endDate)
                     ->first();
 
-               // \Log::info("startdateM=> {$startDate}");
-               // \Log::info("endate=> {$endDate}");
-                
-
                 if ($existingInvoice) {
-                    \Log::info("Factura existe para el service_id: {$service->id} desde {$startDate->toDateString()} to {$endDate->toDateString()}");
+                    Log::info("Factura existe para el service_id: {$service->id} desde {$startDate->toDateString()} to {$endDate->toDateString()}");
                 } else {
                     // Crear la factura solo si la fecha de inicio está dentro del rango de los últimos tres meses hasta el mes actual
                     if ($startDate->greaterThanOrEqualTo($threeMonthsAgo) && $endDate->lessThanOrEqualTo($endOfCurrentMonth)) {
-                        \Log::info("Creando factura para service_id: {$service->id} desde {$startDate->toDateString()} hasta {$endDate->toDateString()}");
+                        Log::info("Creando factura para service_id: {$service->id} desde {$startDate->toDateString()} hasta {$endDate->toDateString()}");
 
                         Invoice::create([
                             'service_id' => $service->id,
@@ -173,7 +168,7 @@ class InvoiceService
                         ]);
                         $totalInvoices++;
 
-                        \Log::info("Factura creada para service_id: {$service->id} desde {$startDate} hasta {$endDate}");
+                        Log::info("Factura creada para service_id: {$service->id} desde {$startDate} hasta {$endDate}");
                     }
                    
                 }
@@ -195,7 +190,7 @@ class InvoiceService
             ->get();
 
         foreach ($overdueInvoices as $invoice) {
-            \Log::info("Updating invoice_id: {$invoice->id} to status 'vencida'");
+            Log::info("Updating invoice_id: {$invoice->id} to status 'vencida'");
             $invoice->update(['status' => 'vencida']);
         }
     }

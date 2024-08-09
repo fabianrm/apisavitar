@@ -11,7 +11,7 @@ class Kardex extends Model
     use HasFactory;
 
     protected $fillable = [
-        'entry_detail_id', 'date', 'operation', 'quantity', 'price', 'total', 'comment'
+        'entry_detail_id', 'date', 'has', 'operation', 'quantity', 'stock', 'comment'
     ];
 
     public function entryDetail()

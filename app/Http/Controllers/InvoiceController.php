@@ -261,8 +261,8 @@ class InvoiceController extends Controller
             'note' => $invoice->note,
         ];
 
-        $pdf = PDF::loadView('invoice.receipt', $data)->setPaper([0, 0, 226, 654], 'portrait');
-        //$pdf = PDF::loadView('invoice.receipt', compact('invoice'))->setPaper([0, 0, 226, 654], 'portrait'); // 58mm x 140mm
+        $pdf = PDF::loadView('invoice.receipt', $data)->setPaper([0, 0, 155, 654], 'portrait');
+        //$pdf = PDF::loadView('invoice.receipt', compact('invoice'))->setPaper([0, 0, 226, 654], 'portrait'); // 80mm x 140mm
         return $pdf->download('recibo_nro_' . $invoice->receipt . '.pdf');
     }
 }

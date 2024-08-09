@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('entry_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('entry_id')->constrained('entries');
-            $table->date('date');
+            $table->datetime('date');
             $table->foreignId('material_id')->constrained('materials');
             $table->integer('quantity');
             $table->integer('current_stock');

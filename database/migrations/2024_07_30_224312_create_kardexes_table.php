@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('kardexes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('entry_detail_id')->constrained('entry_details');
-            $table->date('date');
+            $table->datetime('date');
+            $table->decimal('has', 8, 2);
             $table->enum('operation', ['entry', 'output']);
             $table->integer('quantity');
-            $table->decimal('price', 8, 2);
-            $table->decimal('total', 8, 2);
+            $table->decimal('stock', 8, 2);
             $table->string('comment')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

@@ -23,12 +23,12 @@ class UpdateEntryRequest extends FormRequest
     {
         return [
             'date' => 'sometimes|required|date',
-            'series' => 'sometimes|required|string|max:255',
-            'correlative' => 'sometimes|required|string|max:255',
-            'provider_id' => 'sometimes|required|exists:providers,id',
+            'document_number' => 'sometimes|required|string|max:255',
+            'supplier_id' => 'sometimes|required|exists:suppliers,id',
             'document_id' => 'sometimes|required|exists:documents,id',
             'entry_type_id' => 'sometimes|required|exists:entry_types,id',
-            'status' => 'sometimes|required|boolean',
+            'total' => 'sometimes',
+            'status' => 'sometimes',
         ];
     }
 }

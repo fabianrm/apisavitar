@@ -19,9 +19,9 @@ class EntryResource extends JsonResource
             'date' => $this->date,
             'series' => $this->series,
             'correlative' => $this->correlative,
-            'provider' => new SupplierResource($this->whenLoaded('supplier')),
+            'supplier' => new SupplierResource($this->whenLoaded('supplier')),
             'document' => new DocumentResource($this->whenLoaded('document')),
-            'entry_type' => new EntryTypeResource($this->whenLoaded('entry_type')),
+            'entry_type' => new EntryTypeResource($this->whenLoaded('entryType')),
             'status' => $this->status,
         ];
     }

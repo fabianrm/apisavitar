@@ -10,7 +10,7 @@ class Entry extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date', 'document_number', 'supplier_id', 'document_id', 'entry_type_id'];
+    protected $fillable = ['date', 'document_number', 'supplier_id', 'document_id', 'entry_type_id', 'total', 'status'];
 
     public function supplier()
     {

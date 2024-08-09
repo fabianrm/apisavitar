@@ -60,6 +60,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
         //Módulo almacen
         Route::apiResource('materials', MaterialController::class);
+        Route::apiResource('entries', EntryController::class);
 
 
     });
@@ -76,6 +77,11 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     //Route::apiResource('materials', MaterialController::class);
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('presentations', PresentationController::class);
+    Route::apiResource('warehouses', WarehouseController::class);
+   
+    Route::apiResource('suppliers', SupplierController::class);
+    Route::apiResource('documents', DocumentController::class);
+    Route::apiResource('entry-types', EntryTypeController::class);
 
 
     Route::post('login', [AuthController::class, 'login']);
