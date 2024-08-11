@@ -18,6 +18,7 @@ class Box extends Model
         'longitude',
         'total_ports',
         'available_ports',
+        'note',
         'status',
     ];
 

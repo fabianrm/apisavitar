@@ -26,6 +26,7 @@ class UpdateEquipmentRequest extends FormRequest
         if ($method === "PUT") {
             return [
                 'type' => ['required'],
+                'mac' => ['required'],
                 'serie' => ['required'],
                 'model' => ['required'],
                 'brandId' => ['required'],
@@ -35,6 +36,7 @@ class UpdateEquipmentRequest extends FormRequest
         } else {
             return [
                 'type' => ['sometimes', 'required'],
+                'mac' => ['sometimes', 'required'],
                 'serie' => ['sometimes', 'required'],
                 'model' => ['sometimes', 'required'],
                 'brandId' => ['sometimes', 'required'],

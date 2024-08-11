@@ -45,6 +45,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::get('/user/permissions', [PermissionController::class, 'getUserPermissions']);
       
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
+        Route::post('invoices/generateByService/{id}', [InvoiceController::class, 'generateInvoicesByService']);
         Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
         Route::post('expenses/generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
         Route::get('expenses/report', [ExpenseController::class, 'expenseReport']);

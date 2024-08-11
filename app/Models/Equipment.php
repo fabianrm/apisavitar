@@ -13,6 +13,7 @@ class Equipment extends Model
     protected $fillable = [
         'id',
         'type',
+        'mac',
         'serie',
         'model',
         'brand_id',

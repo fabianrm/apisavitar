@@ -30,6 +30,7 @@ class StoreBoxRequest extends FormRequest
             'longitude'=> [''],
             'totalPorts' => ['required'],
             'availablePorts' => [''],
+            'note' => [''],
             'status' => ['required'],
         ];
     }

@@ -42,6 +42,9 @@ class StoreServiceRequest extends FormRequest
             'userPppoe' => [''],
             'passPppoe' => [''],
             'observation' => [''],
+            'installationPayment' => [''],
+            'installationAmount' => [''],
+            'prepayment' => [''],
             'status' => ['required']
         ];
     }
@@ -64,7 +67,10 @@ class StoreServiceRequest extends FormRequest
             'due_date' => $this->dueDate,
             'end_date' => $this->endDate, 
             'user_pppoe' => $this->userPppoe, 
-            'pass_pppoe' => $this->passPppoe, 
+            'pass_pppoe' => $this->passPppoe,
+            'installation_payment' => $this->installationPayment, 
+            'installation_amount' => $this->installationAmount, 
+           
         ]);
     }
 

@@ -24,7 +24,9 @@ class DatabaseSwitcher
             Config::set('database.default', 'mysql');
         } elseif ($clientID === 'corales') {
             Config::set('database.default', 'mysql_corales');
-        }else{
+        } elseif ($clientID === 'vargasnet') {
+            Config::set('database.default', 'mysql_vargasnet');
+        } else {
             return 0;
         }
         return $next($request);

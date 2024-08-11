@@ -32,6 +32,7 @@ class UpdateBoxRequest extends FormRequest
                 'longitude' => [''],
                 'totalPorts' => ['required'],
                 'availablePorts' => [''],
+                'note' => [''],
                 'status' => ['required'],
             ];
         } else {

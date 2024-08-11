@@ -23,6 +23,7 @@ class StoreEquipmentRequest extends FormRequest
     {
         return [
             'type' => ['required'],
+            'mac' => ['required'],
             'serie' => ['required'],
             'model' => ['required'],
             'brandId' => ['required'],

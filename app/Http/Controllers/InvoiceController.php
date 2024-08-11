@@ -108,7 +108,7 @@ class InvoiceController extends Controller
     {
         $invoiceService = app(InvoiceService::class);
         $totalInvoices = $invoiceService->generateCurrentMonthInvoices();
-        //return response()->json(['Facturas del mes generadas correctamente']);
+
         return response()->json(
             [
                 'totalInvoices' => $totalInvoices,
@@ -116,6 +116,25 @@ class InvoiceController extends Controller
             ]
         );
     }
+
+    /**
+     * Generar facturas de un contrato
+     */
+    function generateInvoicesByService($id) {
+        $invoiceService = app(InvoiceService::class);
+        $totalInvoices = $invoiceService->generateInvoicesForService($id);
+
+        return response()->json(
+            [
+                'totalInvoices' => $totalInvoices,
+                'message' => $totalInvoices . ' facturas generadas'
+            ]
+        );
+
+    }
+
+
+
 
 
     /***
@@ -194,6 +213,10 @@ class InvoiceController extends Controller
         if ($request->has('customer_name') && $request->input('customer_name') !== null) {
             $query->where('customers.name', 'like', '%' . $request->input('customer_name') . '%');
         }
+
+        // Ordenar por nombre del cliente
+        $query->orderBy('customers.name')
+            ->orderBy('invoices.start_date', 'desc');
 
         // Usar la paginación de Laravel
         $invoices = $query->with(['service.customers', 'service.plans'])->paginate($perPage);
