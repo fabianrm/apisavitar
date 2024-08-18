@@ -27,6 +27,7 @@ class Output extends Model
         return $this->hasMany(OutputDetail::class);
     }
 
+
     /**
      * Capturar usuario
      * @return void

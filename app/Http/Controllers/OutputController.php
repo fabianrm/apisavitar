@@ -7,6 +7,11 @@ use App\Http\Requests\StoreOutputRequest;
 use App\Http\Requests\UpdateOutputRequest;
 use App\Http\Resources\OutputCollection;
 use App\Http\Resources\OutputResource;
+use App\Models\EntryDetail;
+use App\Models\Kardex;
+use App\Models\OutputDetail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OutputController extends Controller
 {
@@ -15,7 +20,18 @@ class OutputController extends Controller
      */
     public function index()
     {
-        return new OutputCollection(Output::all());
+        $outputs = Output::with([
+            
+            'destination', 
+            'employee', 
+            'outputDetails', 
+            'outputDetails.entryDetail',
+            'outputDetails.entryDetail.material.category',
+            'outputDetails.entryDetail.material.presentation',
+            'outputDetails.entryDetail.material.brand',
+            ])->get();
+        return new OutputCollection($outputs);
+
     }
 
     /**
@@ -31,15 +47,96 @@ class OutputController extends Controller
      */
     public function store(StoreOutputRequest $request)
     {
-        $output = Output::create($request->validated());
-        return new OutputResource($output);
+        DB::beginTransaction();
+
+        try {
+            // Crear la salida
+            // $output = Output::create($request->only(['number', 'date', 'destination_id', 'employee_id', 'total', 'comment']));
+
+            // Obtener el número más reciente de salida
+            $lastOutput = Output::orderBy('id', 'desc')->first();
+            $lastNumber = $lastOutput ? intval(substr($lastOutput->number, 4)) : 0;
+
+            // Incrementar el número para la nueva salida
+            $newNumber = 'SAL-' . str_pad($lastNumber + 1, 6, '0', STR_PAD_LEFT);
+
+            // Crear la salida con el nuevo número
+            $output = Output::create([
+                'number' => $newNumber,
+                'date' => $request->date,
+                'destination_id' => $request->destination_id,
+                'employee_id' => $request->employee_id,
+                'total' => 0, // Se actualizará después
+                'comment' => $request->comment,
+            ]);
+
+            // Crear los detalles de la salida
+            $totalOutput = 0; // Para calcular el total de la salida
+
+            foreach ($request->output_details as $detail) {
+                // Obtener el detalle de entrada correspondiente
+                $entryDetail = EntryDetail::findOrFail($detail['entry_detail_id']);
+
+                // Calcular el subtotal
+                $subtotal = $detail['quantity'] * $entryDetail->price;
+
+                // Crear el detalle de la salida
+                $outputDetail = OutputDetail::create([
+                    'output_id' => $output->id,
+                    'entry_detail_id' => $entryDetail->id,
+                    'quantity' => $detail['quantity'],
+                    'subtotal' => $subtotal,
+                ]);
+
+                // Reducir el current_stock del detalle de entrada
+                $entryDetail->decrement('current_stock', $detail['quantity']);
+
+                // Obtener el último registro de Kardex para este material
+                $lastKardex = Kardex::where('entry_detail_id', $entryDetail->id)->orderBy('date', 'desc')->first();
+                $previousStock = $lastKardex ? $lastKardex->stock : 0;
+
+                // Registrar en el Kardex
+                Kardex::create([
+                    'entry_detail_id' => $entryDetail->id,
+                    'date' => $output->date,
+                    'has' => $previousStock,
+                    'operation' => 'OUTPUT',
+                    'quantity' => -$detail['quantity'],
+                    'stock' => $previousStock - $detail['quantity'],
+                    'comment' => 'Salida por ' . $output->number,
+                    'created_by' => auth()->user()->id,
+                    'updated_by' => auth()->user()->id,
+                ]);
+
+                // Sumar al total de la salida
+                $totalOutput += $subtotal;
+            }
+
+            // Actualizar el total de la salida
+            $output->update(['total' => $totalOutput]);
+
+            DB::commit();
+
+            return new OutputResource($output);
+        } catch (\Exception $e) {
+            Log::info($e->getMessage());
+            Log::info($e->getLine());
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to create output'], 500);
+        }
     }
+
 
     /**
      * Display the specified resource.
      */
     public function show(Output $output)
     {
+        $output = Output::with([
+            'outputDetails.entryDetail.material.category',
+            'outputDetails.entryDetail.material.presentation',
+            'outputDetails.entryDetail.material.brand',
+            ])->findOrFail($output->id);
         return new OutputResource($output);
     }
 

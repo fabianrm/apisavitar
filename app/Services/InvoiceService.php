@@ -36,7 +36,7 @@ class InvoiceService
                 'igv' => 0.00,
                 'discount' => 0.00,
                 'letter_amount' => "",
-                'due_date' => $endDate->copy()->addDays(5),//due_date 5 days after end date for example
+                'due_date' => $endDate->copy()->addDays(5), //due_date 5 days after end date for example
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'receipt' => "",
@@ -89,7 +89,7 @@ class InvoiceService
                 'discount' => 0.00,
                 'amount' => 0.00,
                 'letter_amount' => null,
-                'due_date' => $endDate->copy()->addDays(5),//due_date 5 days after end date for example
+                'due_date' => $endDate->copy()->addDays(5), //due_date 5 days after end date for example
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'paid_dated' => null,
@@ -175,7 +175,7 @@ class InvoiceService
     //     return $totalInvoices;
     // }
 
-
+    //Implementado en el sistema
     public function generateCurrentMonthInvoices()
     {
         $currentDate = Carbon::now();
@@ -198,12 +198,19 @@ class InvoiceService
 
             // Validar si ya se generó la factura de instalación
             $installationInvoiceExists = Invoice::where('service_id', $service->id)
-            ->where('start_date', $service->installation_date)
+                ->where('start_date', $service->installation_date)
                 ->where('end_date', $service->installation_date)
                 ->exists();
 
-            if ($service->installation_payment && !$installationInvoiceExists
-            ) {
+            // Obtener el último número de recibo
+            $lastReceipt = Invoice::whereNotNull('receipt')->orderBy('receipt', 'desc')->first();
+            $nextReceiptNumber = $lastReceipt ? intval(substr($lastReceipt->receipt, -6)) + 1 : 1;
+
+            if ($service->installation_payment && !$installationInvoiceExists) {
+
+                // Formatear y asignar el recibo
+                $formattedReceipt = '003-N°. ' . sprintf('%06d', $nextReceiptNumber++);
+
                 Invoice::create([
                     'service_id' => $service->id,
                     'price' => $service->installation_amount,
@@ -215,7 +222,7 @@ class InvoiceService
                     'start_date' => $service->installation_date,
                     'end_date' => $service->installation_date,
                     'paid_dated' => null,
-                    'receipt' => null,
+                    'receipt' => $formattedReceipt,
                     'note' => 'Factura por instalación',
                     'status' => 'pendiente',
                 ]);
@@ -228,16 +235,19 @@ class InvoiceService
 
                 // Verificar si la factura ya existe para el rango de fechas
                 $existingInvoice = Invoice::where('service_id', $service->id)
-                ->where('start_date', $startDate)
-                ->where('end_date', $endDate)
-                ->first();
+                    ->where('start_date', $startDate)
+                    ->where('end_date', $endDate)
+                    ->first();
 
                 if (!$existingInvoice) {
                     Log::info("Creando factura para service_id: {$service->id} desde {$startDate->toDateString()} hasta {$endDate->toDateString()}");
 
                     $dueDate = $service->prepayment
-                    ? $startDate->copy()->addDays(5)
+                        ? $startDate->copy()->addDays(5)
                         : $endDate->copy()->addDays(5);
+
+                    // Formatear y asignar el recibo
+                    $formattedReceipt = '003-N°. ' . sprintf('%06d', $nextReceiptNumber++);
 
                     Invoice::create([
                         'service_id' => $service->id,
@@ -250,7 +260,7 @@ class InvoiceService
                         'start_date' => $startDate,
                         'end_date' => $endDate,
                         'paid_dated' => null,
-                        'receipt' => null,
+                        'receipt' => $formattedReceipt,
                         'note' => null,
                         'status' => 'pendiente',
                     ]);
@@ -286,7 +296,8 @@ class InvoiceService
             return $totalInvoices;
         }
 
-        $lastInvoice = $service->invoices()->orderBy('end_date',
+        $lastInvoice = $service->invoices()->orderBy(
+            'end_date',
             'desc'
         )->first();
         $startDate = $lastInvoice ? Carbon::parse($lastInvoice->end_date)->addDay() : Carbon::parse($service->installation_date);
@@ -298,11 +309,19 @@ class InvoiceService
 
         // Validar si ya se generó la factura de instalación
         $installationInvoiceExists = Invoice::where('service_id', $service->id)
-        ->where('start_date', $service->installation_date)
-        ->where('end_date', $service->installation_date)
-        ->exists();
+            ->where('start_date', $service->installation_date)
+            ->where('end_date', $service->installation_date)
+            ->exists();
+
+        // Obtener el último número de recibo
+        $lastReceipt = Invoice::whereNotNull('receipt')->orderBy('receipt', 'desc')->first();
+        $nextReceiptNumber = $lastReceipt ? intval(substr($lastReceipt->receipt, -6)) + 1 : 1;
 
         if ($service->installation_payment && !$installationInvoiceExists) {
+
+            // Formatear y asignar el recibo
+            $formattedReceipt = '003-N°. ' . sprintf('%06d', $nextReceiptNumber++);
+
             Invoice::create([
                 'service_id' => $service->id,
                 'price' => $service->installation_amount,
@@ -314,7 +333,7 @@ class InvoiceService
                 'start_date' => $service->installation_date,
                 'end_date' => $service->installation_date,
                 'paid_dated' => null,
-                'receipt' => null,
+                'receipt' => $formattedReceipt,
                 'note' => 'Factura por instalación',
                 'status' => 'pendiente',
             ]);
@@ -335,8 +354,11 @@ class InvoiceService
                 Log::info("Creando factura para service_id: {$service->id} desde {$startDate->toDateString()} hasta {$endDate->toDateString()}");
 
                 $dueDate = $service->prepayment
-                ? $startDate->copy()->addDays(5)
-                : $endDate->copy()->addDays(5);
+                    ? $startDate->copy()->addDays(5)
+                    : $endDate->copy()->addDays(5);
+
+                // Formatear y asignar el recibo
+                $formattedReceipt = '003-N°. ' . sprintf('%06d', $nextReceiptNumber++);
 
                 Invoice::create([
                     'service_id' => $service->id,
@@ -349,7 +371,7 @@ class InvoiceService
                     'start_date' => $startDate,
                     'end_date' => $endDate,
                     'paid_dated' => null,
-                    'receipt' => null,
+                    'receipt' => $formattedReceipt,
                     'note' => null,
                     'status' => 'pendiente',
                 ]);

@@ -21,7 +21,9 @@ class EntryResource extends JsonResource
             'correlative' => $this->correlative,
             'supplier' => new SupplierResource($this->whenLoaded('supplier')),
             'document' => new DocumentResource($this->whenLoaded('document')),
+            'document_number' => $this->document_number,
             'entry_type' => new EntryTypeResource($this->whenLoaded('entryType')),
+            'total' => $this->total,
             'status' => $this->status,
         ];
     }

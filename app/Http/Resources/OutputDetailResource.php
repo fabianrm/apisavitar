@@ -16,12 +16,11 @@ class OutputDetailResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'exit' => new OutputResource($this->whenLoaded('output')),
-            'entry_detail' => new EntryDetailResource($this->whenLoaded('entry_detail')),
+            'entry_detail_id' => $this->entry_detail_id,
+            'entry_detail' => new EntryDetailResource($this->whenLoaded('entryDetail')),
+            'material' => new MaterialResource($this->whenLoaded('entryDetail.material')),
             'quantity' => $this->quantity,
             'subtotal' => $this->subtotal,
-            'status' => $this->status,
         ];
-
     }
 }

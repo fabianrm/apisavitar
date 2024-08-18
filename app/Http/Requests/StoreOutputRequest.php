@@ -22,11 +22,10 @@ class StoreOutputRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'number' => 'required|string|max:255',
             'date' => 'required|date',
             'destination_id' => 'required|exists:destinations,id',
             'employee_id' => 'required|exists:employees,id',
-            'total' => 'required|numeric',
+            'total' => '',
             'comment' => 'nullable|string|max:255',
             'status' => 'required|boolean',
         ];

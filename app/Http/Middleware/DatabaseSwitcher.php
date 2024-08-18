@@ -17,6 +17,7 @@ class DatabaseSwitcher
      */
     public function handle(Request $request, Closure $next): Response
     {
+        //TODO: Setear la conexión del cliente en automatico.
         $clientID = $request->header('X-Client-ID');
         Log::info('Soy el cliente Id: ' . $clientID);
 

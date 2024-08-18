@@ -23,6 +23,7 @@ class OutputResource extends JsonResource
             'total' => $this->total,
             'comment' => $this->comment,
             'status' => $this->status,
+            'details' => OutputDetailResource::collection($this->whenLoaded('outputDetails')),
         ];
     }
 }

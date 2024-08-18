@@ -23,23 +23,8 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        // $customers = Customer::all();
-        // $services = Service::with('customers')->get();
-        //return new ServiceCollection($services);
-
-        /*   $services = Service::with('customers')->get();
-          $transformedServices = $services->map(function ($service) {
-              return [
-                  'id' => $service->id,
-                  'name' => $service->router_id,
-                  'price' => $service->plan_id,
-                  'customer_name' => $service->customers->name,
-              ];
-          });
-          return response()->json(['data' => $transformedServices]); */
-
-        $services = Service::with(['customers', 'routers', 'plans', 'cities'])->get();
-        return new ServiceCollection($services);
+        $service = Service::with(['customers', 'routers', 'plans', 'cities'])->get();
+        return new ServiceCollection($service);
     }
 
     /**
@@ -72,9 +57,13 @@ class ServiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Service $service)
     {
-        $service = Service::find($id);
+
+        // $service = Service::with(['customers', 'plans', 'boxes', 'cities', 'equipments'])->findOrFail($service->id);
+        // return new ServiceResource($service);
+
+        $service = Service::find($service->id);
 
         if (!$service) {
             throw new ModelNotFoundException('Service not found');

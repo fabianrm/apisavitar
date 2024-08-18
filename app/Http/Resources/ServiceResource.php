@@ -47,7 +47,7 @@ class ServiceResource extends JsonResource
             'passPppoe' => $this->pass_pppoe,
             'observation' => $this->observation,
             'status' => $this->status,
-            
+
         ];
 
         // return parent::toArray($request);

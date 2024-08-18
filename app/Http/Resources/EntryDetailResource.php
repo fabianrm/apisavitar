@@ -16,7 +16,7 @@ class EntryDetailResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'entry' => new EntryResource($this->whenLoaded('entry')),
+            //'entry' => new EntryResource($this->whenLoaded('entry')),
             'date' => $this->date,
             'material' => new MaterialResource($this->whenLoaded('material')),
             'quantity' => $this->quantity,

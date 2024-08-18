@@ -27,6 +27,7 @@ class StoreEntryRequest extends FormRequest
             'supplier_id' => 'required|exists:suppliers,id',
             'document_id' => 'required|exists:documents,id',
             'entry_type_id' => 'required|exists:entry_types,id',
+            'total' => 'required',
         ];
     }
 }

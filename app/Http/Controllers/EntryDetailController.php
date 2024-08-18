@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\EntryDetail;
 use App\Http\Requests\StoreEntryDetailRequest;
 use App\Http\Requests\UpdateEntryDetailRequest;
+use App\Http\Resources\EntryCollection;
 use App\Http\Resources\EntryDetailCollection;
 use App\Http\Resources\EntryDetailResource;
+use App\Models\Entry;
 
 class EntryDetailController extends Controller
 {
@@ -15,7 +17,10 @@ class EntryDetailController extends Controller
      */
     public function index()
     {
-        return new EntryDetailCollection(EntryDetail::all());
+        $entry = EntryDetail::with(['material', 'material.presentation', 'material.category', 'warehouse'])->get();
+        return new EntryDetailCollection($entry);
+
+        //return new EntryDetailCollection(EntryDetail::all());
     }
 
     /**
@@ -40,7 +45,8 @@ class EntryDetailController extends Controller
      */
     public function show(EntryDetail $entryDetail)
     {
-        return new EntryDetailResource($entryDetail);
+        $entry = EntryDetail::with(['material','material.presentation', 'material.category', 'warehouse'])->findOrFail($entryDetail->id);
+        return new EntryDetailResource($entry);
     }
 
     /**

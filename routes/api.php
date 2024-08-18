@@ -62,9 +62,18 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         //Módulo almacen
         Route::apiResource('materials', MaterialController::class);
         Route::apiResource('entries', EntryController::class);
+        Route::apiResource('outputs', OutputController::class);
 
 
     });
+
+    //Route::apiResource('outputs', OutputController::class);
+    Route::apiResource('destinations', DestinationController::class);
+    Route::apiResource('employees', EmployeeController::class);
+    Route::apiResource('entry-details', EntryDetailController::class);
+
+
+
     Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);
 
     Route::apiResource('plans', PlanController::class);
