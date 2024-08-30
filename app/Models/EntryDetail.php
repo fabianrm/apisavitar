@@ -32,4 +32,9 @@ class EntryDetail extends Model
     {
         return $this->hasMany(OutputDetail::class);
     }
+
+    public function kardexes()
+    {
+        return $this->hasMany(Kardex::class);
+    }
 }

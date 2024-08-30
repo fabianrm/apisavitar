@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Http\Resources\BrandCollection;
 use App\Http\Requests\StoreBrandRequest;
 use App\Http\Requests\UpdateBrandRequest;
+use App\Http\Resources\BrandResource;
 
 class BrandController extends Controller
 {
@@ -31,7 +32,7 @@ class BrandController extends Controller
      */
     public function store(StoreBrandRequest $request)
     {
-        //
+        return new BrandResource(Brand::create($request->all()));
     }
 
     /**
@@ -39,7 +40,7 @@ class BrandController extends Controller
      */
     public function show(Brand $brand)
     {
-        //
+        return new BrandResource($brand);
     }
 
     /**
@@ -55,7 +56,7 @@ class BrandController extends Controller
      */
     public function update(UpdateBrandRequest $request, Brand $brand)
     {
-        //
+        $brand->update($request->all());
     }
 
     /**

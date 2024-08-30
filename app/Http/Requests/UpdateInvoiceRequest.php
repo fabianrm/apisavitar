@@ -35,6 +35,7 @@ class UpdateInvoiceRequest extends FormRequest
                 'endDate' => [''],
                 'paidDated' => ['required'],
                 'receipt' => [''],
+                'tipo_pago' => [''],
                 'note' => [''],
                 'status' => ['required'],
             ];
@@ -51,12 +52,10 @@ class UpdateInvoiceRequest extends FormRequest
                 'endDate' => ['sometimes', ''],
                 'paidDated' => ['sometimes', 'required'],
                 'receipt' => ['sometimes', ''],
+                'tipo_pago' => ['sometimes', ''],
                 'note' => ['sometimes', ''],
                 'status' => ['sometimes', 'required'],
             ];
         }
     }
-
-   
-
 }

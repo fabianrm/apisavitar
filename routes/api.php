@@ -32,6 +32,10 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
     Route::get('invoices/{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
 
+    Route::get('entries/stock', [EntryDetailController::class, 'getStockSummary']);
+
+
+
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('customers/check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);
@@ -60,6 +64,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::get('summary', [DashboardController::class, 'getSummary']);
 
         //Módulo almacen
+      
         Route::apiResource('materials', MaterialController::class);
         Route::apiResource('entries', EntryController::class);
         Route::apiResource('outputs', OutputController::class);
@@ -67,6 +72,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
     });
 
+  
     //Route::apiResource('outputs', OutputController::class);
     Route::apiResource('destinations', DestinationController::class);
     Route::apiResource('employees', EmployeeController::class);

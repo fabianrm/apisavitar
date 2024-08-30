@@ -30,6 +30,7 @@ class InvoiceResource extends JsonResource
             'dueDate' => $this->due_date,
             'paidDated' => $this->paid_dated,
             'receipt' => $this->receipt,
+            'tipoPago' => $this->tipo_pago,
             'note' => $this->note,
             'status' => $this->status
         ];

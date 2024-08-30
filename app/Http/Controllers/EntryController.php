@@ -96,7 +96,9 @@ class EntryController extends Controller
      */
     public function show(Entry $entry)
     {
+        $entry = Entry::with(['supplier', 'document', 'entryType', 'entryDetails', 'entryDetails.material',  'entryDetails.material.presentation', 'entryDetails.warehouse'])->findOrFail($entry->id);
         return new EntryResource($entry);
+        //return new EntryResource($entry);
     }
 
     /**
@@ -173,7 +175,95 @@ class EntryController extends Controller
      */
     public function destroy(Entry $entry)
     {
-        $entry->delete();
-        return response()->noContent();
+        // Iniciar la transacción
+        DB::beginTransaction();
+
+        try {
+            // Obtener el ingreso
+            $entry = Entry::with('entryDetails.kardexes')->findOrFail($entry->id);
+
+            // Verificar que no se haya afectado el stock
+            foreach ($entry->entryDetails as $entryDetail) {
+                if ($entryDetail->quantity != $entryDetail->current_stock) {
+                    return response()->json([
+                        'message' => 'Cannot cancel entry. Stock has been affected.'
+                    ], 400);
+                }
+            }
+
+            // Eliminar los registros relacionados en el Kardex
+            foreach ($entry->entryDetails as $entryDetail) {
+                $entryDetail->kardexes()->delete();
+            }
+
+            // Eliminar los detalles de la entrada
+            $entry->entryDetails()->delete();
+
+            // Eliminar la entrada
+            $entry->delete();
+
+            // Confirmar la transacción
+            DB::commit();
+
+            return response()->json([
+                'status' => 'true',
+                'message' => 'Entrada eliminada correctamente.'
+            ], 200);
+        } catch (\Exception $e) {
+            // Revertir la transacción en caso de error
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Failed to cancel and delete entry.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function cancelEntry($id)
+    {
+
+        // Iniciar la transacción
+        DB::beginTransaction();
+
+        try {
+            // Obtener el ingreso
+            $entry = Entry::with('entryDetails.kardexes')->findOrFail($id);
+
+            // Verificar que no se haya afectado el stock
+            foreach ($entry->entryDetails as $entryDetail) {
+                if ($entryDetail->quantity != $entryDetail->current_stock) {
+                    return response()->json([
+                        'message' => 'Cannot cancel entry. Stock has been affected.'
+                    ], 400);
+                }
+            }
+
+            // Anular el ingreso, estableciendo el estado a 0
+            $entry->status = 0;
+            $entry->save();
+
+            // Eliminar los registros relacionados en el Kardex
+            foreach ($entry->entryDetails as $entryDetail) {
+                $entryDetail->kardexes()->delete();
+            }
+
+            // Confirmar la transacción
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Entry successfully cancelled.'
+            ], 200);
+        } catch (\Exception $e) {
+            // Revertir la transacción en caso de error
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Failed to cancel entry.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    
     }
 }

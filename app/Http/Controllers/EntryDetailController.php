@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\EntryDetail;
 use App\Http\Requests\StoreEntryDetailRequest;
 use App\Http\Requests\UpdateEntryDetailRequest;
-use App\Http\Resources\EntryCollection;
 use App\Http\Resources\EntryDetailCollection;
 use App\Http\Resources\EntryDetailResource;
-use App\Models\Entry;
+use Illuminate\Support\Facades\DB;
 
 class EntryDetailController extends Controller
 {
@@ -45,7 +44,7 @@ class EntryDetailController extends Controller
      */
     public function show(EntryDetail $entryDetail)
     {
-        $entry = EntryDetail::with(['material','material.presentation', 'material.category', 'warehouse'])->findOrFail($entryDetail->id);
+        $entry = EntryDetail::with(['material', 'material.presentation', 'material.category', 'warehouse'])->findOrFail($entryDetail->id);
         return new EntryDetailResource($entry);
     }
 
@@ -73,5 +72,24 @@ class EntryDetailController extends Controller
     {
         $entryDetail->delete();
         return response()->noContent();
+    }
+
+
+    /**
+     * Obtener stock
+     */
+
+    public function getStockSummary()
+    {
+        $stockSummary = EntryDetail::select('material_id', DB::raw('SUM(current_stock) as total_stock'))
+            ->groupBy('material_id')
+            ->with('material:id,code,name') // Incluye el nombre del material para mostrar en la consulta
+            ->get();
+
+        return response()->json(
+            [
+                'data' =>  $stockSummary
+            ]
+        );
     }
 }

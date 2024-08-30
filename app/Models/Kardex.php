@@ -19,6 +19,7 @@ class Kardex extends Model
         return $this->belongsTo(EntryDetail::class);
     }
 
+
     /**
      * Capturar usuario
      * @return void

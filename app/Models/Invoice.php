@@ -22,6 +22,7 @@ class Invoice extends Model
         'end_date',
         'paid_dated',
         'receipt',
+        'tipo_pago',
         'note',
         'status',
         'created_by',

@@ -25,6 +25,7 @@ class EntryResource extends JsonResource
             'entry_type' => new EntryTypeResource($this->whenLoaded('entryType')),
             'total' => $this->total,
             'status' => $this->status,
+            'entry_details' =>  EntryDetailResource::collection($this->whenLoaded('entryDetails')),
         ];
     }
 }

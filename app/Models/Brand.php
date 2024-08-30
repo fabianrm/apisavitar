@@ -9,6 +9,12 @@ class Brand extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'status',
+    ];
+
+
     /**
      * Get all of the equipments for the Brand
      *
