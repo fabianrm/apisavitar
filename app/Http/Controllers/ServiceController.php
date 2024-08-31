@@ -103,7 +103,7 @@ class ServiceController extends Controller
             ], 400);
         }
 
-       
+
         //Eliminar el contrato
         $service->deleteOrFail();
 
@@ -132,9 +132,12 @@ class ServiceController extends Controller
             'plan_id' => 'required|exists:plans,id',
         ]);
 
+        $equipo = $contract->equipment_id;
+
         // Finalizamos el contrato actual
         $contract->update([
             'status' => 'terminado',
+            'equipment_id' => NULL,
             'end_date' => now(),
         ]);
 
@@ -154,7 +157,7 @@ class ServiceController extends Controller
             'router_id' => $contract->router_id,
             'box_id' => $contract->box_id,
             'port_number' => $contract->port_number,
-            'equipment_id' => $contract->equipment_id,
+            'equipment_id' => $equipo,
             'city_id' => $contract->city_id,
             'address_installation' => $contract->address_installation,
             'reference' => $contract->reference,

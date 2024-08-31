@@ -90,6 +90,30 @@ class InvoiceController extends Controller
         //
     }
 
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function cancelInvoice(Request $request, $id)
+    {
+        $request->validate([
+            'note' => 'nullable|string',
+        ]);
+
+        $invoice = Invoice::findOrFail($id);
+
+        $invoice->status = 'anulada';
+        $invoice->note = $request->input('note');
+        $invoice->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Factura anulada con éxito',
+            'invoice' => $invoice,
+        ], 200);
+
+    }
+
     /***
      * Generar facturas
      */

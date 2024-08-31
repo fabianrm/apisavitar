@@ -51,6 +51,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
         Route::post('invoices/generateByService/{id}', [InvoiceController::class, 'generateInvoicesByService']);
         Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
+        Route::patch('invoices/{id}/cancel-invoice', [InvoiceController::class, 'cancelInvoice']);
         Route::post('expenses/generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
         Route::get('expenses/report', [ExpenseController::class, 'expenseReport']);
 

@@ -141,7 +141,7 @@ class CustomerController extends Controller
 
         $customer = Customer::findOrFail($id);
 
-        $customer->status = $request->input('status');;
+        $customer->status = $request->input('status');
         $customer->observation = $request->input('observation');
         $customer->save();
 

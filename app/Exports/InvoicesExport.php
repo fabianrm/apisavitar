@@ -62,6 +62,7 @@ class InvoicesExport implements FromQuery, WithHeadings, WithMapping
             'Vencimiento',
             'Fecha Pago',
             'Recibo Nro.',
+            'Tipo Pago.',
             'Nota.',
             'Status',
         ];
@@ -82,6 +83,7 @@ class InvoicesExport implements FromQuery, WithHeadings, WithMapping
             $invoice->due_date,
             $invoice->paid_dated,
             $invoice->receipt,
+            $invoice->tipo_pago,
             $invoice->note,
             $invoice->status,
         ];
