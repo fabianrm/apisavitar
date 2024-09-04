@@ -60,11 +60,16 @@ class User extends Authenticatable
         return $this->roles()->where('name', $role)->exists();
     }
 
-    public function hasPermission($permission)
+    // public function hasPermission($permission)
+    // {
+    //     return $this->roles()->whereHas('permissions', function ($q) use ($permission) {
+    //         $q->where('name', $permission);
+    //     })->exists();
+    // }
+
+    public function permissions()
     {
-        return $this->roles()->whereHas('permissions', function ($q) use ($permission) {
-            $q->where('name', $permission);
-        })->exists();
+        return $this->roles->flatMap->permissions->unique();
     }
 
 

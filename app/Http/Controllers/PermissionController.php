@@ -4,30 +4,46 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Models\Permission;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class PermissionController extends Controller
 {
+
     public function getUserPermissions(Request $request)
     {
-        //$user = Auth::user();
-        $user = $request->user();
-        $permissions = $user->roles()->with('permissions.children')->get()->pluck('permissions')->flatten()->unique('id');
-        $response = $this->buildPermissionTree($permissions->whereNull('parent_id'));
+        $user = User::with('roles.permissions')->find($request->user()->id);
 
-        return response()->json(['data' => $response]);
+        // Obtener todos los permisos asignados al usuario a través de sus roles
+        $permissions = $user->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->unique('id');
+
+        // Filtrar permisos padres que tienen hijos permitidos
+        $filteredPermissions = $permissions->whereNull('parent_id')->map(function ($permission) use ($permissions) {
+            return $this->formatPermission($permission,
+                $permissions
+            );
+        })->filter(function ($permission) {
+            return !empty($permission['children']) || $permission['route'] !== null;
+        });
+
+        return response()->json(['data' => $filteredPermissions->values()]);
     }
 
-    private function buildPermissionTree($permissions)
+    private function formatPermission($permission, $allPermissions)
     {
-        return $permissions->map(function ($permission) {
-            return [
-                'name' => $permission->name,
-                'icon' => $permission->icon,
-                'route' => $permission->route,
-                'children' => $this->buildPermissionTree($permission->children)
-            ];
-        })->values()->toArray();
+        return [
+            'name' => $permission->name,
+            'icon' => $permission->icon,
+            'route' => $permission->route,
+            'children' => $allPermissions->where('parent_id', $permission->id)->map(function ($child) use ($allPermissions) {
+                return $this->formatPermission($child, $allPermissions);
+            })->values()->toArray() // Convertir a array simple
+        ];
     }
+    
+
+
+
+
 }
