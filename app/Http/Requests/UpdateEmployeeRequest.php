@@ -26,6 +26,9 @@ class UpdateEmployeeRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'address' => 'sometimes|required|string|max:255',
             'phone' => 'sometimes|required|string|max:255',
+            'position' => 'sometimes|required|string|max:255',
+            'department' => 'sometimes|required|string|max:255',
+            'user_id' => 'sometimes',
             'status' => 'sometimes|required|boolean',
         ];
     }

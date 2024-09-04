@@ -150,6 +150,10 @@ class ServiceController extends Controller
         // $service = new Service($request->all());
         // $service->service_code = $uniqueCode;
 
+        $newInstallationDate = Carbon::parse($contract->installation_date)
+        ->month(Carbon::now()->month)
+            ->toDateString();
+
         $newContract = Service::create([
             'service_code' => $uniqueCode,
             'customer_id' => $contract->customer_id,
@@ -162,11 +166,15 @@ class ServiceController extends Controller
             'address_installation' => $contract->address_installation,
             'reference' => $contract->reference,
             'registration_date' => now(),
-            'installation_date' => $contract->installation_date,
+            'installation_date' => $newInstallationDate,
             'latitude' => $contract->latitude,
             'longitude' => $contract->longitude,
             'billing_date' => $contract->billing_date,
             'due_date' => $contract->due_date,
+            'user_pppoe' => $contract->user_pppoe,
+            'pass_pppoe' => $contract->pass_pppoe,
+            'observation' => $contract->observation,
+            'prepayment' => $contract->prepayment,
             'status' => 'activo',
         ]);
 

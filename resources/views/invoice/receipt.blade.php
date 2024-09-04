@@ -5,9 +5,10 @@
     <title>Comprobante</title>
     <style>
         @page {
-            margin-left: 0.2cm;
-            margin-right: 0.2cm;
+            margin-left: 2mm;
+            margin-right: 2mm;
         }
+
         body {
             font-family: Arial, sans-serif;
             width: 58mm;
@@ -18,7 +19,7 @@
 
         .receipt {
             width: 100%;
-            padding: 3mm;
+            padding: 2mm;
             box-sizing: border-box;
             background-image: url('images/bg_savitar.jpg');
             background-position: center center;
@@ -35,7 +36,7 @@
 
         .receipt-header,
         .receipt-footer {
-            text-align: center;
+            text-align: left;
         }
 
 
@@ -65,14 +66,14 @@
     </div>
 
     <div class="datos-head">
-        <p style="font-size:8px; line-height: 1px;  text-align: center;">JR MARAVILLA, TRANSVERSAL MANCO CAPAC - PNC</p>
+        <p style="font-size:8px; line-height: 1px;  text-align: center;">JR MARAVILLA, TR. MANCO CAPAC - PNC</p>
         <p>RUC: 20601788285</p>
         <p>TEL: 921 799 850</p>
     </div>
     <div class="receipt">
         <h2 class="receipt-header">Recibo Nro. {{ $receipt }}</h2>
         <p><strong>Cod.Contrato:</strong> {{ $service_id }}</p>
-        <p><strong>Cliente:</strong> {{ $customer_name }}</p>
+        <p><strong>Cliente:</strong>{{ $customer_name }}</p>
         <p><strong>Servicio:</strong> {{ $plan_name }}</p>
         <p class="divider">..................................................................</p>
 

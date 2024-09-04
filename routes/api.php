@@ -73,12 +73,12 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
     });
 
+    Route::get('/destination-use/{destinationId}', [DestinationController::class, 'getMaterialsByDestination']);
   
     //Route::apiResource('outputs', OutputController::class);
     Route::apiResource('destinations', DestinationController::class);
     Route::apiResource('employees', EmployeeController::class);
     Route::apiResource('entry-details', EntryDetailController::class);
-
 
 
     Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);

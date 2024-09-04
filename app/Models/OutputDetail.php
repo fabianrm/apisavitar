@@ -11,6 +11,10 @@ class OutputDetail extends Model
 
     protected $fillable = ['output_id', 'entry_detail_id', 'quantity', 'subtotal'];
 
+    protected $casts = [
+        'subtotal' => 'decimal:2',
+    ];
+
     public function output()
     {
         return $this->belongsTo(Output::class);

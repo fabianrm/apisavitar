@@ -20,8 +20,7 @@ class OutputController extends Controller
      */
     public function index()
     {
-        $outputs = Output::with([
-            
+        $outputs = Output::with([    
             'destination', 
             'employee', 
             'outputDetails', 
@@ -133,6 +132,7 @@ class OutputController extends Controller
     public function show(Output $output)
     {
         $output = Output::with([
+            'destination',
             'outputDetails.entryDetail.material.category',
             'outputDetails.entryDetail.material.presentation',
             'outputDetails.entryDetail.material.brand',

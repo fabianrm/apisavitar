@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\EmployeeCollection;
+use App\Http\Resources\EmployeeResource;
 
 class EmployeeController extends Controller
 {
@@ -14,7 +15,10 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        return new EmployeeCollection(Employee::all());
+        $employee = Employee::with([
+            'user',
+        ])->get();
+        return new EmployeeCollection($employee);
     }
 
     /**
@@ -30,7 +34,8 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request)
     {
-        //
+        $employee = Employee::create($request->validated());
+        return new EmployeeResource($employee);
     }
 
     /**
@@ -38,7 +43,10 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
-        //
+        $employee = Employee::with([
+            'user',
+        ])->findOrFail($employee->id);
+        return new EmployeeResource($employee);
     }
 
     /**
@@ -54,7 +62,8 @@ class EmployeeController extends Controller
      */
     public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
-        //
+        $employee->update($request->validated());
+        return new EmployeeResource($employee);
     }
 
     /**

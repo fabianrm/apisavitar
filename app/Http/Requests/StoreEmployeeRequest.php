@@ -26,6 +26,9 @@ class StoreEmployeeRequest extends FormRequest
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
+            'position' => 'required|string|max:255',
+            'department' => 'required|string|max:255',
+            'user_id' => '',
             'status' => 'required|boolean',
         ];
     }
