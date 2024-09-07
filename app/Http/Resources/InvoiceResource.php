@@ -4,6 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
+
+Carbon::setLocale('es');
 
 class InvoiceResource extends JsonResource
 {
@@ -14,6 +17,8 @@ class InvoiceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $periodic = Carbon::parse($this->start_date)->translatedFormat('F');
+
         return [
             'invoiceId' => $this->id,
             'serviceId' => $this->service_id,
@@ -32,6 +37,7 @@ class InvoiceResource extends JsonResource
             'receipt' => $this->receipt,
             'tipoPago' => $this->tipo_pago,
             'note' => $this->note,
+            'periodic' => $periodic,
             'status' => $this->status
         ];
         // return parent::toArray($request);

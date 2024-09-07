@@ -159,8 +159,6 @@ class InvoiceController extends Controller
 
 
 
-
-
     /***
      * Retornar facturas con Nombre de cliente
      */
@@ -294,16 +292,19 @@ class InvoiceController extends Controller
     {
         $invoice = Invoice::findOrFail($id);
 
+        $customer_name = wordwrap($invoice->service->customers->name, 30, "\n", true);
+
         $data = [
             'receipt' => $invoice->receipt,
             'service_id' => $invoice->service->service_code,
             'plan_name' => $invoice->service->plans->name,
-            'customer_name' => $invoice->service->customers->name,
+            'customer_name' => $customer_name,
             'price' => $invoice->price,
             'discount' => $invoice->discount,
             'total' => $invoice->amount,
             'start_date' => Carbon::parse($invoice->start_date)->format('d-m-Y'),
             'end_date' => Carbon::parse($invoice->end_date)->format('d-m-Y'),
+            'periodic' => strtoupper( Carbon::parse($invoice->start_date)->translatedFormat('F')),
             'paid_dated' => Carbon::parse($invoice->paid_dated)->format('d-m-Y'),
             'note' => $invoice->note,
         ];

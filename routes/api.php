@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::patch('services/{id}/suspend', [ServiceController::class, 'suspend']);
         Route::patch('services/{id}/update-equipment', [ServiceController::class, 'updateEquipment']);
         Route::patch('customer/{id}/suspend', [CustomerController::class, 'suspend']);
+        Route::post('materials/uploadfile', [MaterialController::class, 'uploadFile']);
 
         Route::get('/user/permissions', [PermissionController::class, 'getUserPermissions']);
       

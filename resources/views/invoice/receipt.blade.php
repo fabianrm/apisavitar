@@ -73,11 +73,14 @@
     <div class="receipt">
         <h2 class="receipt-header">Recibo Nro. {{ $receipt }}</h2>
         <p><strong>Cod.Contrato:</strong> {{ $service_id }}</p>
-        <p><strong>Cliente:</strong>{{ $customer_name }}</p>
+        <p><strong>Cliente:</strong></p>
+        <p>{{ $customer_name }}</p>
+        <!-- <p><strong>Cliente:</strong> <span style="word-wrap: break-word; word-break: break-all;">{{ $customer_name }}</span></p> -->
+
         <p><strong>Servicio:</strong> {{ $plan_name }}</p>
         <p class="divider">..................................................................</p>
 
-        <h3>Periodo:</h3>
+        <h3>Periodo: {{$periodic}}</h3>
         <p><strong>Desde:</strong> {{ $start_date }}</p>
         <p><strong>Hasta:</strong> {{ $end_date }}</p>
         <p><strong>Fecha de pago:</strong> {{ $paid_dated }}</p>
