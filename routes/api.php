@@ -36,9 +36,14 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('entries/stock', [EntryDetailController::class, 'getStockSummary']);
 
 
+    //Modulo Soporte
+    Route::apiResource('support/update-status', TicketController::class);
+
 
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
+
+
         Route::get('customers/check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);
         Route::get('services/check-equipment', [ServiceController::class, 'checkServicesByEquipment']);
         Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
@@ -49,7 +54,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::post('materials/uploadfile', [MaterialController::class, 'uploadFile']);
 
         Route::get('/user/permissions', [PermissionController::class, 'getUserPermissions']);
-      
+
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
         Route::post('invoices/generateByService/{id}', [InvoiceController::class, 'generateInvoicesByService']);
         Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
@@ -63,20 +68,24 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('expenses', ExpenseController::class);
         Route::apiResource('reasons', ReasonController::class);
         Route::apiResource('brands', BrandController::class);
+        Route::apiResource('users', AuthController::class);
 
         Route::get('summary', [DashboardController::class, 'getSummary']);
 
         //Módulo almacen
-      
+
         Route::apiResource('materials', MaterialController::class);
         Route::apiResource('entries', EntryController::class);
         Route::apiResource('outputs', OutputController::class);
 
-
+        //Modulo Soporte - Auth
+        Route::patch('tickets/{ticketId}/assign-technician', [TicketController::class, 'assignTechnician']);
+        Route::apiResource('support', TicketController::class);
+        Route::apiResource('categories-support', CategoryTicketController::class);
     });
 
     Route::get('/destination-use/{destinationId}', [DestinationController::class, 'getMaterialsByDestination']);
-  
+
     //Route::apiResource('outputs', OutputController::class);
     Route::apiResource('destinations', DestinationController::class);
     Route::apiResource('employees', EmployeeController::class);
@@ -97,12 +106,14 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('presentations', PresentationController::class);
     Route::apiResource('warehouses', WarehouseController::class);
-   
+
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('documents', DocumentController::class);
     Route::apiResource('entry-types', EntryTypeController::class);
 
 
+
+    //Login
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::delete('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
