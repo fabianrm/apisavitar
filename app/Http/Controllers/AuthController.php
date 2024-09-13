@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserCollection;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,13 +30,16 @@ class AuthController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $user = $request->user();
+        //$user = User::with('roles'));
+
+        $user = $request->user()->load('roles'); // Cargar la relación 'roles'
+        //$user = $request->user();
         $userToken = $user->createToken('AppToken')->plainTextToken;
 
         return response()->json([
             'message' => 'Se ha iniciado sesión correctamente.',
             'token' => $userToken,
-            'user' => $user
+            'user' => new UserResource($user)
         ], Response::HTTP_OK);
     }
 

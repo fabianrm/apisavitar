@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('ticket_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ticket_id');
-            $table->enum('status', ['Pendiente', 'En atención', 'Espera pase', 'En validación', 'Solucionado']);
+            $table->enum('status', ['registrado', 'pendiente', 'atencion', 'espera_pase', 'validacion', 'solucionado']);
             $table->unsignedBigInteger('changed_by');  // Quien cambió el estado (admin o técnico)
             $table->text('comment')->nullable();
             $table->timestamps();
 
             // Llaves foráneas
             $table->foreign('ticket_id')->references('id')->on('tickets')->onDelete('cascade');
-            $table->foreign('changed_by')->references('id')->on('employees')->onDelete('cascade');
+            $table->foreign('changed_by')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

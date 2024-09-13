@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('code');
             $table->unsignedBigInteger('category_ticket_id');  // Relación con categories_tickets
+            $table->unsignedBigInteger('destination_id');
             $table->string('subject');
             $table->text('description');
-            $table->enum('status', ['Pendiente', 'En atención', 'Espera pase', 'En validación', 'Solucionado']);
+            $table->date('expiration')->nullable();
+            $table->enum('priority', ['baja', 'normal', 'alta']);
+            $table->enum('status', ['registrado', 'pendiente', 'atencion', 'espera_pase', 'validacion', 'solucionado']);
             $table->unsignedBigInteger('customer_id');  // Relación con customers
             $table->unsignedBigInteger('technician_id')->nullable();  // Técnico de la tabla employees
             $table->unsignedBigInteger('admin_id');  // Administrador de la tabla employees
@@ -34,6 +37,8 @@ return new class extends Migration
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
             $table->foreign('technician_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('admin_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('destination_id')->references('id')->on('destinations')->onDelete('cascade');
+            
         });
     }
 

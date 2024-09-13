@@ -11,6 +11,8 @@ use App\Models\TicketAttachment;
 use App\Models\TicketHistory;
 use App\Services\UtilService;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 
 class TicketController extends Controller
 {
@@ -19,8 +21,29 @@ class TicketController extends Controller
      */
     public function index()
     {
-        $ticket = Ticket::with(['categoryTicket', 'customer','admin', 'technician'])->get();
-        return new TicketCollection($ticket);
+        // $ticket = Ticket::with(['categoryTicket', 'customer','admin', 'technician'])->get();
+        // return new TicketCollection($ticket);
+
+        // Obtener el usuario autenticado
+        $user = auth()->user();
+
+        // Obtener el primer rol del usuario autenticado
+        $role = $user->roles()->first();
+
+        // Inicializar la consulta base con las relaciones necesarias
+        $query = Ticket::with(['categoryTicket', 'customer', 'admin', 'technician']);
+
+        // Filtrar según el rol
+        if ($role && $role->name === 'Técnico') {
+            // Si el usuario es técnico, filtrar por los tickets asignados a él
+            $query->where('technician_id', $user->id);
+        }
+
+        // Ejecutar la consulta
+        $tickets = $query->get();
+
+        // Devolver los tickets usando el recurso TicketCollection
+        return new TicketCollection($tickets);
     }
 
     /**
@@ -46,9 +69,11 @@ class TicketController extends Controller
         $ticket = Ticket::create([
             'code' => $uniqueCode,
             'category_ticket_id' => $request->category_ticket_id,
+            'destination_id' => $request->destination_id,
             'subject' => $request->subject,
             'description' => $request->description,
-            'status' => 'Pendiente',
+            'priority' => $request->priority,
+            'status' => 'registrado',
             'customer_id' => $request->customer_id,
             'technician_id' => null,  // Aún no asignado
             'admin_id' => auth()->id(),
@@ -56,7 +81,8 @@ class TicketController extends Controller
 
         TicketHistory::create([
             'ticket_id' => $ticket->id,
-            'status' => 'Pendiente',
+            'status' => 'registrado',
+            'comment' => 'Registrado',
             'changed_by' => auth()->id(),
         ]);
 
@@ -68,10 +94,10 @@ class TicketController extends Controller
      */
     public function show($id)
     {
-        $ticket = Ticket::with(['categoryTicket', 'customer', 'admin', 'technician'])->findOrFail($id);
+        $ticket = Ticket::with(['categoryTicket', 'customer', 'admin', 'technician', 'history', 'history.user'])->findOrFail($id);
         return new TicketResource($ticket);
     }
-  
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -100,8 +126,8 @@ class TicketController extends Controller
     {
         // Validar los datos de entrada
         $request->validate([
-            'status' => 'required|in:Pendiente,En atención,Espera pase,En validación,Solucionado',
-            'changed_by' => 'required|exists:employees,id',
+            'status' => 'required|in:pendiente,atencion,espera_pase,validacion,solucionado,cerrado',
+            'changed_by' => 'required|exists:users,id',
         ]);
 
         // Buscar el ticket
@@ -111,27 +137,33 @@ class TicketController extends Controller
         $ticket->status = $request->status;
 
         // Si el estado es 'En atención', se asigna un técnico
-        if ($request->status === 'En atención' && isset($request->technician_id)) {
-            $ticket->technician_id = $request->technician_id;
-            $ticket->assigned_at = now();
+        if ($request->status === 'atencion') {
+            $note = 'Se inició la atención';
         }
 
         // Si el estado es 'Solucionado', se guarda la fecha de resolución
-        if ($request->status === 'Solucionado') {
+        if ($request->status === 'solucionado') {
+            $note =  $request->comment;
             $ticket->resolved_at = now();
         }
 
         // Si el estado es 'En validación', se guarda la fecha de cierre
-        if ($request->status === 'En validación') {
-            $ticket->closed_at = now();
+        if ($request->status === 'validacion') {
+            $note = 'Esperando confirmación de solución';
         }
 
+        // Si el estado es 'En validación', se guarda la fecha de cierre
+        if ($request->status === 'cerrado') {
+            $ticket->closed_at = now();
+            $note = 'Caso cerrado';
+        }
         // Guardar los cambios del ticket
         $ticket->save();
 
         // Registrar el historial del cambio de estado
         TicketHistory::create([
             'ticket_id' => $ticket->id,
+            'comment' => $note,
             'status' => $request->status,
             'changed_by' => $request->changed_by,  // Id del técnico o admin que hizo el cambio
         ]);
@@ -142,6 +174,7 @@ class TicketController extends Controller
         ], 200);
     }
 
+    
     // Adjuntar documentos/imágenes al ticket
     public function addAttachment(Request $request, Ticket $ticket)
     {
@@ -184,9 +217,16 @@ class TicketController extends Controller
         // Si ya hay un técnico asignado, se permite reasignar
         $previousTechnician = $ticket->technician_id;
 
+        // Si el ticket no tiene un técnico asignado, lo colocamos en 'Pending'
+        if (!$ticket->technician_id) {
+            $ticket->status = 'pendiente'; // Asignación inicial al estado 'Pending'
+        }
+
         // Asignar el nuevo técnico al ticket (sin cambiar el estado)
         $ticket->technician_id = $request->technician_id;
-        $ticket->assigned_at = now(); // Registrar la fecha de asignación
+        $ticket->assigned_at = Carbon::now(); // Registrar la fecha de asignación
+        $ticket->expiration = $request->expiration; // Registrar la fecha de asignación
+       
         $ticket->save();
 
         // Registrar el historial del cambio de técnico
@@ -206,7 +246,4 @@ class TicketController extends Controller
             'ticket' => $ticket
         ], 200);
     }
-
-
-
 }

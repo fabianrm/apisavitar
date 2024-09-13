@@ -12,8 +12,11 @@ class Ticket extends Model
     protected $fillable = [
         'code',
         'category_ticket_id',
+        'destination_id',
         'subject',
         'description',
+        'expiration',
+        'priority',
         'customer_id',
         'technician_id',
         'admin_id',
@@ -23,11 +26,16 @@ class Ticket extends Model
         'status'
     ];
 
-    protected $dates = ['assigned_at', 'resolved_at', 'closed_at'];
+    protected $dates = ['expiration','assigned_at', 'resolved_at', 'closed_at'];
 
     public function categoryTicket()
     {
         return $this->belongsTo(CategoryTicket::class);
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Destination::class, 'destination_id');
     }
 
     public function customer()

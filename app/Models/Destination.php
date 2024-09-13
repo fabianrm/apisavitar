@@ -15,4 +15,9 @@ class Destination extends Model
     {
         return $this->hasMany(Output::class);
     }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }
