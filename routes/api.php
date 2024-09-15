@@ -81,6 +81,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         //Modulo Soporte - Auth
         Route::patch('tickets/{ticketId}/assign-technician', [TicketController::class, 'assignTechnician']);
         Route::patch('tickets/{ticketId}/update-status', [TicketController::class, 'updateStatus']);
+        Route::post('tickets/{ticketId}/attachments', [TicketController::class, 'addAttachment']);
+        Route::get('tickets/{ticketID}/attachments', [TicketController::class, 'getAttachments']);
+
         Route::apiResource('support', TicketController::class);
         Route::apiResource('categories-support', CategoryTicketController::class);
     });

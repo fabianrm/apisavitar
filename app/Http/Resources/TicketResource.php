@@ -33,6 +33,7 @@ class TicketResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'history' => TicketHistoryResource::collection($this->whenLoaded('history')),
+            'attachments' => TicketAttachmentResource::collection($this->whenLoaded('attachments')),
         ];
     }
 }

@@ -12,6 +12,7 @@ use App\Models\TicketHistory;
 use App\Services\UtilService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 
 class TicketController extends Controller
@@ -94,7 +95,7 @@ class TicketController extends Controller
      */
     public function show($id)
     {
-        $ticket = Ticket::with(['categoryTicket', 'customer', 'admin', 'technician', 'history', 'history.user'])->findOrFail($id);
+        $ticket = Ticket::with(['categoryTicket', 'customer', 'admin', 'technician', 'history', 'history.user', 'attachments'])->findOrFail($id);
         return new TicketResource($ticket);
     }
 
@@ -176,17 +177,47 @@ class TicketController extends Controller
 
     
     // Adjuntar documentos/imágenes al ticket
-    public function addAttachment(Request $request, Ticket $ticket)
+    public function addAttachment(Request $request, $ticketId)
     {
-        $filePath = $request->file('attachment')->store('attachments');
 
-        TicketAttachment::create([
-            'ticket_id' => $ticket->id,
-            'file_path' => $filePath,
+        Log::info('Esperando al file');
+        Log::info($request->file);
+
+        $request->validate([
+            'file' => 'required|file|mimes:jpg,jpeg,png,pdf,docx|max:2048',
+            'filename' => 'required|string'
         ]);
 
-        return response()->json(['message' => 'Archivo adjuntado con éxito']);
+        try {
+
+            // Obtener el archivo y el nombre desde el request
+            $file = $request->file('file');
+            $filename = $request->input('filename');
+
+            // Buscar el ticket
+            $ticket = Ticket::findOrFail($ticketId);
+           
+            // Guardar el archivo
+            $filePath = $file->storeAs('attachments', $filename, 'public');
+            
+            // Verificar si la ruta del archivo fue generada correctamente
+            if (!$filePath) {
+                return response()->json(['error' => 'Error al almacenar el archivo'], 500);
+            }
+
+            // Insertar el registro en la base de datos
+            TicketAttachment::create([
+                'ticket_id' => $ticket->id,
+                'file_path' => $filePath, // Asegúrate de que este campo se está enviando
+            ]);
+
+            return response()->json(['message' => 'Archivo adjuntado con éxito'], 200);
+        } catch (\Exception $e) {
+            Log::info($e->getMessage());
+            return response()->json(['error' => 'Error al adjuntar el archivo'], 500);
+        }
     }
+
 
     // Ver el historial del ticket
     public function history(Ticket $ticket)
@@ -246,4 +277,19 @@ class TicketController extends Controller
             'ticket' => $ticket
         ], 200);
     }
+
+
+    //Obtener adjuntos
+    public function getAttachments(Ticket $ticket)
+    {
+        // Obtener los archivos adjuntos relacionados con el ticket
+        $attachments = TicketAttachment::where('ticket_id', $ticket->id)
+            ->get(['id', 'file_path', 'created_at']); // Puedes agregar otros campos si es necesario
+
+        // Retornar la lista de archivos adjuntos como un JSON
+        return response()->json([
+            'data'=> $attachments
+        ]);
+    }
+
 }
