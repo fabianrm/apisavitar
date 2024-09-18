@@ -95,7 +95,7 @@ class TicketController extends Controller
      */
     public function show($id)
     {
-        $ticket = Ticket::with(['categoryTicket', 'customer', 'admin', 'technician', 'history', 'history.user', 'attachments'])->findOrFail($id);
+        $ticket = Ticket::with(['categoryTicket', 'customer', 'admin', 'technician', 'history', 'history.user', 'project', 'attachments'])->findOrFail($id);
         return new TicketResource($ticket);
     }
 
@@ -110,9 +110,10 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTicketRequest $request, Ticket $ticket)
+    public function update(UpdateTicketRequest $request,$ticketId)
     {
-        //
+        $ticket = Ticket::findOrFail($ticketId);
+        $ticket->update($request->all());
     }
 
     /**
@@ -192,7 +193,7 @@ class TicketController extends Controller
 
             // Obtener el archivo y el nombre desde el request
             $file = $request->file('file');
-            $filename = $request->input('filename');
+            $filename = date('His') . '-' . $request->input('filename');
 
             // Buscar el ticket
             $ticket = Ticket::findOrFail($ticketId);

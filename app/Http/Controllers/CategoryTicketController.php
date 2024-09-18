@@ -57,9 +57,10 @@ class CategoryTicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCategoryTicketRequest $request, CategoryTicket $categoryTicket)
+    public function update(UpdateCategoryTicketRequest $request, $id)
     {
-        $categoryTicket->update($request->all());
+        $category = CategoryTicket::findOrFail($id);
+        $category->update($request->all());
     }
 
     /**
@@ -67,6 +68,6 @@ class CategoryTicketController extends Controller
      */
     public function destroy(CategoryTicket $categoryTicket)
     {
-        //
+        
     }
 }

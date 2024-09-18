@@ -28,6 +28,7 @@ class StoreTicketRequest extends FormRequest
             'customer_id' => ['required'],
             'technician_id' => [''],
             'admin_id' =>   ['required'],
+            'priority' => [''],
             'assigned_at' => [''],
             'resolved_at' => [''],
             'closed_at' => [''],

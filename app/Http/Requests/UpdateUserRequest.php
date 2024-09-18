@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCategoryTicketRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,18 +21,25 @@ class UpdateCategoryTicketRequest extends FormRequest
      */
     public function rules(): array
     {
-
         $method = $this->method();
         if ($method === "PUT") {
             return [
+                'dni' => ['required'],
                 'name' => ['required'],
-                'description' => ['required'],
+                'address' => [''],
+                'phone' => [''],
+                'position' => [''],
                 'status' => ['required'],
             ];
         } else {
             return [
+                'dni' => ['sometimes', 'required'],
                 'name' => ['sometimes', 'required'],
-                'description' => ['sometimes', 'required'],
+                'email' => ['sometimes', 'required'],
+                'password' => ['sometimes', 'required'],
+                'address' => ['sometimes', ''],
+                'phone' => ['sometimes', ''],
+                'position' => ['sometimes', ''],
                 'status' => ['sometimes', 'required'],
             ];
         }

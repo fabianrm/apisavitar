@@ -68,7 +68,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('expenses', ExpenseController::class);
         Route::apiResource('reasons', ReasonController::class);
         Route::apiResource('brands', BrandController::class);
-        Route::apiResource('users', AuthController::class);
+        // Route::apiResource('users', AuthController::class);
 
         Route::get('summary', [DashboardController::class, 'getSummary']);
 
@@ -87,6 +87,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('support', TicketController::class);
         Route::apiResource('categories-support', CategoryTicketController::class);
     });
+
+    Route::apiResource('users', AuthController::class);
 
     Route::get('/destination-use/{destinationId}', [DestinationController::class, 'getMaterialsByDestination']);
 
@@ -118,6 +120,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
 
     //Login
+    Route::apiResource('roles', RoleController::class);
+    Route::apiResource('role-user', RoleUserController::class);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::delete('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
