@@ -69,6 +69,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('reasons', ReasonController::class);
         Route::apiResource('brands', BrandController::class);
         // Route::apiResource('users', AuthController::class);
+        Route::apiResource('permissions', PermissionController::class);
 
         Route::get('summary', [DashboardController::class, 'getSummary']);
 
@@ -117,7 +118,10 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('documents', DocumentController::class);
     Route::apiResource('entry-types', EntryTypeController::class);
 
-
+    //Roles
+    Route::post('roles/{roleId}/permissions', [PermissionRoleController::class, 'assignPermissionsToRole']);
+    Route::get('roles/{roleId}/permissions', [PermissionRoleController::class, 'getPermissionsByRole']);
+    Route::delete('roles/{roleId}/permissions/{permissionId}', [PermissionRoleController::class, 'removePermissionFromRole']);
 
     //Login
     Route::apiResource('roles', RoleController::class);

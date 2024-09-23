@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\RoleResource;
+use App\Http\Resources\RoleUserCollection;
+use App\Http\Resources\RoleUserResource;
 use App\Models\RoleUser;
 use Illuminate\Http\Request;
 
@@ -12,7 +15,8 @@ class RoleUserController extends Controller
      */
     public function index()
     {
-        //
+        $roles = RoleUser::all();
+        return new RoleUserCollection($roles);
     }
 
     /**
@@ -37,7 +41,9 @@ class RoleUserController extends Controller
      */
     public function show(string $id)
     {
-        //
+
+        $role = RoleUser::where('user_id', $id)->orderBy('id', 'desc')->first();
+        return new RoleUserResource($role);
     }
 
     /**
@@ -53,7 +59,8 @@ class RoleUserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $role = RoleUser::where('user_id', $id)->orderBy('id', 'desc')->first();
+        $role->update($request->all());
     }
 
     /**

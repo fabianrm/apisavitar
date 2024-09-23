@@ -2,12 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PermissionCollection;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
 
 class PermissionController extends Controller
 {
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+
+        $permissions = Permission::all();
+        return new PermissionCollection($permissions);
+
+
+    }
 
     public function getUserPermissions(Request $request)
     {

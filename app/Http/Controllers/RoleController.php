@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRoleRequest;
+use App\Http\Requests\UpdateRoleRequest;
 use App\Http\Resources\RoleCollection;
+use App\Http\Resources\RoleResource;
 use App\Models\Role;
 use Illuminate\Http\Request;
 
@@ -28,9 +31,10 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        //
+        $role = Role::create($request->validated());
+        return new RoleResource($role);
     }
 
     /**
@@ -38,7 +42,9 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
-        //
+        //return new CategoryTicketResource($categoryTicket);
+        $role = Role::findOrFail($id);
+        return new RoleResource($role);
     }
 
     /**
@@ -52,16 +58,26 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateRoleRequest $request, string $id)
     {
-        //
+        $role = Role::findOrFail($id);
+        $role->update($request->all());
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Role $role)
     {
-        //
+        $role->deleteOrFail();
+
+        return response()->json([
+            'data' => [
+                'status' => true,
+                'message' => 'Rol eliminado correctamente'
+            ]
+        ]);
+
     }
 }

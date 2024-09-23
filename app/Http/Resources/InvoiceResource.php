@@ -24,6 +24,7 @@ class InvoiceResource extends JsonResource
             'serviceId' => $this->service_id,
             'contractId' => $this->service->service_code,
             'customerName' => $this->service->customers->name,
+            'address' => $this->service->customers->address,
             'planName' => $this->service->plans->name,
             'price' => $this->price,
             'igv' => $this->igv,
