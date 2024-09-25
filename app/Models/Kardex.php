@@ -11,12 +11,18 @@ class Kardex extends Model
     use HasFactory;
 
     protected $fillable = [
-        'entry_detail_id', 'date', 'has', 'operation', 'quantity', 'stock', 'comment'
+        'material_id',
+        'date',
+        'has',
+        'operation',
+        'quantity',
+        'stock',
+        'comment'
     ];
 
-    public function entryDetail()
+    public function material()
     {
-        return $this->belongsTo(EntryDetail::class);
+        return $this->belongsTo(Material::class, 'material_id', 'id');
     }
 
 

@@ -9,10 +9,17 @@ use Illuminate\Support\Facades\Auth;
 class Material extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
-        'code', 'name', 'category_id', 'presentation_id',
-        'serial', 'model', 'brand_id', 'min', 'type', 'image', 'status'
+        'code',
+        'name',
+        'category_id',
+        'presentation_id',
+        'brand_id',
+        'min',
+        'type',
+        'image',
+        'status'
     ];
 
     public function category()
@@ -30,9 +37,9 @@ class Material extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function entryDetails()
+    public function kardexes()
     {
-        return $this->hasMany(EntryDetail::class);
+        return $this->hasMany(Kardex::class, 'material_id', 'id');
     }
 
     /**

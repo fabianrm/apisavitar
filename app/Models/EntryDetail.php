@@ -10,7 +10,7 @@ class EntryDetail extends Model
     use HasFactory;
 
     protected $fillable = [
-        'entry_id', 'date', 'material_id', 'quantity', 'current_stock', 'price', 'subtotal', 'warehouse_id', 'location'
+        'entry_id', 'date', 'material_id', 'quantity', 'price', 'subtotal', 'warehouse_id', 'location'
     ];
 
     public function entry()

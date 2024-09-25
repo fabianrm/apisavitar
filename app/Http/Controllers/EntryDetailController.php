@@ -7,6 +7,7 @@ use App\Http\Requests\StoreEntryDetailRequest;
 use App\Http\Requests\UpdateEntryDetailRequest;
 use App\Http\Resources\EntryDetailCollection;
 use App\Http\Resources\EntryDetailResource;
+use App\Models\Kardex;
 use Illuminate\Support\Facades\DB;
 
 class EntryDetailController extends Controller
@@ -81,15 +82,16 @@ class EntryDetailController extends Controller
 
     public function getStockSummary()
     {
-        $stockSummary = EntryDetail::select('material_id', DB::raw('SUM(current_stock) as total_stock'))
-            ->groupBy('material_id')
-            ->with('material:id,code,name') // Incluye el nombre del material para mostrar en la consulta
+        $stockSummary = Kardex::select('material_id', DB::raw('SUM(stock) as total_stock'))
+        ->groupBy('material_id')
+        ->with([
+            'material:id,code,name',
+            'material.brand:id,name' // Relación con la marca a través de material_details
+        ])
             ->get();
 
-        return response()->json(
-            [
-                'data' =>  $stockSummary
-            ]
-        );
+        return response()->json([
+            'data' =>  $stockSummary
+        ]);
     }
 }

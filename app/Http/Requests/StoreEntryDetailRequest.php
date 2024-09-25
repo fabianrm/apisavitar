@@ -26,7 +26,6 @@ class StoreEntryDetailRequest extends FormRequest
             'date' => 'required|date',
             'material_id' => 'required|exists:materials,id',
             'quantity' => 'required|integer',
-            'current_stock' => 'required|integer',
             'price' => 'required|numeric',
             'subtotal' => 'required|numeric',
             'warehouse_id' => 'required|exists:warehouses,id',

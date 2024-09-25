@@ -9,6 +9,7 @@ use App\Http\Resources\EntryCollection;
 use App\Http\Resources\EntryResource;
 use App\Models\EntryDetail;
 use App\Models\Kardex;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -49,10 +50,9 @@ class EntryController extends Controller
             foreach ($request->entry_details as $detail) {
                 $entryDetail =   EntryDetail::create([
                     'entry_id' => $entry->id,
-                    'date' => $entry->date,
+                    'date' => Carbon::parse($entry->date),
                     'material_id' => $detail['material_id'],
                     'quantity' => $detail['quantity'],
-                    'current_stock' => $detail['quantity'],
                     'price' => $detail['price'],
                     'subtotal' => $detail['quantity'] * $detail['price'],
                     'warehouse_id' => $detail['warehouse_id'],
@@ -60,17 +60,25 @@ class EntryController extends Controller
                 ]);
 
                 // Obtener el último registro de Kardex para este material
-                $lastKardex = Kardex::where('entry_detail_id', $entryDetail->id)->orderBy('id', 'desc')->first();
+                // $lastKardex = Kardex::where('entry_detail_id', $entryDetail->id)->orderBy('id', 'desc')->first();
+                // 
+
+                $lastKardex = Kardex::where('material_id', $detail['material_id'])
+                    ->latest('created_at')
+                    ->first();
+
                 $previousStock = $lastKardex ? $lastKardex->stock : 0;
+                // Calcular el nuevo stock
+                $newStock = $lastKardex ? $lastKardex->stock + $detail['quantity'] : $detail['quantity'];
 
                 // Actualizar el Kardex
-                $kardex =  Kardex::create([
-                    'entry_detail_id' => $entryDetail->id,
+                Kardex::create([
+                    'material_id' => $entryDetail->material_id,
                     'date' => $entryDetail->date,
                     'has' => $previousStock,
                     'operation' => 'entry',
                     'quantity' => $entryDetail->quantity,
-                    'stock' => $previousStock + $entryDetail->quantity,
+                    'stock' => $newStock,
                     'comment' => 'Entrada por ' . $entry->entryType->abbreviation,
                     'created_by' => auth()->user()->id,
                     'updated_by' => auth()->user()->id,
@@ -87,7 +95,11 @@ class EntryController extends Controller
             Log::info($e->getFile());
             Log::info($e->getLine());
             DB::rollBack();
-            return response()->json(['error' => 'Failed to create entry'], 500);
+            return response()->json([
+                'message' => $e->getMessage(),
+                'error' => 'Failed to create entry'
+            
+            ], 500);
         }
     }
 
@@ -264,6 +276,5 @@ class EntryController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-    
     }
 }
