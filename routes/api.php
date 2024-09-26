@@ -33,7 +33,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
     Route::get('invoices/{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
 
-    Route::get('entries/stock', [EntryDetailController::class, 'getStockSummary']);
+    Route::get('materials/stock', [MaterialController::class, 'getStockSummary']);
 
 
     //Modulo Soporte

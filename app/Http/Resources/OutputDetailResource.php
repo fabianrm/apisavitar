@@ -15,9 +15,7 @@ class OutputDetailResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'entry_detail_id' => $this->entry_detail_id,
-            'entry_detail' => new EntryDetailResource($this->whenLoaded('entryDetail')),
-            'material' => new MaterialResource($this->whenLoaded('entryDetail.material')),
+            'material' => new MaterialResource($this->whenLoaded('material')),
             'quantity' => $this->quantity,
             'subtotal' => (float) $this->subtotal,
         ];

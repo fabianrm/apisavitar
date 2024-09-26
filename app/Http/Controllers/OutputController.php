@@ -7,9 +7,10 @@ use App\Http\Requests\StoreOutputRequest;
 use App\Http\Requests\UpdateOutputRequest;
 use App\Http\Resources\OutputCollection;
 use App\Http\Resources\OutputResource;
-use App\Models\EntryDetail;
 use App\Models\Kardex;
+use App\Models\Material;
 use App\Models\OutputDetail;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -24,10 +25,10 @@ class OutputController extends Controller
             'destination', 
             'employee', 
             'outputDetails', 
-            'outputDetails.entryDetail',
-            'outputDetails.entryDetail.material.category',
-            'outputDetails.entryDetail.material.presentation',
-            'outputDetails.entryDetail.material.brand',
+            'outputDetails.material',
+            'outputDetails.material.category',
+            'outputDetails.material.presentation',
+            'outputDetails.material.brand',
             ])->get();
         return new OutputCollection($outputs);
 
@@ -62,7 +63,7 @@ class OutputController extends Controller
             // Crear la salida con el nuevo número
             $output = Output::create([
                 'number' => $newNumber,
-                'date' => $request->date,
+                'date' => Carbon::parse($request->date),
                 'destination_id' => $request->destination_id,
                 'employee_id' => $request->employee_id,
                 'total' => 0, // Se actualizará después
@@ -74,32 +75,33 @@ class OutputController extends Controller
 
             foreach ($request->output_details as $detail) {
                 // Obtener el detalle de entrada correspondiente
-                $entryDetail = EntryDetail::findOrFail($detail['entry_detail_id']);
+                $material = Material::findOrFail($detail['material_id']);
+                
 
                 // Calcular el subtotal
-                $subtotal = $detail['quantity'] * $entryDetail->price;
+                $subtotal = $detail['quantity'] * $material->price;
 
                 // Crear el detalle de la salida
                 $outputDetail = OutputDetail::create([
                     'output_id' => $output->id,
-                    'entry_detail_id' => $entryDetail->id,
+                    'material_id' => $material->id,
                     'quantity' => $detail['quantity'],
                     'subtotal' => $subtotal,
                 ]);
 
                 // Reducir el current_stock del detalle de entrada
-                $entryDetail->decrement('current_stock', $detail['quantity']);
+                //$material->decrement('current_stock', $detail['quantity']);
 
                 // Obtener el último registro de Kardex para este material
-                $lastKardex = Kardex::where('entry_detail_id', $entryDetail->id)->orderBy('date', 'desc')->first();
+                $lastKardex = Kardex::where('material_id', $material->id)->orderBy('created_at', 'desc')->first();
                 $previousStock = $lastKardex ? $lastKardex->stock : 0;
 
                 // Registrar en el Kardex
                 Kardex::create([
-                    'entry_detail_id' => $entryDetail->id,
+                    'material_id' => $material->id,
                     'date' => $output->date,
                     'has' => $previousStock,
-                    'operation' => 'OUTPUT',
+                    'operation' => 'output',
                     'quantity' => -$detail['quantity'],
                     'stock' => $previousStock - $detail['quantity'],
                     'comment' => 'Salida por ' . $output->number,

@@ -23,7 +23,7 @@ class StoreOutputDetailRequest extends FormRequest
     {
         return [
             'output_id' => 'required|exists:exits,id',
-            'entry_detail_id' => 'required|exists:entry_details,id',
+            'material_id' => 'required|exists:materials,id',
             'quantity' => 'required|integer',
             'subtotal' => 'required|numeric',
             'status' => 'required|boolean',

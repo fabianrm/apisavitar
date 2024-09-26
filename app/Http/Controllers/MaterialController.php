@@ -7,7 +7,9 @@ use App\Http\Requests\StoreMaterialRequest;
 use App\Http\Requests\UpdateMaterialRequest;
 use App\Http\Resources\MaterialCollection;
 use App\Http\Resources\MaterialResource;
+use App\Models\Kardex;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class MaterialController extends Controller
@@ -133,6 +135,34 @@ class MaterialController extends Controller
         }
 
         return response()->json(['mensaje' => 'No se ha subido ningún archivo'], 400);
+    }
+
+
+    //Obtener Stock
+    public function getStockSummary()
+    {
+        // Obtenemos el último stock registrado para cada material
+        $stockSummary = Kardex::select(
+            'material_id as id',
+            'materials.code',
+            'materials.name as name',
+            'brands.name as brand',
+            'presentations.prefix as unit',
+            'kardexes.stock as total_stock' // Último stock registrado
+        )
+            ->join('materials', 'kardexes.material_id', '=', 'materials.id') // Unimos con la tabla materials
+            ->join('presentations', 'materials.presentation_id', '=', 'presentations.id') // Unimos con la tabla materials
+            ->leftJoin('brands', 'materials.brand_id', '=', 'brands.id') // Unimos con la tabla brands
+            ->whereIn('kardexes.id', function ($query) {
+                $query->select(DB::raw('MAX(id)'))
+                    ->from('kardexes')
+                    ->groupBy('material_id'); // Tomamos el último registro del Kardex por material
+            })
+            ->get();
+
+        return response()->json([
+            'data' => $stockSummary
+        ]);
     }
 
 }

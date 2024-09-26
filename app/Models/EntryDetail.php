@@ -27,14 +27,4 @@ class EntryDetail extends Model
     {
         return $this->belongsTo(Warehouse::class);
     }
-
-    public function outputDetails()
-    {
-        return $this->hasMany(OutputDetail::class);
-    }
-
-    public function kardexes()
-    {
-        return $this->hasMany(Kardex::class);
-    }
 }

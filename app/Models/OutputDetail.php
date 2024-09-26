@@ -9,7 +9,7 @@ class OutputDetail extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['output_id', 'entry_detail_id', 'quantity', 'subtotal'];
+    protected $fillable = ['output_id', 'material_id', 'quantity', 'subtotal'];
 
     protected $casts = [
         'subtotal' => 'decimal:2',
@@ -20,8 +20,8 @@ class OutputDetail extends Model
         return $this->belongsTo(Output::class);
     }
 
-    public function entryDetail()
+    public function material()
     {
-        return $this->belongsTo(EntryDetail::class);
+        return $this->belongsTo(Material::class);
     }
 }

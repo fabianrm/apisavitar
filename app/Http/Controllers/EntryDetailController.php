@@ -75,23 +75,4 @@ class EntryDetailController extends Controller
         return response()->noContent();
     }
 
-
-    /**
-     * Obtener stock
-     */
-
-    public function getStockSummary()
-    {
-        $stockSummary = Kardex::select('material_id', DB::raw('SUM(stock) as total_stock'))
-        ->groupBy('material_id')
-        ->with([
-            'material:id,code,name',
-            'material.brand:id,name' // Relación con la marca a través de material_details
-        ])
-            ->get();
-
-        return response()->json([
-            'data' =>  $stockSummary
-        ]);
-    }
 }
