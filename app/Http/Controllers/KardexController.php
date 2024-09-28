@@ -15,7 +15,9 @@ class KardexController extends Controller
      */
     public function index()
     {
-        return new KardexCollection(Kardex::all());
+
+        $kardex = Kardex::with(['material'])->get();
+        return new KardexCollection($kardex);
     }
 
     /**
@@ -38,9 +40,18 @@ class KardexController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Kardex $kardex)
+    public function show($materialId)
     {
-        return new KardexResource($kardex);
+        $kardexEntries = Kardex::with(['material', 'material.category', 'material.brand', 'material.presentation']) // Incluye la relación con el modelo Material
+        ->where('material_id', $materialId)
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // Devolver el resultado en formato JSON
+        return response()->json([
+            'data' => $kardexEntries
+        ]);
+
     }
 
     /**
@@ -68,4 +79,6 @@ class KardexController extends Controller
         $kardex->delete();
         return response()->noContent();
     }
+
+
 }

@@ -90,6 +90,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     });
 
     Route::apiResource('users', AuthController::class);
+    Route::apiResource('kardex', KardexController::class);
 
     Route::get('/destination-use/{destinationId}', [DestinationController::class, 'getMaterialsByDestination']);
 

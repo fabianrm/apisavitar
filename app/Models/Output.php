@@ -10,16 +10,16 @@ class Output extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['number', 'date', 'destination_id', 'employee_id', 'total', 'comment', 'status'];
+    protected $fillable = ['number', 'date', 'destination_id', 'user_id', 'total', 'comment', 'status'];
 
     public function destination()
     {
         return $this->belongsTo(Destination::class);
     }
 
-    public function employee()
+    public function user()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class);
     }
 
     public function outputDetails()

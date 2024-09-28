@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('kardexes', function (Blueprint $table) {
             // Eliminar la columna entry_detail_id
             $table->dropForeign(['entry_detail_id']); // Si había una clave foránea
-            $table->dropColumn('entry_detail_id');
+
 
             // Agregar la columna material_id
             $table->unsignedBigInteger('material_id')->after('id');

@@ -24,7 +24,7 @@ class StoreOutputRequest extends FormRequest
         return [
             'date' => 'required|date',
             'destination_id' => 'required|exists:destinations,id',
-            'employee_id' => 'required|exists:employees,id',
+            'employee_id' => 'required|exists:users,id',
             'total' => '',
             'comment' => 'nullable|string|max:255',
             'status' => 'required|boolean',

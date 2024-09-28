@@ -16,12 +16,12 @@ class KardexResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'entry_detail' => new EntryDetailResource($this->whenLoaded('entry_detail')),
+            'material' => new MaterialResource($this->whenLoaded('material')),
             'date' => $this->date,
+            'has' => $this->has,
             'operation' => $this->operation,
             'quantity' => $this->quantity,
-            'price' => $this->price,
-            'total' => $this->total,
+            'stock' => $this->stock,
             'comment' => $this->comment,
             'status' => $this->status,
         ];

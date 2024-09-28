@@ -19,7 +19,7 @@ class OutputResource extends JsonResource
             'number' => $this->number,
             'date' => $this->date,
             'destination' => new DestinationResource($this->whenLoaded('destination')),
-            'employee' => new EmployeeResource($this->whenLoaded('employee')),
+            'employee' => new UserResource($this->whenLoaded('user')),
             'total' => $this->total,
             'comment' => $this->comment,
             'status' => $this->status,

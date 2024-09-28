@@ -50,6 +50,12 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function outputs()
+    {
+        return $this->hasMany(Output::class);
+    }
+
+
     public function employees()
     {
         return $this->hasMany(Employee::class);

@@ -23,7 +23,7 @@ class OutputController extends Controller
     {
         $outputs = Output::with([    
             'destination', 
-            'employee', 
+            'user', 
             'outputDetails', 
             'outputDetails.material',
             'outputDetails.material.category',
@@ -65,7 +65,7 @@ class OutputController extends Controller
                 'number' => $newNumber,
                 'date' => Carbon::parse($request->date),
                 'destination_id' => $request->destination_id,
-                'employee_id' => $request->employee_id,
+                'user_id' => $request->employee_id,
                 'total' => 0, // Se actualizará después
                 'comment' => $request->comment,
             ]);
@@ -77,7 +77,6 @@ class OutputController extends Controller
                 // Obtener el detalle de entrada correspondiente
                 $material = Material::findOrFail($detail['material_id']);
                 
-
                 // Calcular el subtotal
                 $subtotal = $detail['quantity'] * $material->price;
 
