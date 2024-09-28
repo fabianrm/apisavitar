@@ -29,6 +29,8 @@ class DatabaseSwitcher
             Config::set('database.default', 'mysql_vargasnet');
         } elseif ($clientID === 'vavel') {
             Config::set('database.default', 'mysql_vavel');
+        } elseif ($clientID === 'demo') {
+            Config::set('database.default', 'mysql_demo');
         }
         else {
             return 0;
