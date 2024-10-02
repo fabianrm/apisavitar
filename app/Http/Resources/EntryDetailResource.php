@@ -20,7 +20,6 @@ class EntryDetailResource extends JsonResource
             'date' => $this->date,
             'material' => new MaterialResource($this->whenLoaded('material')),
             'quantity' => $this->quantity,
-            'current_stock' => $this->current_stock,
             'price' => $this->price,
             'subtotal' => $this->subtotal,
             'warehouse' => new WarehouseResource($this->whenLoaded('warehouse')),

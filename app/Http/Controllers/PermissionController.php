@@ -50,6 +50,7 @@ class PermissionController extends Controller
             'name' => $permission->name,
             'icon' => $permission->icon,
             'route' => $permission->route,
+            'order' => $permission->ord,
             'children' => $allPermissions->where('parent_id', $permission->id)->map(function ($child) use ($allPermissions) {
                 return $this->formatPermission($child, $allPermissions);
             })->values()->toArray() // Convertir a array simple

@@ -34,6 +34,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('invoices/{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
 
     Route::get('materials/stock', [MaterialController::class, 'getStockSummary']);
+    Route::get('materials/locations/{id}', [EntryDetailController::class, 'showLocations']);
 
 
     //Modulo Soporte

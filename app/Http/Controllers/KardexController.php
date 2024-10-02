@@ -44,7 +44,7 @@ class KardexController extends Controller
     {
         $kardexEntries = Kardex::with(['material', 'material.category', 'material.brand', 'material.presentation']) // Incluye la relación con el modelo Material
         ->where('material_id', $materialId)
-            ->orderBy('date', 'asc')
+            ->orderBy('created_at', 'asc')
             ->get();
 
         // Devolver el resultado en formato JSON

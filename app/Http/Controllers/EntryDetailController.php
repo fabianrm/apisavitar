@@ -75,4 +75,13 @@ class EntryDetailController extends Controller
         return response()->noContent();
     }
 
+    public function showLocations($material_id)
+    {
+        $entries = EntryDetail::with(['material', 'warehouse'])
+        ->where('material_id', $material_id)
+            ->get(); // Cambiamos firstOrFail por get para obtener una colección
+
+        return new EntryDetailCollection($entries); // Retorna la colección de EntryDetail
+    }
+
 }

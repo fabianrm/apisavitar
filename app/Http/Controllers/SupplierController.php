@@ -31,8 +31,21 @@ class SupplierController extends Controller
      */
     public function store(StoreSupplierRequest $request)
     {
-        $supplier = Supplier::create($request->validated());
-        return new SupplierResource($supplier);
+
+        try {
+            $supplier = Supplier::create($request->validated());
+            return response()->json([
+                'status' => true,
+                'message' => 'Proveedor registrado',
+                'data' => new SupplierResource($supplier)
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => $e->getMessage(),
+                'message' => 'Error al registrar el proveedor'
+            ], 500);
+        }
     }
 
     /**
@@ -57,7 +70,11 @@ class SupplierController extends Controller
     public function update(UpdateSupplierRequest $request, Supplier $supplier)
     {
         $supplier->update($request->validated());
-        return new SupplierResource($supplier);
+        return response()->json([
+            'status' => true,
+            'message' => 'Proveedor actualizado',
+            'data' => new SupplierResource($supplier)
+        ], 200);
     }
 
     /**
