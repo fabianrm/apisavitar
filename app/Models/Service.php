@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -110,6 +111,11 @@ class Service extends Model
         return $this->belongsTo(Equipment::class, "equipment_id");
     }
 
+    public function enterprise()
+    {
+        return $this->belongsTo(Enterprise::class);
+    }
+
 
     /**
      * Capturar usuario
@@ -129,6 +135,17 @@ class Service extends Model
         });
     }
 
+    /**
+     * Scopes para filtro por tienda de usuario
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope(new EnterpriseScope);
+    }
 
-
+    // Si necesitas consultas sin el filtro global
+    public static function withoutStoreScope()
+    {
+        return static::withoutGlobalScope(EnterpriseScope::class);
+    }
 }

@@ -223,7 +223,26 @@ class ServiceController extends Controller
 
 
     /**
-     * Cambiar caja y puerto
+     * Cambiar Vlan
+     */
+    public function updateVlan(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'routerId' => 'required|exists:routers,id',
+        ]);
+
+        $contract = Service::findOrFail($id);
+       
+       // $contract->router_id = $request->routerId;
+        $contract->router_id = $validatedData['routerId'];;
+        $contract->save();
+
+        return response()->json($contract, 200);
+    }
+
+
+    /**
+     * Cambiar equipo y usuario
      */
     public function updateEquipment(Request $request, $id)
     {
@@ -248,6 +267,29 @@ class ServiceController extends Controller
     }
 
 
+    /**
+     * Cambiar equipo y usuario
+     */
+    public function updateUser(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'userPppoe' => 'nullable|string',
+            'passPppoe' => 'nullable|string',
+        ]);
+
+        $contract = Service::findOrFail($id);
+
+        // Actualizar el contrato con los nuevos datos del usuario
+        $contract->user_pppoe = $validatedData['userPppoe'];
+        $contract->pass_pppoe = $validatedData['passPppoe'];
+        $contract->save();
+
+        return response()->json([
+            'message' => 'Ok',
+            'contract' => $contract
+        ], 200);
+    }
+
 
     /**
      * Suspender contrato
@@ -260,7 +302,7 @@ class ServiceController extends Controller
 
         $contract = Service::findOrFail($id);
 
-        $contract->status = 'terminado';
+        $contract->status = 'inactivo';
         $contract->end_date = Carbon::now();
         $contract->observation = $request->input('observation');
         $contract->save();
@@ -270,7 +312,6 @@ class ServiceController extends Controller
             'contract' => $contract,
         ], 200);
     }
-
 
 
     /**

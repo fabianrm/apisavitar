@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Filters\InvoiceFilter;
 use App\Services\InvoiceService;
 use App\Exports\InvoicesExport;
+use App\Exports\InvoicesResumen;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -48,9 +49,7 @@ class InvoiceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreInvoiceRequest $request)
-    {
-    }
+    public function store(StoreInvoiceRequest $request) {}
 
     /**
      * Display the specified resource.
@@ -82,12 +81,39 @@ class InvoiceController extends Controller
         $invoice->update($request->all());
     }
 
+
+
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Invoice $invoice)
     {
         //
+    }
+
+    /* Paid Invoice */
+
+    public function paidInvoice(Request $request, $id)
+    {
+        $request->validate([
+            'note' => 'nullable|string',
+        ]);
+
+        $invoice = Invoice::findOrFail($id);
+
+        $invoice->status = 'pagada';
+        $invoice->tipo_pago = $request->input('tipo_pago');
+        $invoice->amount = $request->input('amount');
+        $invoice->discount = $request->input('discount');
+        $invoice->paid_dated = Carbon::now();
+        $invoice->note = $request->input('note');
+        $invoice->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Factura pagada con éxito',
+            'invoice' => $invoice,
+        ], 200);
     }
 
 
@@ -111,7 +137,6 @@ class InvoiceController extends Controller
             'message' => 'Factura anulada con éxito',
             'invoice' => $invoice,
         ], 200);
-
     }
 
     /***
@@ -144,7 +169,8 @@ class InvoiceController extends Controller
     /**
      * Generar facturas de un contrato
      */
-    function generateInvoicesByService($id) {
+    function generateInvoicesByService($id)
+    {
         $invoiceService = app(InvoiceService::class);
         $totalInvoices = $invoiceService->generateInvoicesForService($id);
 
@@ -154,9 +180,7 @@ class InvoiceController extends Controller
                 'message' => $totalInvoices . ' facturas generadas'
             ]
         );
-
     }
-
 
 
     /***
@@ -248,12 +272,57 @@ class InvoiceController extends Controller
     }
 
 
+    //Funcion para envio de recordatorios por n8n
+    public function recordatory(Request $request)
+    {
+        $today = Carbon::today();
+        $limitDate = $today->copy()->addDays(5);
+
+        $invoices = Invoice::query()
+            ->join('services', 'invoices.service_id', '=', 'services.id')
+            ->join('customers', 'services.customer_id', '=', 'customers.id')
+            ->select(
+                'invoices.id',
+                'invoices.price',
+                'invoices.due_date',
+                'customers.name as customer_name',
+                'customers.phone_number as customer_phone'
+            )
+            ->where('invoices.status', 'pendiente')
+            ->whereNull('invoices.reminder_sent_at') // 🔒 Recordatorio aún no enviado
+            ->whereBetween('invoices.due_date', [$today, $limitDate])
+            ->orderBy('customers.name')
+            ->get();
+        return response()->json($invoices);
+    }
+
+    //Marcar el recordatorio como enviado
+    public function markReminderSent($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $invoice->reminder_sent_at = now();
+        $invoice->save();
+
+        return response()->json(['success' => true]);
+    }
+
+
+
     //Exportar facturas
     public function exportInvoices(Request $request)
     {
         $filters = $request->only(['status', 'start_date', 'end_date', 'customer_name']);
         return Excel::download(new InvoicesExport($filters), 'invoices.xlsx');
     }
+
+
+    //Exportar facturas resumen
+    public function exportInvoicesResumen(Request $request)
+    {
+        $filters = $request->only(['start_date', 'end_date']);
+        return Excel::download(new InvoicesResumen($filters), 'invoices_resumen.xlsx');
+    }
+
 
 
     //Reporte de facturas
@@ -304,7 +373,7 @@ class InvoiceController extends Controller
             'total' => $invoice->amount,
             'start_date' => Carbon::parse($invoice->start_date)->format('d-m-Y'),
             'end_date' => Carbon::parse($invoice->end_date)->format('d-m-Y'),
-            'periodic' => strtoupper( Carbon::parse($invoice->start_date)->translatedFormat('F')),
+            'periodic' => strtoupper(Carbon::parse($invoice->start_date)->translatedFormat('F')),
             'paid_dated' => Carbon::parse($invoice->paid_dated)->format('d-m-Y'),
             'note' => $invoice->note,
         ];
@@ -312,5 +381,51 @@ class InvoiceController extends Controller
         $pdf = PDF::loadView('invoice.receipt', $data)->setPaper([0, 0, 155, 654], 'portrait');
         //$pdf = PDF::loadView('invoice.receipt', compact('invoice'))->setPaper([0, 0, 226, 654], 'portrait'); // 80mm x 140mm
         return $pdf->download('recibo_nro_' . $invoice->receipt . '.pdf');
+    }
+
+    public function getMonthlyPaidAmounts()
+    {
+        $monthlyPaidAmounts = Invoice::where('status', 'pagada')
+            ->selectRaw('MONTH(paid_dated) as month, SUM(amount) as total_amount')
+            ->groupBy('month')
+            ->get();
+
+        // Array de nombres de los meses
+        $monthNames = [
+            1 => 'Enero',
+            2 => 'Febrero',
+            3 => 'Marzo',
+            4 => 'Abril',
+            5 => 'Mayo',
+            6 => 'Junio',
+            7 => 'Julio',
+            8 => 'Agosto',
+            9 => 'Septiembre',
+            10 => 'Octubre',
+            11 => 'Noviembre',
+            12 => 'Diciembre'
+        ];
+
+        // Variables para almacenar los resultados finales
+        $months = [];
+        $totals = [];
+
+        // Organizar los resultados
+        foreach ($monthlyPaidAmounts as $item) {
+            $months[] = $monthNames[$item->month];
+            $totals[] = floatval($item->total_amount);
+        }
+
+        // Formato de salida
+        $result = [
+            'data' => [
+                [
+                    'month' => $months,
+                    'total_amount' => $totals,
+                ]
+            ]
+        ];
+
+        return response()->json($result);
     }
 }

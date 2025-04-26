@@ -6,7 +6,7 @@ use App\Models\Brand;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,38 +27,43 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
     //Módulo ISP
     Route::get('invoices/search', [InvoiceController::class, 'searchInvoices']);
+    Route::get('invoices/recordatory', [InvoiceController::class, 'recordatory']);
+    Route::post('invoices/reminder/{id}', [InvoiceController::class, 'markReminderSent']);
     Route::get('invoices/export', [InvoiceController::class, 'exportInvoices']);
+    Route::get('invoices/export-resumen', [InvoiceController::class, 'exportInvoicesResumen']);
     Route::get('services/by-customer/{customer_id}', [ServiceController::class, 'getServicesByCustomer']);
     Route::get('customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
+    Route::get('customers/by-dni', [CustomerController::class, 'getCustomerActiveStatus']);
     Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
     Route::get('invoices/{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
 
     Route::get('materials/stock', [MaterialController::class, 'getStockSummary']);
     Route::get('materials/locations/{id}', [EntryDetailController::class, 'showLocations']);
 
-
     //Modulo Soporte
     Route::apiResource('support/update-status', TicketController::class);
 
-
     //Rutas autenticadas
     Route::middleware(['auth:sanctum'])->group(function () {
-
 
         Route::get('customers/check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);
         Route::get('services/check-equipment', [ServiceController::class, 'checkServicesByEquipment']);
         Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
         Route::patch('services/{id}/update-box-port', [ServiceController::class, 'updateBoxAndPort']);
+        Route::patch('services/{id}/update-vlan', [ServiceController::class, 'updateVlan']);
         Route::patch('services/{id}/suspend', [ServiceController::class, 'suspend']);
         Route::patch('services/{id}/update-equipment', [ServiceController::class, 'updateEquipment']);
+        Route::patch('services/{id}/update-user', [ServiceController::class, 'updateUser']);
         Route::patch('customer/{id}/suspend', [CustomerController::class, 'suspend']);
         Route::post('materials/uploadfile', [MaterialController::class, 'uploadFile']);
 
         Route::get('/user/permissions', [PermissionController::class, 'getUserPermissions']);
 
+        Route::get('invoices/monthly-paid-amounts', [InvoiceController::class, 'getMonthlyPaidAmounts']);
         Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
         Route::post('invoices/generateByService/{id}', [InvoiceController::class, 'generateInvoicesByService']);
         Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
+        Route::patch('invoices/{id}/paid-invoice', [InvoiceController::class, 'paidInvoice']);
         Route::patch('invoices/{id}/cancel-invoice', [InvoiceController::class, 'cancelInvoice']);
         Route::post('expenses/generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
         Route::get('expenses/report', [ExpenseController::class, 'expenseReport']);
@@ -90,6 +95,14 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('categories-support', CategoryTicketController::class);
     });
 
+    Route::get('check-time', function () {
+        return [
+            'php_time' => now()->format('Y-m-d H:i:s'),
+            'server_time' => DB::select('SELECT NOW() as time')[0]->time
+        ];
+    });
+
+
     Route::apiResource('users', AuthController::class);
     Route::apiResource('kardex', KardexController::class);
 
@@ -99,7 +112,6 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::apiResource('destinations', DestinationController::class);
     Route::apiResource('employees', EmployeeController::class);
     Route::apiResource('entry-details', EntryDetailController::class);
-
 
     Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);
 

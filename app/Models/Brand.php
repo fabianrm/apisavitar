@@ -30,4 +30,13 @@ class Brand extends Model
     {
         return $this->hasMany(Material::class);
     }
+
+
+    /**
+     * Relación con enterprise
+     */
+    public function enterprise()
+    {
+        return $this->belongsTo(Enterprise::class);
+    }
 }

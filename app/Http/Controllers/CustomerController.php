@@ -131,6 +131,36 @@ class CustomerController extends Controller
     }
 
     /**
+     * Verificar estado activo de cliente por documento
+     */
+    public function getCustomerActiveStatus(Request $request)
+    {
+        $request->validate([
+            'documentNumber' => 'required|string',
+        ]);
+
+        $customer = Customer::where('document_number', $request->documentNumber)
+            ->withCount(['services as active_services' => function ($query) {
+                $query->where('status', 'activo');
+            }])
+            ->first();
+
+        if (!$customer) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Cliente no encontrado'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'document_number' => $customer->document_number,
+            'customer_name' => $customer->name,
+            'has_active_services' => $customer->active_services > 0
+        ]);
+    }
+
+    /**
      * Suspender contrato
      */
     public function suspend(Request $request, $id)
