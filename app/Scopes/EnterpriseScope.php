@@ -5,6 +5,7 @@ namespace App\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Support\Facades\Log;
 
 class EnterpriseScope implements Scope
 {
@@ -13,7 +14,7 @@ class EnterpriseScope implements Scope
         //Multiple Store
         if (auth()->check()) {
             $user = auth()->user();
-            $storeIds = $user->stores()->pluck('enterprise_id')->toArray(); // Todas las tiendas del usuario
+            $storeIds = $user->enterprises()->select('role_user.enterprise_id')->pluck('enterprise_id')->toArray(); // Todas las tiendas del usuario
 
             if (!empty($storeIds)) {
                 $table = $model->getTable();

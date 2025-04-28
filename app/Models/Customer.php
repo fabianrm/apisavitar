@@ -11,6 +11,7 @@ class Customer extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'enterprise_id',
         'type',
         'document_number',
         'name',

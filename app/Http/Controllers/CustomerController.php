@@ -11,7 +11,7 @@ use App\Services\UtilService;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use App\Exports\CustomersExport;
-
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
@@ -21,22 +21,11 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         // Obtener los clientes junto con el total de contratos
-        $customers = Customer::withCount('services')->get();
+        // $customers = Customer::withCount('services')->get();
+        $customers = Customer::all();
+        Log::info($customers);
         // Retornar la colección de clientes con el total de contratos
         return new CustomerCollection($customers);
-
-
-        // $filter = new CustomerFilter();
-        // $queryItems = $filter->transform($request);
-        // $includeServices = $request->query('includeServices');
-        // $customers = Customer::where($queryItems);
-
-        // if ($includeServices) {
-        //     $customers = $customers->with('services');
-        // }
-        // //return new CustomerCollection($customers->paginate()->appends($request->query()));
-        // $customers = Customer::all();
-        // return new CustomerCollection($customers);
     }
 
     /**

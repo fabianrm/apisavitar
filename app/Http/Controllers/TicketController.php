@@ -41,7 +41,7 @@ class TicketController extends Controller
         }
 
         // Ejecutar la consulta
-        $tickets = $query->get();
+        $tickets = $query->orderBy('created_at', 'desc')->get();
 
         // Devolver los tickets usando el recurso TicketCollection
         return new TicketCollection($tickets);
@@ -110,7 +110,7 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTicketRequest $request,$ticketId)
+    public function update(UpdateTicketRequest $request, $ticketId)
     {
         $ticket = Ticket::findOrFail($ticketId);
         $ticket->update($request->all());
@@ -176,7 +176,7 @@ class TicketController extends Controller
         ], 200);
     }
 
-    
+
     // Adjuntar documentos/imágenes al ticket
     public function addAttachment(Request $request, $ticketId)
     {
@@ -197,10 +197,10 @@ class TicketController extends Controller
 
             // Buscar el ticket
             $ticket = Ticket::findOrFail($ticketId);
-           
+
             // Guardar el archivo
             $filePath = $file->storeAs('attachments', $filename, 'public');
-            
+
             // Verificar si la ruta del archivo fue generada correctamente
             if (!$filePath) {
                 return response()->json(['error' => 'Error al almacenar el archivo'], 500);
@@ -258,7 +258,7 @@ class TicketController extends Controller
         $ticket->technician_id = $request->technician_id;
         $ticket->assigned_at = Carbon::now(); // Registrar la fecha de asignación
         $ticket->expiration = $request->expiration; // Registrar la fecha de asignación
-       
+
         $ticket->save();
 
         // Registrar el historial del cambio de técnico
@@ -289,8 +289,7 @@ class TicketController extends Controller
 
         // Retornar la lista de archivos adjuntos como un JSON
         return response()->json([
-            'data'=> $attachments
+            'data' => $attachments
         ]);
     }
-
 }

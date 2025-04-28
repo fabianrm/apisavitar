@@ -23,7 +23,8 @@ class LoginRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
+            'enterprise_id' => 'required|integer|exists:enterprises,id'
         ];
     }
 }

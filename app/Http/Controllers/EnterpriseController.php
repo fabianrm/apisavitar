@@ -15,8 +15,8 @@ class EnterpriseController extends Controller
      */
     public function index()
     {
-        $enterprise = Enterprise::first();
-        return new EnterpriseResource($enterprise);
+        $enterprise = Enterprise::all();
+        return new EnterpriseCollection($enterprise);
     }
 
     /**

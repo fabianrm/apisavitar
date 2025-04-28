@@ -10,17 +10,27 @@ class Enterprise extends Model
     use HasFactory;
 
     protected $fillable = [
-        'ruc',
         'name',
-        'city_id',
         'address',
         'phone',
-        'logo'
+        'status'
     ];
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
+
 
     public function cities()
     {
         return $this->belongsTo(City::class, "city_id");
     }
 
+
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'role_user')->withPivot('role_id');
+    }
 }

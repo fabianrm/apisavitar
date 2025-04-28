@@ -15,7 +15,7 @@ class EquipmentController extends Controller
      */
     public function index()
     {
-        $equipments = Equipment::all();
+        $equipments = Equipment::orderBy('id', 'desc')->get();
         return new EquipmentCollection($equipments);
     }
 

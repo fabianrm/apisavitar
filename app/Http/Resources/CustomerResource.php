@@ -32,7 +32,7 @@ class CustomerResource extends JsonResource
             'status' => $this->status,
             'updated_at' => $this->updated_at,
             'totalContracts' => $this->services->count(),
-            'service' => ServiceResource::collection($this->whenLoaded('services')),
+            // 'service' => ServiceResource::collection($this->whenLoaded('services')),
         ];
 
 

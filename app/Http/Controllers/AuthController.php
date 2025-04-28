@@ -8,6 +8,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
+use App\Models\Enterprise;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,13 +28,12 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        if (!Auth::attempt($request->validated())) {
+        if (!Auth::attempt($request->only(['email', 'password']))) {
             return response()->json([
                 'errors' => 'Credenciales incorrectas.'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        // Obtener al usuario autenticado
         $user = $request->user();
 
         // Verificar si el usuario tiene el status 1
@@ -43,14 +43,30 @@ class AuthController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $user = $request->user()->load('roles'); // Cargar la relación 'roles'
-        //$user = $request->user();
+        // Verificar que el usuario tenga acceso a la empresa solicitada
+        $enterpriseId = $request->enterprise_id;
+        if (!$user->roles()->wherePivot('enterprise_id', $enterpriseId)->exists()) {
+            return response()->json([
+                'errors' => 'No tienes permisos para acceder a esta sucursal.'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $user = $user->load(['roles' => function ($query) use ($enterpriseId) {
+            $query->wherePivot('enterprise_id', $enterpriseId);
+        }]);
+
         $userToken = $user->createToken('AppToken')->plainTextToken;
+
+        $enterprise = Enterprise::find($enterpriseId);
 
         return response()->json([
             'message' => 'Se ha iniciado sesión correctamente.',
             'token' => $userToken,
-            'user' => new UserResource($user)
+            'user' => new UserResource($user),
+            'enterprise' => [
+                'id' => $enterprise->id,
+                'name' => $enterprise->name
+            ]
         ], Response::HTTP_OK);
     }
 
@@ -73,15 +89,15 @@ class AuthController extends Controller
         return new UserResource($user);
     }
 
-    
-    
+
+
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateUserRequest $request, $id)
     {
         $user = User::findOrFail($id);
-       // Log::info($user);
+        // Log::info($user);
         $user->update($request->all());
     }
 
@@ -104,5 +120,4 @@ class AuthController extends Controller
             'message' => 'Se ha cerrado sesión correctamente.'
         ], Response::HTTP_OK);
     }
-
 }

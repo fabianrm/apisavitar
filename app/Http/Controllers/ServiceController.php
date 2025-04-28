@@ -23,7 +23,7 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $service = Service::with(['customers', 'routers', 'plans', 'cities'])->get();
+        $service = Service::with(['customers', 'routers', 'plans', 'cities'])->orderBy('created_at', 'desc')->get();
         return new ServiceCollection($service);
     }
 
@@ -151,7 +151,7 @@ class ServiceController extends Controller
         // $service->service_code = $uniqueCode;
 
         $newInstallationDate = Carbon::parse($contract->installation_date)
-        ->month(Carbon::now()->month)
+            ->month(Carbon::now()->month)
             ->toDateString();
 
         $newContract = Service::create([
@@ -232,8 +232,8 @@ class ServiceController extends Controller
         ]);
 
         $contract = Service::findOrFail($id);
-       
-       // $contract->router_id = $request->routerId;
+
+        // $contract->router_id = $request->routerId;
         $contract->router_id = $validatedData['routerId'];;
         $contract->save();
 

@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        
+
         'dni',
         'name',
         'email',
@@ -64,8 +64,14 @@ class User extends Authenticatable
 
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_user','user_id', 'role_id');
+        return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
     }
+
+    public function enterprises()
+    {
+        return $this->belongsToMany(Enterprise::class, 'role_user', 'user_id', 'enterprise_id');
+    }
+
 
 
     public function hasRole($role)
@@ -84,7 +90,4 @@ class User extends Authenticatable
     {
         return $this->roles->flatMap->permissions->unique();
     }
-
-
-
 }
