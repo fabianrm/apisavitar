@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrentEnterprise;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ class Entry extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date', 'document_number', 'supplier_id', 'document_id', 'entry_type_id', 'total', 'status'];
+    protected $fillable = ['enterprise_id', 'date', 'document_number', 'supplier_id', 'document_id', 'entry_type_id', 'total', 'status'];
 
     public function supplier()
     {
@@ -47,6 +48,11 @@ class Entry extends Model
         parent::boot();
 
         static::creating(function ($model) {
+
+            if (empty($model->enterprise_id)) {
+                $model->enterprise_id = CurrentEnterprise::get();
+            }
+
             $model->created_by = Auth::id();
             $model->updated_by = Auth::id();
         });

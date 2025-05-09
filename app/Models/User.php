@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Helpers\CurrentEnterprise;
+use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,7 +21,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-
+        'enterprise_id',
         'dni',
         'name',
         'email',
@@ -72,8 +75,6 @@ class User extends Authenticatable
         return $this->belongsToMany(Enterprise::class, 'role_user', 'user_id', 'enterprise_id');
     }
 
-
-
     public function hasRole($role)
     {
         return $this->roles()->where('name', $role)->exists();
@@ -89,5 +90,33 @@ class User extends Authenticatable
     public function permissions()
     {
         return $this->roles->flatMap->permissions->unique();
+    }
+
+    /**
+     * Setear id de empresa
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->enterprise_id)) {
+                $model->enterprise_id = CurrentEnterprise::get();
+            }
+        });
+    }
+
+    /**
+     * Scopes para filtro por tienda de usuario
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope(new EnterpriseScope);
+    }
+
+    // Si necesitas consultas sin el filtro global
+    public static function withoutStoreScope()
+    {
+        return static::withoutGlobalScope(EnterpriseScope::class);
     }
 }

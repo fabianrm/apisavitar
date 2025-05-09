@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrentEnterprise;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,7 @@ class Expense extends Model
     use HasFactory;
 
     protected $fillable = [
+        'enterprise_id',
         'expense_code',
         'description',
         'reason_id',
@@ -41,18 +43,26 @@ class Expense extends Model
         return $this->belongsTo(Enterprise::class);
     }
 
-
+    /**
+     * Capturar usuario
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();
 
-        static::creating(function ($expense) {
-            $expense->created_by = Auth::id();
-            $expense->updated_by = Auth::id();
+        static::creating(function ($model) {
+
+            if (empty($model->enterprise_id)) {
+                $model->enterprise_id = CurrentEnterprise::get();
+            }
+
+            $model->created_by = Auth::id();
+            $model->updated_by = Auth::id();
         });
 
-        static::updating(function ($expense) {
-            $expense->updated_by = Auth::id();
+        static::updating(function ($model) {
+            $model->updated_by = Auth::id();
         });
     }
 

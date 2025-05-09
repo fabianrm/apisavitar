@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrentEnterprise;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class TicketHistory extends Model
 {
     use HasFactory;
-    protected $fillable = ['ticket_id', 'status', 'changed_by', 'comment'];
+    protected $fillable = ['enterprise_id', 'ticket_id', 'status', 'changed_by', 'comment'];
 
     public function ticket()
     {
@@ -24,6 +25,20 @@ class TicketHistory extends Model
     public function enterprise()
     {
         return $this->belongsTo(Enterprise::class);
+    }
+
+    /**
+     * Setear id de empresa
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->enterprise_id)) {
+                $model->enterprise_id = CurrentEnterprise::get();
+            }
+        });
     }
 
     /**

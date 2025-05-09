@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrentEnterprise;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,7 @@ class Router extends Model
     use HasFactory;
     protected $fillable = [
         'id',
+        'enterprise_id',
         'ip',
         'vlan',
         'usuario',
@@ -33,6 +35,18 @@ class Router extends Model
     public function enterprise()
     {
         return $this->belongsTo(Enterprise::class);
+    }
+
+    //Capturar y setear la empresa del usuario logueado
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->enterprise_id)) {
+                $model->enterprise_id = CurrentEnterprise::get();
+            }
+        });
     }
 
     /**

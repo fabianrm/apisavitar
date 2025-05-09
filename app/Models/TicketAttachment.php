@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrentEnterprise;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,12 +10,26 @@ use Illuminate\Database\Eloquent\Model;
 class TicketAttachment extends Model
 {
     use HasFactory;
-    protected $fillable = ['ticket_id', 'file_path'];
+    protected $fillable = ['enterprise_id', 'ticket_id', 'file_path'];
 
 
     public function enterprise()
     {
         return $this->belongsTo(Enterprise::class);
+    }
+
+    /**
+     * Setear id de empresa
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->enterprise_id)) {
+                $model->enterprise_id = CurrentEnterprise::get();
+            }
+        });
     }
 
     /**

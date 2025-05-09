@@ -62,7 +62,9 @@ class Box extends Model
         $this->save();
     }
 
-
+    /**
+     * Setear id de empresa
+     */
     protected static function boot()
     {
         parent::boot();
@@ -73,7 +75,6 @@ class Box extends Model
             }
         });
     }
-
 
 
     /**

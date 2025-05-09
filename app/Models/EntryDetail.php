@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrentEnterprise;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,7 @@ class EntryDetail extends Model
     use HasFactory;
 
     protected $fillable = [
+        'enterprise_id',
         'entry_id',
         'date',
         'material_id',
@@ -49,5 +51,16 @@ class EntryDetail extends Model
     public static function withoutStoreScope()
     {
         return static::withoutGlobalScope(EnterpriseScope::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->enterprise_id)) {
+                $model->enterprise_id = CurrentEnterprise::get();
+            }
+        });
     }
 }

@@ -137,7 +137,6 @@ class Service extends Model
 
         static::creating(function ($model) {
             if (empty($model->enterprise_id)) {
-
                 $model->enterprise_id = CurrentEnterprise::get();
             }
 

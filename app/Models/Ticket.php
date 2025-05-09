@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrentEnterprise;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,7 +28,7 @@ class Ticket extends Model
         'status'
     ];
 
-    protected $dates = ['expiration', 'assigned_at', 'resolved_at', 'closed_at'];
+    protected $dates = ['enterprise_id', 'expiration', 'assigned_at', 'resolved_at', 'closed_at'];
 
     public function categoryTicket()
     {
@@ -67,6 +68,20 @@ class Ticket extends Model
     public function enterprise()
     {
         return $this->belongsTo(Enterprise::class);
+    }
+
+    /**
+     * Setear id de empresa
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->enterprise_id)) {
+                $model->enterprise_id = CurrentEnterprise::get();
+            }
+        });
     }
 
     /**
