@@ -261,7 +261,7 @@ class InvoiceController extends Controller
         }
 
         // Ordenar por nombre del cliente
-        $query->orderBy('customers.name')
+        $query->orderBy('invoices.updated_at', 'desc')
             ->orderBy('invoices.start_date', 'desc');
 
         // Usar la paginación de Laravel
@@ -273,10 +273,11 @@ class InvoiceController extends Controller
 
 
     //Funcion para envio de recordatorios por n8n
+    //Recuerda desde una semana antes, pasando un día.
     public function recordatory(Request $request)
     {
         $today = Carbon::today();
-        $limitDate = $today->copy()->addDays(5);
+        $limitDate = $today->copy()->addDays(7); // Change from 5 to 7 days
 
         $invoices = Invoice::query()
             ->join('services', 'invoices.service_id', '=', 'services.id')
@@ -284,26 +285,134 @@ class InvoiceController extends Controller
             ->select(
                 'invoices.id',
                 'invoices.price',
-                'invoices.due_date',
+                'invoices.start_date',
                 'customers.name as customer_name',
-                'customers.phone_number as customer_phone'
+                'customers.whatsapp as customer_phone',
+                'invoices.reminder_sent_at',
+                'invoices.reminder_count'
             )
+            ->where('services.status', 'activo')
             ->where('invoices.status', 'pendiente')
-            ->whereNull('invoices.reminder_sent_at') // 🔒 Recordatorio aún no enviado
-            ->whereBetween('invoices.due_date', [$today, $limitDate])
+            ->where('invoices.start_date', '>=', $today)
+            ->where('invoices.start_date', '<=', $limitDate)
+            ->where(function ($query) use ($today) {
+                $query->whereNull('invoices.reminder_sent_at')
+                    ->orWhere('invoices.reminder_sent_at', '<=', $today->copy()->subDay());
+            })
             ->orderBy('customers.name')
             ->get();
         return response()->json($invoices);
     }
 
-    //Marcar el recordatorio como enviado
+    //Recordar vencidos
+    public function recordatoryOverdue(Request $request)
+    {
+        $today = Carbon::today();
+
+        $invoices = Invoice::query()
+            ->join('services', 'invoices.service_id', '=', 'services.id')
+            ->join('customers', 'services.customer_id', '=', 'customers.id')
+            ->select(
+                'invoices.id',
+                'invoices.price',
+                'invoices.start_date as due_date', // Mostramos start_date como fecha de vencimiento
+                'invoices.due_date as cutoff_date', // Mostramos la fecha límite de pago
+                'customers.name as customer_name',
+                'customers.whatsapp as customer_phone',
+                'invoices.reminder_sent_at',
+                'invoices.reminder_count'
+            )
+            ->where('services.status', 'activo')
+            ->where('invoices.status', 'vencida')
+            ->where('invoices.start_date', '<=', $today) // Ya pasó la fecha de vencimiento
+            ->where('invoices.due_date', '>=', $today) // Aún no se corta el servicio
+            ->where(function ($query) use ($today) {
+                $query->whereNull('invoices.overdue_reminder_sent_at')
+                    ->orWhereDate('invoices.overdue_reminder_sent_at', '<=', $today->copy()->subDay());
+            })
+            ->orderBy('customers.name')
+            ->get();
+        return response()->json($invoices);
+    }
+
+
+    // Marcar la respuesta de recordatorio x vencer
     public function markReminderSent($id)
     {
         $invoice = Invoice::findOrFail($id);
         $invoice->reminder_sent_at = now();
+        $invoice->reminder_count = ($invoice->reminder_count ?? 0) + 1;
         $invoice->save();
-
         return response()->json(['success' => true]);
+    }
+
+
+    //Marcar recordatorio de vencidas
+    public function sendReminderOverdue($invoiceId)
+    {
+        $invoice = Invoice::findOrFail($invoiceId);
+        $today = Carbon::today();
+
+        // Solo la fecha, sin hora
+        $lastReminderDate = $invoice->overdue_reminder_sent_at
+            ? Carbon::parse($invoice->overdue_reminder_sent_at)->toDateString()
+            : null;
+
+        $todayDate = $today->toDateString();
+
+        // Verifica si está dentro del rango permitido: después del vencimiento (start_date), antes del corte (due_date)
+        // Y además que no se haya enviado recordatorio hoy
+        if (
+            $invoice->start_date < $today &&
+            $invoice->due_date >= $today &&
+            ($lastReminderDate === null || $lastReminderDate < $todayDate)
+        ) {
+            $invoice->update([
+                'overdue_reminder_sent_at' => Carbon::now(),
+                'reminder_count' => $invoice->reminder_count + 1
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Recordatorio enviado correctamente'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No se envió recordatorio. Fecha fuera de rango o ya enviado hoy.'
+        ]);
+    }
+
+
+
+    //Consulta Vencidas sin corte
+    public function getExpiredActiveServices()
+    {
+        $today = Carbon::today();
+
+        $services = Invoice::query()
+            ->join('services', 'invoices.service_id', '=', 'services.id')
+            ->join('customers', 'services.customer_id', '=', 'customers.id')
+            ->select(
+                'invoices.id as invoice_id',
+                'invoices.start_date',
+                'invoices.due_date',
+                'invoices.status as invoice_status',
+                'services.id as service_id',
+                'services.status as service_status',
+                'services.address_installation',
+                'services.reference',
+                'customers.name as customer_name',
+                'customers.whatsapp as customer_phone'
+            )
+            ->where('invoices.status', 'vencida') // Factura vencida
+            ->where('services.status', 'activo')  // Pero el servicio sigue activo
+            ->where('invoices.due_date', '<', $today) // Ya pasó la fecha de corte
+            ->orderBy('customers.name')
+            ->get();
+
+        return response()->json($services);
     }
 
 

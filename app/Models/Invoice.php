@@ -15,6 +15,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'id',
+        'enterprise_id',
         'service_id',
         'price',
         'igv',
@@ -29,6 +30,8 @@ class Invoice extends Model
         'tipo_pago',
         'note',
         'status',
+        'reminder_sent_at',
+        'overdue_reminder_sent_at',
         'created_by',
         'updated_by',
     ];

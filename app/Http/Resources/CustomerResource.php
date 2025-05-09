@@ -16,6 +16,7 @@ class CustomerResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'enterprise_id' => $this->enterprise_id,
             'type' => $this->type,
             'customerCode' => $this->client_code,
             'documentNumber' => $this->document_number,
@@ -28,6 +29,7 @@ class CustomerResource extends JsonResource
             'longitude' => $this->longitude,
             'coordinates' => [$this->latitude, $this->longitude],
             'phoneNumber' => $this->phone_number,
+            'whatsapp' => $this->whatsapp,
             'email' => $this->email,
             'status' => $this->status,
             'updated_at' => $this->updated_at,

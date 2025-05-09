@@ -34,6 +34,7 @@ class UpdateCustomerRequest extends FormRequest
                 'latitude' => ['required'],
                 'longitude' => ['required'],
                 'phoneNumber' => ['required'],
+                'whatsapp' => ['required'],
                 'email' => ['required', 'email'],
                 'status' => ['required'],
             ];
@@ -42,16 +43,16 @@ class UpdateCustomerRequest extends FormRequest
                 'type' => ['sometimes', 'required', Rule::in(['natural', 'juridica'])],
                 'documentNumber' => ['sometimes', 'required'],
                 'name' => ['sometimes', 'required'],
-                'cityId' => ['sometimes','required'],
+                'cityId' => ['sometimes', 'required'],
                 'address' => ['sometimes', 'required'],
                 'reference' => ['sometimes', 'required'],
                 'latitude' => ['sometimes', 'required'],
                 'longitude' => ['sometimes', 'required'],
                 'phoneNumber' => ['sometimes', 'required'],
+                'whatsapp' => ['sometimes', 'required'],
                 'email' => ['sometimes', 'required', 'email'],
                 'status' => ['sometimes', 'required'],
             ];
-
         }
     }
     protected function prepareForValidation(): void

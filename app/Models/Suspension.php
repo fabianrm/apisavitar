@@ -2,32 +2,32 @@
 
 namespace App\Models;
 
-use App\Helpers\CurrentEnterprise;
-use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use App\Scopes\EnterpriseScope;
 
-class Customer extends Model
+class Suspension extends Model
 {
     use HasFactory;
+
     protected $fillable = [
+        'id',
         'enterprise_id',
-        'type',
-        'document_number',
-        'name',
-        'city_id',
-        'address',
-        'reference',
-        'latitude',
-        'longitude',
-        'phone_number',
-        'whatsapp',
-        'email',
+        'service_id',
+        'start_date',
+        'end_date',
+        'reason',
+        'observation',
         'status',
-        'created_by',
-        'updated_by',
     ];
+
+
+    //relacion con services
+    public function service()
+    {
+        return $this->belongsTo(Service::class, 'service_id');
+    }
 
 
     /**
@@ -39,11 +39,6 @@ class Customer extends Model
         parent::boot();
 
         static::creating(function ($model) {
-
-            if (empty($model->enterprise_id)) {
-                $model->enterprise_id = CurrentEnterprise::get();
-            }
-
             $model->created_by = Auth::id();
             $model->updated_by = Auth::id();
         });
@@ -51,31 +46,6 @@ class Customer extends Model
         static::updating(function ($model) {
             $model->updated_by = Auth::id();
         });
-    }
-
-
-
-    /**
-     * Get all of the services for the Customer
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function services()
-    {
-        return $this->hasMany(Service::class);
-    }
-
-    public function cities()
-    {
-        return $this->belongsTo(City::class, "city_id");
-    }
-
-    /**
-     * Relación con enterprise
-     */
-    public function enterprise()
-    {
-        return $this->belongsTo(Enterprise::class);
     }
 
     /**

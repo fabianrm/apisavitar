@@ -23,6 +23,7 @@ class StoreServiceRequest extends FormRequest
     {
         return [
             'serviceCode' => [''],
+            'enterpriseId' => [''],
             'customerId' => ['required'],
             'planId' => ['required'],
             'routerId' => ['required'],
@@ -41,6 +42,9 @@ class StoreServiceRequest extends FormRequest
             'endDate' => [''],
             'userPppoe' => [''],
             'passPppoe' => [''],
+            'iptv' => [''],
+            'userIptv' => [''],
+            'passIptv' => [''],
             'observation' => [''],
             'installationPayment' => [''],
             'installationAmount' => [''],
@@ -53,6 +57,7 @@ class StoreServiceRequest extends FormRequest
     {
         $this->merge([
             'service_code' => $this->serviceCode,
+            'enterprise_id' => $this->enterpriseId,
             'customer_id' => $this->customerId,
             'plan_id' => $this->planId,
             'router_id' => $this->routerId,
@@ -65,13 +70,14 @@ class StoreServiceRequest extends FormRequest
             'installation_date' => $this->installationDate,
             'billing_date' => $this->billingDate,
             'due_date' => $this->dueDate,
-            'end_date' => $this->endDate, 
-            'user_pppoe' => $this->userPppoe, 
+            'end_date' => $this->endDate,
+            'user_pppoe' => $this->userPppoe,
             'pass_pppoe' => $this->passPppoe,
-            'installation_payment' => $this->installationPayment, 
-            'installation_amount' => $this->installationAmount, 
-           
+            'user_iptv' => $this->userIptv,
+            'pass_iptv' => $this->passIptv,
+            'installation_payment' => $this->installationPayment,
+            'installation_amount' => $this->installationAmount,
+
         ]);
     }
-
 }

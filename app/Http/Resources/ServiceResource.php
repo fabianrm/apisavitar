@@ -23,7 +23,7 @@ class ServiceResource extends JsonResource
             'routerId' => $this->router_id,
             'routerIp' => $this->routers->ip,
             'vlan' => $this->routers->vlan,
-            'boxName' => $this->boxes->name,
+            'boxName' => $this->boxes ? $this->boxes->name : '-',
             'portNumber' => $this->port_number,
             'equipmentId' => $this->equipment_id,
             'equipmentSerie' => $this->equipments?->serie,
@@ -45,6 +45,9 @@ class ServiceResource extends JsonResource
             'endDate' => $this->end_date,
             'userPppoe' => $this->user_pppoe,
             'passPppoe' => $this->pass_pppoe,
+            'iptv' => $this->iptv,
+            'userIptv' => $this->user_iptv,
+            'passIptv' => $this->pass_iptv,
             'observation' => $this->observation,
             'status' => $this->status,
 

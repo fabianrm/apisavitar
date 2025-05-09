@@ -55,7 +55,11 @@ class AuthController extends Controller
             $query->wherePivot('enterprise_id', $enterpriseId);
         }]);
 
-        $userToken = $user->createToken('AppToken')->plainTextToken;
+        // $userToken = $user->createToken('AppToken')->plainTextToken;
+        $userToken = $user->createToken('AppToken', ['enterprise_id:' . $enterpriseId])->plainTextToken;
+
+        Log::info($userToken);
+
 
         $enterprise = Enterprise::find($enterpriseId);
 

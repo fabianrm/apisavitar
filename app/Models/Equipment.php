@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Equipment extends Model
 {
@@ -13,6 +12,7 @@ class Equipment extends Model
 
     protected $fillable = [
         'id',
+        'enterprise_id',
         'type',
         'mac',
         'serie',

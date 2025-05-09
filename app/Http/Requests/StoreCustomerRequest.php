@@ -33,6 +33,7 @@ class StoreCustomerRequest extends FormRequest
             'latitude' => ['required'],
             'longitude' => ['required'],
             'phoneNumber' => ['required'],
+            'whatsapp' => ['required'],
             'email' => ['required', 'email'],
             'status' => ['required'],
         ];
@@ -45,6 +46,5 @@ class StoreCustomerRequest extends FormRequest
             'city_id' => $this->cityId,
             'phone_number' => $this->phoneNumber
         ]);
-
     }
 }

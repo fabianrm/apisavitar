@@ -113,6 +113,39 @@ class ServiceController extends Controller
         ]);
     }
 
+    //Terminar Contrato
+    public function terminate(string $id)
+    {
+
+        try {
+            $today = Carbon::now();
+
+            $service = Service::findOrFail($id);
+
+            $service->status = 'terminado';
+            $service->box_id = null;
+            $service->port_number = null;
+            $service->equipment_id = null;
+            $service->observation = 'Terminado por usuario con id #' . auth()->user()->id . ' el ' . $today;
+            $service->save();
+
+            return response()->json(
+                [
+                    'message' => 'Contrato terminado exitosamente',
+                ],
+                200
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Error al terminar el contrato.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
     /**
      * Obtener los puertos disponibles en la caja.
      */
@@ -156,6 +189,7 @@ class ServiceController extends Controller
 
         $newContract = Service::create([
             'service_code' => $uniqueCode,
+            'enterprise_id' => $contract->enterprise_id,
             'customer_id' => $contract->customer_id,
             'plan_id' => $request->plan_id,
             'router_id' => $contract->router_id,
@@ -173,6 +207,9 @@ class ServiceController extends Controller
             'due_date' => $contract->due_date,
             'user_pppoe' => $contract->user_pppoe,
             'pass_pppoe' => $contract->pass_pppoe,
+            'iptv' => $contract->iptv,
+            'user_iptv' => $contract->user_iptv,
+            'pass_iptv' => $contract->pass_iptv,
             'observation' => $contract->observation,
             'prepayment' => $contract->prepayment,
             'status' => 'activo',
@@ -287,29 +324,6 @@ class ServiceController extends Controller
         return response()->json([
             'message' => 'Ok',
             'contract' => $contract
-        ], 200);
-    }
-
-
-    /**
-     * Suspender contrato
-     */
-    public function suspend(Request $request, $id)
-    {
-        $request->validate([
-            'observation' => 'nullable|string',
-        ]);
-
-        $contract = Service::findOrFail($id);
-
-        $contract->status = 'inactivo';
-        $contract->end_date = Carbon::now();
-        $contract->observation = $request->input('observation');
-        $contract->save();
-
-        return response()->json([
-            'message' => 'El contrato ha sido suspendido',
-            'contract' => $contract,
         ], 200);
     }
 

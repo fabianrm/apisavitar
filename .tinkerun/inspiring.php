@@ -1,17 +1,36 @@
 <?php
 
-use App\Models\OutputDetail;
-use Illuminate\Support\Facades\DB;
+use App\Models\Invoice;
+use App\Models\Suspension;
+use Carbon\Carbon;
 
-$destinationId = 2; // Aquí pones el destination_id que deseas filtrar
+// $invoiceStart = Carbon::parse('2025-05-10');
+// $invoiceEnd = Carbon::parse('2025-06-09');
+// $serviceId = 184;
 
-OutputDetail::select('outputs.date', 'materials.code', 'materials.name', 'brands.name as brand', 'materials.model', 'presentations.name as presentation', 'output_details.quantity', 'output_details.subtotal')
-    ->join('entry_details', 'output_details.entry_detail_id', '=', 'entry_details.id')
-    ->join('materials', 'entry_details.material_id', '=', 'materials.id')
-    ->join('presentations', 'presentations.id', '=', 'materials.presentation_id')
-    ->join('brands', 'brands.id', '=', 'materials.brand_id')
-    ->join('outputs', 'output_details.output_id', '=', 'outputs.id')
-    ->where('outputs.destination_id', $destinationId)
+// $exists = Invoice::where('service_id', $serviceId)
+//     ->whereDate('start_date', $invoiceStart->toDateString())
+//     ->whereDate('end_date', $invoiceEnd->toDateString())
+//     ->exists();
+
+
+// $serviceId = 184;
+// $startDate = '2025-04-10';
+// $endDate = '2025-05-09';
+
+// $exists = Invoice::where('service_id', $serviceId)
+//     ->whereDate('start_date', $startDate)
+//     ->whereDate('end_date', $endDate)
+//     ->exists();
+
+// dump('¿Existe factura?', $exists ? 'Sí' : 'No');
+
+// $exists;
+
+
+$suspension = Suspension::with(['service'])
+    ->where('service_id', '474')
+    ->where('status', true)
     ->get();
 
-
+$suspension;

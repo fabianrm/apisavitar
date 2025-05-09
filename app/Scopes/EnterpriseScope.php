@@ -2,6 +2,7 @@
 
 namespace App\Scopes;
 
+use App\Helpers\CurrentEnterprise;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -11,6 +12,13 @@ class EnterpriseScope implements Scope
 {
     public function apply(Builder $builder, Model $model)
     {
+
+        $enterpriseId = CurrentEnterprise::get();
+
+        if ($enterpriseId) {
+            $builder->where($model->getTable() . '.enterprise_id', $enterpriseId);
+        }
+
         //Multiple Store
         if (auth()->check()) {
             $user = auth()->user();

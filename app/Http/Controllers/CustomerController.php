@@ -22,8 +22,8 @@ class CustomerController extends Controller
     {
         // Obtener los clientes junto con el total de contratos
         // $customers = Customer::withCount('services')->get();
-        $customers = Customer::all();
-        Log::info($customers);
+        $customers = Customer::orderBy('created_at', 'desc')->get();
+
         // Retornar la colección de clientes con el total de contratos
         return new CustomerCollection($customers);
     }

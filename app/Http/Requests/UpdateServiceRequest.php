@@ -103,6 +103,15 @@ class UpdateServiceRequest extends FormRequest
         if ($this->has('passPppoe')) {
             $data['pass_pppoe'] = $this->passPppoe;
         }
+        if ($this->has('iptv')) {
+            $data['iptv'] = $this->iptv;
+        }
+        if ($this->has('user_iptv')) {
+            $data['user_iptv'] = $this->userIptv;
+        }
+        if ($this->has('pass_iptv')) {
+            $data['pass_iptv'] = $this->passIptv;
+        }
         if ($this->has('observation')) {
             $data['observation'] = $this->observation;
         }

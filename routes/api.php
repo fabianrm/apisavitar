@@ -19,82 +19,14 @@ use Illuminate\Support\Facades\DB;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function () {
 
-    //Módulo ISP
-    Route::get('invoices/search', [InvoiceController::class, 'searchInvoices']);
-    Route::get('invoices/recordatory', [InvoiceController::class, 'recordatory']);
-    Route::post('invoices/reminder/{id}', [InvoiceController::class, 'markReminderSent']);
-    Route::get('invoices/export', [InvoiceController::class, 'exportInvoices']);
-    Route::get('invoices/export-resumen', [InvoiceController::class, 'exportInvoicesResumen']);
-    Route::get('services/by-customer/{customer_id}', [ServiceController::class, 'getServicesByCustomer']);
-    Route::get('customers-with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
-    Route::get('customers/by-dni', [CustomerController::class, 'getCustomerActiveStatus']);
-    Route::get('export-customers', [CustomerController::class, 'exportCustomers']);
-    Route::get('invoices/{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
+    // Rutas públicas (no autenticadas)
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::apiResource('enterprises', EnterpriseController::class);
 
-    Route::get('materials/stock', [MaterialController::class, 'getStockSummary']);
-    Route::get('materials/locations/{id}', [EntryDetailController::class, 'showLocations']);
-
-    //Modulo Soporte
-    Route::apiResource('support/update-status', TicketController::class);
-
-    //Rutas autenticadas
-    Route::middleware(['auth:sanctum'])->group(function () {
-
-        Route::get('customers/check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);
-        Route::get('services/check-equipment', [ServiceController::class, 'checkServicesByEquipment']);
-        Route::patch('services/{contract}/update-plan', [ServiceController::class, 'updatePlan']);
-        Route::patch('services/{id}/update-box-port', [ServiceController::class, 'updateBoxAndPort']);
-        Route::patch('services/{id}/update-vlan', [ServiceController::class, 'updateVlan']);
-        Route::patch('services/{id}/suspend', [ServiceController::class, 'suspend']);
-        Route::patch('services/{id}/update-equipment', [ServiceController::class, 'updateEquipment']);
-        Route::patch('services/{id}/update-user', [ServiceController::class, 'updateUser']);
-        Route::patch('customer/{id}/suspend', [CustomerController::class, 'suspend']);
-        Route::post('materials/uploadfile', [MaterialController::class, 'uploadFile']);
-
-        Route::get('/user/permissions', [PermissionController::class, 'getUserPermissions']);
-
-        Route::get('invoices/monthly-paid-amounts', [InvoiceController::class, 'getMonthlyPaidAmounts']);
-        Route::post('invoices/generate', [InvoiceController::class, 'generateInvoicesMonth']);
-        Route::post('invoices/generateByService/{id}', [InvoiceController::class, 'generateInvoicesByService']);
-        Route::get('invoices/paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
-        Route::patch('invoices/{id}/paid-invoice', [InvoiceController::class, 'paidInvoice']);
-        Route::patch('invoices/{id}/cancel-invoice', [InvoiceController::class, 'cancelInvoice']);
-        Route::post('expenses/generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
-        Route::get('expenses/report', [ExpenseController::class, 'expenseReport']);
-
-        Route::apiResource('services', ServiceController::class);
-        Route::apiResource('invoices', InvoiceController::class);
-        Route::apiResource('customers', CustomerController::class);
-        Route::apiResource('expenses', ExpenseController::class);
-        Route::apiResource('reasons', ReasonController::class);
-        Route::apiResource('brands', BrandController::class);
-        // Route::apiResource('users', AuthController::class);
-        Route::apiResource('permissions', PermissionController::class);
-
-        Route::get('summary', [DashboardController::class, 'getSummary']);
-
-        //Módulo almacen
-
-        Route::apiResource('materials', MaterialController::class);
-        Route::apiResource('entries', EntryController::class);
-        Route::apiResource('outputs', OutputController::class);
-
-        //Modulo Soporte - Auth
-        Route::patch('tickets/{ticketId}/assign-technician', [TicketController::class, 'assignTechnician']);
-        Route::patch('tickets/{ticketId}/update-status', [TicketController::class, 'updateStatus']);
-        Route::post('tickets/{ticketId}/attachments', [TicketController::class, 'addAttachment']);
-        Route::get('tickets/{ticketID}/attachments', [TicketController::class, 'getAttachments']);
-
-        Route::apiResource('support', TicketController::class);
-        Route::apiResource('categories-support', CategoryTicketController::class);
-    });
-
+    // Check server time
     Route::get('check-time', function () {
         return [
             'php_time' => now()->format('Y-m-d H:i:s'),
@@ -102,45 +34,125 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         ];
     });
 
+    // Rutas autenticadas
+    Route::middleware(['auth:sanctum'])->group(function () {
+        // Usuario y autenticación
+        Route::get('/user', function (Request $request) {
+            return $request->user();
+        });
+        Route::delete('logout', [AuthController::class, 'logout']);
+        Route::apiResource('users', AuthController::class);
+        Route::get('/user/permissions', [PermissionController::class, 'getUserPermissions']);
 
-    Route::apiResource('users', AuthController::class);
-    Route::apiResource('kardex', KardexController::class);
+        // Dashboard
+        Route::get('summary', [DashboardController::class, 'getSummary']);
 
-    Route::get('/destination-use/{destinationId}', [DestinationController::class, 'getMaterialsByDestination']);
+        // Módulo Clientes
+        Route::prefix('customers')->group(function () {
+            Route::get('check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);
+            Route::get('by-dni', [CustomerController::class, 'getCustomerActiveStatus']);
+            Route::get('with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
+            Route::patch('{id}/suspend', [CustomerController::class, 'suspend']);
+            Route::get('export', [CustomerController::class, 'exportCustomers']);
+        });
+        Route::apiResource('customers', CustomerController::class);
 
-    //Route::apiResource('outputs', OutputController::class);
-    Route::apiResource('destinations', DestinationController::class);
-    Route::apiResource('employees', EmployeeController::class);
-    Route::apiResource('entry-details', EntryDetailController::class);
+        // Módulo Servicios
+        Route::prefix('services')->group(function () {
+            Route::get('by-customer/{customer_id}', [ServiceController::class, 'getServicesByCustomer']);
+            Route::get('check-equipment', [ServiceController::class, 'checkServicesByEquipment']);
+            Route::patch('{contract}/update-plan', [ServiceController::class, 'updatePlan']);
+            Route::patch('{id}/update-box-port', [ServiceController::class, 'updateBoxAndPort']);
+            Route::patch('{id}/update-vlan', [ServiceController::class, 'updateVlan']);
+            Route::patch('{id}/update-equipment', [ServiceController::class, 'updateEquipment']);
+            Route::patch('{id}/update-user', [ServiceController::class, 'updateUser']);
+            Route::patch('{id}/finish', [ServiceController::class, 'terminate']);
+        });
+        Route::apiResource('services', ServiceController::class);
+        Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);
 
-    Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);
+        // Módulo Facturación
+        Route::prefix('invoices')->group(function () {
+            Route::get('search', [InvoiceController::class, 'searchInvoices']);
+            Route::get('recordatory', [InvoiceController::class, 'recordatory']);
+            Route::get('recordatoryoverdue', [InvoiceController::class, 'recordatoryOverdue']);
+            Route::get('expired-active-services', [InvoiceController::class, 'getExpiredActiveServices']);
+            Route::post('reminder/{id}', [InvoiceController::class, 'markReminderSent']);
+            Route::post('reminderoverdue/{id}', [InvoiceController::class, 'sendReminderOverdue']);
+            Route::get('export', [InvoiceController::class, 'exportInvoices']);
+            Route::get('export-resumen', [InvoiceController::class, 'exportInvoicesResumen']);
+            Route::get('{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
+            Route::get('monthly-paid-amounts', [InvoiceController::class, 'getMonthlyPaidAmounts']);
+            Route::post('generate', [InvoiceController::class, 'generateInvoicesMonth']);
+            Route::post('generateByService/{id}', [InvoiceController::class, 'generateInvoicesByService']);
+            Route::get('paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
+            Route::patch('{id}/paid-invoice', [InvoiceController::class, 'paidInvoice']);
+            Route::patch('{id}/cancel-invoice', [InvoiceController::class, 'cancelInvoice']);
+        });
+        Route::apiResource('invoices', InvoiceController::class);
 
-    Route::apiResource('plans', PlanController::class);
-    Route::apiResource('boxs', BoxController::class);
-    Route::apiResource('routers', RouterController::class);
-    Route::apiResource('cities', CityController::class);
-    Route::apiResource('equipments', EquipmentController::class);
-    Route::apiResource('enterprises', EnterpriseController::class);
+        // Módulo Gastos
+        Route::prefix('expenses')->group(function () {
+            Route::post('generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
+            Route::get('report', [ExpenseController::class, 'expenseReport']);
+        });
+        Route::apiResource('expenses', ExpenseController::class);
 
-    //Módulo almacen
-    //Route::apiResource('materials', MaterialController::class);
-    Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('presentations', PresentationController::class);
-    Route::apiResource('warehouses', WarehouseController::class);
+        // Módulo Almacén
+        Route::prefix('materials')->group(function () {
+            Route::get('stock', [MaterialController::class, 'getStockSummary']);
+            Route::post('uploadfile', [MaterialController::class, 'uploadFile']);
+        });
+        Route::apiResource('materials', MaterialController::class);
+        Route::apiResource('entries', EntryController::class);
+        Route::apiResource('outputs', OutputController::class);
+        Route::apiResource('kardex', KardexController::class);
+        Route::get('materials/locations/{id}', [EntryDetailController::class, 'showLocations']);
+        Route::get('/destination-use/{destinationId}', [DestinationController::class, 'getMaterialsByDestination']);
+        Route::apiResource('entry-details', EntryDetailController::class);
+        Route::apiResource('categories', CategoryController::class);
+        Route::apiResource('presentations', PresentationController::class);
+        Route::apiResource('warehouses', WarehouseController::class);
+        Route::apiResource('suppliers', SupplierController::class);
+        Route::apiResource('documents', DocumentController::class);
+        Route::apiResource('entry-types', EntryTypeController::class);
+        Route::apiResource('destinations', DestinationController::class);
 
-    Route::apiResource('suppliers', SupplierController::class);
-    Route::apiResource('documents', DocumentController::class);
-    Route::apiResource('entry-types', EntryTypeController::class);
+        // Módulo Soporte
+        Route::prefix('tickets')->group(function () {
+            Route::patch('{ticketId}/assign-technician', [TicketController::class, 'assignTechnician']);
+            Route::patch('{ticketId}/update-status', [TicketController::class, 'updateStatus']);
+            Route::post('{ticketId}/attachments', [TicketController::class, 'addAttachment']);
+            Route::get('{ticketID}/attachments', [TicketController::class, 'getAttachments']);
+        });
+        Route::apiResource('support/update-status', TicketController::class);
+        Route::apiResource('support', TicketController::class);
+        Route::apiResource('categories-support', CategoryTicketController::class);
 
-    //Roles
-    Route::post('roles/{roleId}/permissions', [PermissionRoleController::class, 'assignPermissionsToRole']);
-    Route::get('roles/{roleId}/permissions', [PermissionRoleController::class, 'getPermissionsByRole']);
-    Route::delete('roles/{roleId}/permissions/{permissionId}', [PermissionRoleController::class, 'removePermissionFromRole']);
+        // Módulo Suspensiones
+        Route::prefix('suspensions')->group(function () {
+            Route::patch('{id}/reactive', [SuspensionController::class, 'reactivation']);
+        });
+        Route::apiResource('suspensions', SuspensionController::class);
 
-    //Login
-    Route::apiResource('roles', RoleController::class);
-    Route::apiResource('role-user', RoleUserController::class);
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']);
-    Route::delete('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+        // Roles y Permisos
+        Route::apiResource('permissions', PermissionController::class);
+        Route::apiResource('roles', RoleController::class);
+        Route::apiResource('role-user', RoleUserController::class);
+        Route::prefix('roles')->group(function () {
+            Route::post('{roleId}/permissions', [PermissionRoleController::class, 'assignPermissionsToRole']);
+            Route::get('{roleId}/permissions', [PermissionRoleController::class, 'getPermissionsByRole']);
+            Route::delete('{roleId}/permissions/{permissionId}', [PermissionRoleController::class, 'removePermissionFromRole']);
+        });
+
+        // Recursos generales
+        Route::apiResource('brands', BrandController::class);
+        Route::apiResource('equipments', EquipmentController::class);
+        Route::apiResource('boxs', BoxController::class);
+        Route::apiResource('plans', PlanController::class);
+        Route::apiResource('routers', RouterController::class);
+        Route::apiResource('cities', CityController::class);
+        Route::apiResource('employees', EmployeeController::class);
+        Route::apiResource('reasons', ReasonController::class);
+    });
 });

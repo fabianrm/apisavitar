@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrentEnterprise;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,7 @@ class Service extends Model
 
     protected $fillable = [
         'service_code',
+        'enterprise_id',
         'customer_id',
         'plan_id',
         'router_id',
@@ -31,6 +33,9 @@ class Service extends Model
         'end_date',
         'user_pppoe',
         'pass_pppoe',
+        'iptv',
+        'user_iptv',
+        'pass_iptv',
         'installation_payment',
         'installation_amount',
         'prepayment',
@@ -111,6 +116,11 @@ class Service extends Model
         return $this->belongsTo(Equipment::class, "equipment_id");
     }
 
+    public function suspensions()
+    {
+        return $this->hasMany(Suspension::class, 'service_id');
+    }
+
     public function enterprise()
     {
         return $this->belongsTo(Enterprise::class);
@@ -126,6 +136,11 @@ class Service extends Model
         parent::boot();
 
         static::creating(function ($model) {
+            if (empty($model->enterprise_id)) {
+
+                $model->enterprise_id = CurrentEnterprise::get();
+            }
+
             $model->created_by = Auth::id();
             $model->updated_by = Auth::id();
         });
