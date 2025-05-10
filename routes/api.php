@@ -145,8 +145,11 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::delete('{roleId}/permissions/{permissionId}', [PermissionRoleController::class, 'removePermissionFromRole']);
         });
 
+        //Equipos
+
         // Recursos generales
         Route::apiResource('brands', BrandController::class);
+        Route::get('equipments/available', [EquipmentController::class, 'available']);
         Route::apiResource('equipments', EquipmentController::class);
         Route::apiResource('boxs', BoxController::class);
         Route::apiResource('plans', PlanController::class);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\EquipmentCollection;
 use App\Http\Resources\EquipmentResource;
 use App\Models\Equipment;
+use App\Models\Service;
 use App\Http\Requests\StoreEquipmentRequest;
 use App\Http\Requests\UpdateEquipmentRequest;
 
@@ -66,4 +67,25 @@ class EquipmentController extends Controller
     {
         //
     }
+    /**
+     * Display a listing of equipments not being used in services
+     */
+
+    public function available()
+    {
+        $equipments = Equipment::whereDoesntHave('services')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return new EquipmentCollection($equipments);
+    }
+
+    // public function available()
+    // {
+    //     $equipments = Equipment::whereNotIn('id', Service::select('equipment_id'))
+    //         ->orderBy('id', 'desc')
+    //         ->get();
+
+    //     return new EquipmentCollection($equipments);
+    // }
 }
