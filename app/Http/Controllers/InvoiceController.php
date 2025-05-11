@@ -153,10 +153,14 @@ class InvoiceController extends Controller
     /***
      * Generar facturas del mes actual
      */
-    public function generateInvoicesMonth()
+    public function generateInvoicesMonth(Request $request)
     {
+
+        $serviceId = $request->input('service_id');
+
+
         $invoiceService = app(InvoiceService::class);
-        $totalInvoices = $invoiceService->generateCurrentMonthInvoices();
+        $totalInvoices = $invoiceService->generateCurrentMonthInvoices($serviceId);
 
         return response()->json(
             [

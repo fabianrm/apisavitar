@@ -110,15 +110,16 @@ class InvoiceService
 
 
     //Implementado en el sistema
-    public function generateCurrentMonthInvoices(Request $request)
+    public function generateCurrentMonthInvoices($id = null)
     {
-        $serviceId = $request->input('service_id'); // Puede ser null
+        //  $serviceId = $request->input('service_id'); // Puede ser null
+        $serviceId = $id; // Puede ser null
         $currentDate = Carbon::now();
         $startOfLoop = $currentDate->copy()->startOfMonth();
         $endOfLoop = $currentDate->copy()->endOfMonth();
         $totalInvoices = 0;
 
-        Log::info("#### Generando facturas desde {$startOfLoop->toDateString()} a {$endOfLoop->toDateString()}");
+        Log::info("#### Generando facturas desde {$startOfLoop->toDateString()} a {$endOfLoop->toDateString()} para {$serviceId}");
 
         try {
             DB::beginTransaction();
@@ -267,6 +268,7 @@ class InvoiceService
             }
 
             $this->updateOverdueInvoices();
+            DB::commit();
             return $totalInvoices;
         } catch (\Exception $e) {
             DB::rollBack();
