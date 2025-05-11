@@ -29,10 +29,10 @@ class InvoiceController extends Controller
         $perPage = $request->input('perPage', 10); // También puedes usar $request->get('perPage', 10)
 
         if (count($queryItems) == 0) {
-            $invoices = Invoice::orderBy('start_date', 'desc')->paginate($perPage);
+            $invoices = Invoice::orderBy('end_date', 'desc')->paginate($perPage);
         } else {
             $invoices = Invoice::where($queryItems)
-                ->orderBy('start_date', 'desc')
+                ->orderBy('end_date', 'desc')
                 ->paginate($perPage);
         }
         return new InvoiceCollection($invoices->appends($request->query()));
@@ -394,6 +394,7 @@ class InvoiceController extends Controller
         $services = Invoice::query()
             ->join('services', 'invoices.service_id', '=', 'services.id')
             ->join('customers', 'services.customer_id', '=', 'customers.id')
+            ->join('cities', 'services.city_id', '=', 'cities.id')
             ->select(
                 'invoices.id as invoice_id',
                 'invoices.start_date',
@@ -401,15 +402,16 @@ class InvoiceController extends Controller
                 'invoices.status as invoice_status',
                 'services.id as service_id',
                 'services.status as service_status',
+                'cities.name as ciudad',
                 'services.address_installation',
                 'services.reference',
                 'customers.name as customer_name',
-                'customers.whatsapp as customer_phone'
+                'customers.whatsapp as customer_phone',
             )
             ->where('invoices.status', 'vencida') // Factura vencida
             ->where('services.status', 'activo')  // Pero el servicio sigue activo
             ->where('invoices.due_date', '<', $today) // Ya pasó la fecha de corte
-            ->orderBy('customers.name')
+            ->orderBy('invoices.start_date')
             ->get();
 
         return response()->json($services);

@@ -127,6 +127,8 @@ class ServiceController extends Controller
             $service->port_number = null;
             $service->equipment_id = null;
             $service->observation = 'Terminado por usuario con id #' . auth()->user()->id . ' el ' . $today;
+            $service->end_date = $today;
+
             $service->save();
 
             return response()->json(

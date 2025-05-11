@@ -8,6 +8,7 @@ use App\Models\Plan;
 use App\Models\Suspension;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class InvoiceService
 {
@@ -109,18 +110,22 @@ class InvoiceService
 
 
     //Implementado en el sistema
-    public function generateCurrentMonthInvoices()
+    public function generateCurrentMonthInvoices(Request $request)
     {
+        $serviceId = $request->input('service_id'); // Puede ser null
         $currentDate = Carbon::now();
-        //$startOfLoop = $currentDate->copy()->subMonths(1)->startOfMonth(); // Factura desde el mes anterior si aplica
         $startOfLoop = $currentDate->copy()->startOfMonth();
-        $endOfLoop = $currentDate->copy()->endOfMonth(); // Hasta fin de este mes
-        //$endOfLoop =  $currentDate->copy()->addMonth();
+        $endOfLoop = $currentDate->copy()->endOfMonth();
         $totalInvoices = 0;
 
         Log::info("#### Generando facturas desde {$startOfLoop->toDateString()} a {$endOfLoop->toDateString()}");
 
-        $services = Service::where('status', 'activo')->get();
+        // Obtener solo el servicio específico si se proporciona serviceId
+        $servicesQuery = Service::where('status', 'activo');
+        if ($serviceId) {
+            $servicesQuery->where('id', $serviceId);
+        }
+        $services = $servicesQuery->get();
 
         foreach ($services as $service) {
             $lastInvoice = $service->invoices()->orderBy('end_date', 'desc')->first();
@@ -128,13 +133,11 @@ class InvoiceService
                 ? Carbon::parse($lastInvoice->end_date)->addDay()
                 : Carbon::parse($service->installation_date);
 
-            // Verificar si ya se facturó la instalación
             $installationInvoiceExists = Invoice::where('service_id', $service->id)
                 ->where('start_date', $service->installation_date)
                 ->where('end_date', $service->installation_date)
                 ->exists();
 
-            // Obtener el último número de recibo
             $lastReceipt = Invoice::whereNotNull('receipt')->orderBy('receipt', 'desc')->first();
             $nextReceiptNumber = $lastReceipt ? intval(substr($lastReceipt->receipt, -6)) + 1 : 1;
 
@@ -161,7 +164,6 @@ class InvoiceService
                 Log::info("Factura de instalación creada para service_id: {$service->id}");
             }
 
-            // Bucle mensual con corte personalizado
             while ($startDate->lessThanOrEqualTo($endOfLoop)) {
                 $endDate = $startDate->copy()->addMonth()->subDay();
 
@@ -173,14 +175,33 @@ class InvoiceService
                     ->where('enterprise_id', $service->enterprise_id)
                     ->whereDate('start_date', $startDate)
                     ->whereDate('end_date', $endDate)
-                    ->exists();
+                    ->where('status', 'pendiente') // Solo si es pendiente
+                    ->first();
 
                 Log::info('¿Factura ya existe?: ' . ($existingInvoice ? 'Sí' : 'No'));
+
+                // Buscar si hay una suspensión REACTIVADA (status = 0) que afecte el rango
+                $suspensionExists = Suspension::where('service_id', $service->id)
+                    ->where('status', 0) // Solo reactivadas
+                    ->where(function ($query) use ($startDate, $endDate) {
+                        $query->whereBetween('start_date', [$startDate, $endDate])
+                            ->orWhereBetween('end_date', [$startDate, $endDate])
+                            ->orWhere(function ($q) use ($startDate, $endDate) {
+                                $q->where('start_date', '<=', $startDate)
+                                    ->where('end_date', '>=', $endDate);
+                            });
+                    })
+                    ->exists();
+
+                if ($existingInvoice && $suspensionExists) {
+                    Log::info("Factura existente encontrada con suspensión para el rango {$startDate->toDateString()} - {$endDate->toDateString()}, eliminando para regenerar...");
+                    $existingInvoice->delete();
+                    $existingInvoice = null; // Marcamos que ya no existe
+                }
 
                 if (!$existingInvoice) {
                     Log::info("Generando factura para service_id: {$service->id} del {$startDate->toDateString()} al {$endDate->toDateString()}");
 
-                    // Buscar suspensiones en el rango
                     $suspensions = Suspension::where('service_id', $service->id)
                         ->where('status', true)
                         ->where(function ($query) use ($startDate, $endDate) {
@@ -238,124 +259,15 @@ class InvoiceService
                     Log::info("Factura ya existe para service_id: {$service->id} del {$startDate->toDateString()} al {$endDate->toDateString()}, se omite.");
                 }
 
-                // Avanzar al próximo mes
                 $startDate = $startDate->copy()->addMonth();
             }
         }
 
         $this->updateOverdueInvoices();
-        return $totalInvoices;
-    }
-
-
-
-    //Generar facturas por id de servicio
-    public function generateInvoicesForService($serviceId)
-    {
-        $currentDate = Carbon::now();
-        $startOfMonth = $currentDate->copy()->startOfMonth();
-        $endOfMonth = $currentDate->copy()->endOfMonth();
-        $totalInvoices = 0;
-
-        Log::info("#### Generando facturas para el servicio {$serviceId} desde {$startOfMonth->toDateString()} a {$endOfMonth->toDateString()}");
-
-        // Buscar el servicio por ID
-        $service = Service::where('status', 'activo')->find($serviceId);
-
-        if (!$service) {
-            Log::error("Servicio con ID {$serviceId} no encontrado o no está activo.");
-            return $totalInvoices;
-        }
-
-        $lastInvoice = $service->invoices()->orderBy(
-            'end_date',
-            'desc'
-        )->first();
-        $startDate = $lastInvoice ? Carbon::parse($lastInvoice->end_date)->addDay() : Carbon::parse($service->installation_date);
-
-        // Asegurarse de que el startDate esté dentro del rango de tres meses
-        if ($startDate->lessThan($startOfMonth)) {
-            $startDate = $startOfMonth;
-        }
-
-        // Validar si ya se generó la factura de instalación
-        $installationInvoiceExists = Invoice::where('service_id', $service->id)
-            ->where('start_date', $service->installation_date)
-            ->where('end_date', $service->installation_date)
-            ->exists();
-
-        // Obtener el último número de recibo
-        $lastReceipt = Invoice::whereNotNull('receipt')->orderBy('receipt', 'desc')->first();
-        $nextReceiptNumber = $lastReceipt ? intval(substr($lastReceipt->receipt, -6)) + 1 : 1;
-
-        if ($service->installation_payment && !$installationInvoiceExists) {
-
-            // Formatear y asignar el recibo
-            $formattedReceipt = '003-N°. ' . sprintf('%06d', $nextReceiptNumber++);
-
-            Invoice::create([
-                'service_id' => $service->id,
-                'price' => $service->installation_amount,
-                'igv' => 0.00,
-                'discount' => 0.00,
-                'amount' => 0.00,
-                'letter_amount' => null,
-                'due_date' => Carbon::parse($service->installation_date)->copy()->addDays(5),
-                'start_date' => $service->installation_date,
-                'end_date' => $service->installation_date,
-                'paid_dated' => null,
-                'receipt' => $formattedReceipt,
-                'note' => 'Factura por instalación',
-                'status' => 'pendiente',
-            ]);
-            $totalInvoices++;
-            Log::info("Factura de instalación creada para service_id: {$service->id}");
-        }
-
-        while ($startDate->lessThanOrEqualTo($endOfMonth)) {
-            $endDate = $startDate->copy()->addMonth()->subDay();
-
-            // Verificar si la factura ya existe para el rango de fechas
-            $existingInvoice = Invoice::where('service_id', $service->id)
-                ->where('start_date', $startDate)
-                ->where('end_date', $endDate)
-                ->first();
-
-            if (!$existingInvoice) {
-                Log::info("Creando factura para service_id: {$service->id} desde {$startDate->toDateString()} hasta {$endDate->toDateString()}");
-
-                $dueDate = $service->prepayment
-                    ? $startDate->copy()->addDays(5)
-                    : $endDate->copy()->addDays(5);
-
-                // Formatear y asignar el recibo
-                $formattedReceipt = '003-N°. ' . sprintf('%06d', $nextReceiptNumber++);
-
-                Invoice::create([
-                    'service_id' => $service->id,
-                    'price' => $service->plans->price,
-                    'igv' => 0.00,
-                    'discount' => 0.00,
-                    'amount' => 0.00,
-                    'letter_amount' => null,
-                    'due_date' => $dueDate,
-                    'start_date' => $startDate,
-                    'end_date' => $endDate,
-                    'paid_dated' => null,
-                    'receipt' => $formattedReceipt,
-                    'note' => null,
-                    'status' => 'pendiente',
-                ]);
-                $totalInvoices++;
-                Log::info("Factura creada para service_id: {$service->id} desde {$startDate} hasta {$endDate}");
-            }
-
-            // Asegurar que el bucle avance al próximo mes
-            $startDate = $startDate->copy()->addMonth();
-        }
-
-        $this->updateOverdueInvoices();
-        return $totalInvoices;
+        return response()->json([
+            'message' => 'Facturación completada',
+            'total_invoices_created' => $totalInvoices
+        ]);
     }
 
 
