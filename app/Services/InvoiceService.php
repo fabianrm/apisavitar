@@ -264,10 +264,7 @@ class InvoiceService
         }
 
         $this->updateOverdueInvoices();
-        return response()->json([
-            'message' => 'Facturación completada',
-            'total_invoices_created' => $totalInvoices
-        ]);
+        return $totalInvoices;
     }
 
 
