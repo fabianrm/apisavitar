@@ -264,6 +264,11 @@ class InvoiceController extends Controller
             $query->where('customers.name', 'like', '%' . $request->input('customer_name') . '%');
         }
 
+        //Filtrar por ciudad si se proporciona
+        if ($request->has('city_id') && $request->input('city_id') !== null) {
+            $query->where('services.city_id', '=',  $request->input('city_id'));
+        }
+
         // Ordenar por nombre del cliente
         $query->orderBy('invoices.updated_at', 'desc')
             ->orderBy('invoices.start_date', 'desc');
@@ -426,7 +431,7 @@ class InvoiceController extends Controller
     //Exportar facturas
     public function exportInvoices(Request $request)
     {
-        $filters = $request->only(['status', 'start_date', 'end_date', 'customer_name']);
+        $filters = $request->only(['status', 'start_date', 'end_date', 'customer_name', 'city_id']);
         return Excel::download(new InvoicesExport($filters), 'invoices.xlsx');
     }
 

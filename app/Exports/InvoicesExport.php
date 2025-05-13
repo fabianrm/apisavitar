@@ -43,8 +43,12 @@ class InvoicesExport implements FromQuery, WithHeadings, WithMapping
             });
         }
 
-        return $query;
+        //Filtrar por ciudad si se proporciona
+        if (isset($this->filters['city_id'])) {
+            $query->where('services.city_id', $this->filters['city_id']);
+        }
 
+        return $query;
     }
 
     public function headings(): array
@@ -91,4 +95,3 @@ class InvoicesExport implements FromQuery, WithHeadings, WithMapping
         ];
     }
 }
-
