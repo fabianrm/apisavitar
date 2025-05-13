@@ -26,7 +26,7 @@ class BoxController extends Controller
         $boxs = Box::all();
         return new BoxCollection($boxs);
 
-       // return new BoxCollection($boxs->paginate()->appends($request->query()));
+        // return new BoxCollection($boxs->paginate()->appends($request->query()));
 
     }
 
@@ -73,8 +73,29 @@ class BoxController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Box $box)
+    public function destroy($id)
     {
-        //
+
+        $box = Box::findOrFail($id);
+
+        // Asegúrate de verificar los servicios que podrían tener registros asociados con la caja
+        if ($box->services()->exists()) {
+
+            return response()->json([
+                'data' => [
+                    'status' => false,
+                    'message' => 'La caja tiene contrato asociado.'
+                ]
+            ], 400);
+        }
+
+        $box->delete();
+
+        return response()->json([
+            'data' => [
+                'status' => true,
+                'message' => 'Caja eliminada correctamente'
+            ]
+        ]);
     }
 }

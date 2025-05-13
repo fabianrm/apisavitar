@@ -415,7 +415,7 @@ class InvoiceController extends Controller
             ->where('invoices.status', 'vencida') // Factura vencida
             ->where('services.status', 'activo')  // Pero el servicio sigue activo
             ->where('invoices.due_date', '<', $today) // Ya pasó la fecha de corte
-            ->orderBy('invoices.start_date')
+            ->orderBy('invoices.start_date', 'desc')
             ->get();
 
         return response()->json($services);
