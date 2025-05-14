@@ -26,6 +26,7 @@ class SuspensionResource extends JsonResource
             'updated_by' => $this->updated_by,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
+            'reactivation_date' => $this->reactivation_date,
             'status' => $this->status,
         ];
     }
