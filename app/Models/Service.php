@@ -126,6 +126,12 @@ class Service extends Model
         return $this->belongsTo(Enterprise::class);
     }
 
+    public function users()
+    {
+        return $this->belongsTo(User::class, "created_by");
+    }
+
+
 
     /**
      * Capturar usuario

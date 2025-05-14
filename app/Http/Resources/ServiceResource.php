@@ -19,6 +19,7 @@ class ServiceResource extends JsonResource
             'id' => $this->id,
             'serviceCode' => $this->service_code,
             'customerName' => $this->customers->name,
+            //'customer' => new CustomerResource($this->whenLoaded('customers')),
             'planName' => $this->plans->name,
             'routerId' => $this->router_id,
             'routerIp' => $this->routers->ip,

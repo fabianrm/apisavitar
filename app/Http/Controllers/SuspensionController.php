@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Models\Invoice;
 use App\Models\Service;
 use App\Models\Suspension;
+use App\Services\SuspensionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +21,14 @@ class SuspensionController extends Controller
      */
     public function index()
     {
-        $suspensions = Suspension::with(['service'])->get();
+
+        $suspensions = Suspension::with([
+            'service',
+            // 'service.customers',
+            // 'service.plans',
+            'user'
+        ])->get();
+
         return new SuspensionCollection($suspensions);
     }
 

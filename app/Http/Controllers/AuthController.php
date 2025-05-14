@@ -58,8 +58,7 @@ class AuthController extends Controller
         // $userToken = $user->createToken('AppToken')->plainTextToken;
         $userToken = $user->createToken('AppToken', ['enterprise_id:' . $enterpriseId])->plainTextToken;
 
-        Log::info($userToken);
-
+        //Log::info($userToken);
 
         $enterprise = Enterprise::find($enterpriseId);
 

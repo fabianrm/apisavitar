@@ -22,7 +22,7 @@ class SuspensionResource extends JsonResource
             'end_date' => $this->end_date,
             'reason' => $this->reason,
             'observation' => $this->observation,
-            'created_by' => $this->created_by,
+            'created_by' => new UserResource($this->whenLoaded('user')),
             'updated_by' => $this->updated_by,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
