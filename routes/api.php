@@ -135,6 +135,10 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         });
         Route::apiResource('suspensions', SuspensionController::class);
 
+        //Módulo Promociones
+        Route::prefix('promotions')->group(function () {});
+        Route::apiResource('promotions', PromotionController::class);
+
         // Roles y Permisos
         Route::apiResource('permissions', PermissionController::class);
         Route::apiResource('roles', RoleController::class);

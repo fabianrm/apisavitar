@@ -39,6 +39,7 @@ class Service extends Model
         'installation_payment',
         'installation_amount',
         'prepayment',
+        'promotion_id',
         'status',
         'created_by',
         'updated_by',
@@ -131,7 +132,11 @@ class Service extends Model
         return $this->belongsTo(User::class, "created_by");
     }
 
-
+    // Un servicio puede tener una promoción
+    public function promotion()
+    {
+        return $this->belongsTo(Promotion::class, 'promotion_id');
+    }
 
     /**
      * Capturar usuario

@@ -27,6 +27,16 @@ class Enterprise extends Model
         return $this->belongsTo(City::class, "city_id");
     }
 
+    //Una tienda puede tener muchas promociones
+    public function promotions()
+    {
+        return $this->hasMany(Promotion::class);
+    }
+
+
+
+
+
 
 
     public function users()
