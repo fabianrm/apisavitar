@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Service;
 use App\Models\Invoice;
+use App\Models\Promotion;
 use App\Models\Suspension;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -133,7 +134,23 @@ class InvoiceService
                         }
 
                         $activeDays = max($totalDays - $suspendedDays, 0);
-                        $fullPrice = $service->plans->price;
+
+                        // Verificar si el servicio tiene una promoción activa
+                        $note = null;
+                        if ($service->promotion_id) {
+                            $promotion = $service->promotion;
+                            $endDatePromotion = Carbon::parse($service->installation_date)->addMonths($promotion->duration_months);
+
+                            if (Carbon::now()->lte($endDatePromotion)) {
+                                $fullPrice = $promotion->price;
+                                $note = 'Promoción aplicada: ' . $promotion->name;
+                            } else {
+                                $fullPrice = $service->plans->price;
+                            }
+                        } else {
+                            $fullPrice = $service->plans->price;
+                        }
+
                         $proratedPrice = $totalDays > 0 ? round(($fullPrice * $activeDays) / $totalDays, 2) : 0;
 
                         $dueDate = $service->prepayment
@@ -155,7 +172,7 @@ class InvoiceService
                             'end_date' => $endDate,
                             'paid_dated' => null,
                             'receipt' => $formattedReceipt,
-                            'note' => null,
+                            'note' => $note,
                             'status' => 'pendiente',
                         ]);
                         $totalInvoices++;
@@ -163,7 +180,6 @@ class InvoiceService
                     } else {
                         Log::info("Factura ya existe para service_id: {$service->id} del {$startDate->toDateString()} al {$endDate->toDateString()}, se omite.");
                     }
-
                     $startDate = $startDate->copy()->addMonth();
                 }
             }
