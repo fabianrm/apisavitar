@@ -14,7 +14,9 @@ class Promotion extends Model
     protected $fillable = [
         'id',
         'enterprise_id',
+        'plan_id',
         'name',
+        'description',
         'start_date',
         'end_date',
         'price',
@@ -33,6 +35,12 @@ class Promotion extends Model
     {
         return $this->belongsTo(Enterprise::class, 'enterprise_id');
     }
+
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class, 'plan_id');
+    }
+
 
     public function creator()
     {

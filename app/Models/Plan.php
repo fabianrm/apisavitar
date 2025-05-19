@@ -40,6 +40,11 @@ class Plan extends Model
         return $this->belongsTo(Enterprise::class);
     }
 
+    public function promotions()
+    {
+        return $this->hasMany(Promotion::class);
+    }
+
     //Capturar y setear la empresa del usuario logueado
     protected static function boot()
     {

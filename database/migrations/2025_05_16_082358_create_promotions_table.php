@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('promotions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('enterprise_id')->constrained('enterprises')->onDelete('cascade');
+            $table->foreignId('plan_id')->constrained('plans')->onDelete('cascade');
             $table->string('name');
+            $table->string('description')->nullable();
             $table->date('start_date');
             $table->date('end_date');
             $table->decimal('price', 10, 2);

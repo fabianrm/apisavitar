@@ -45,6 +45,7 @@ class StoreServiceRequest extends FormRequest
             'iptv' => [''],
             'userIptv' => [''],
             'passIptv' => [''],
+            'promotionId' => [''],
             'observation' => [''],
             'installationPayment' => [''],
             'installationAmount' => [''],
@@ -75,6 +76,7 @@ class StoreServiceRequest extends FormRequest
             'pass_pppoe' => $this->passPppoe,
             'user_iptv' => $this->userIptv,
             'pass_iptv' => $this->passIptv,
+            'promotion_id' => $this->promotionId,
             'installation_payment' => $this->installationPayment,
             'installation_amount' => $this->installationAmount,
 

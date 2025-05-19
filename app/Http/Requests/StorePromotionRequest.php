@@ -22,7 +22,9 @@ class StorePromotionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'plan_id' => 'required|exists:plans,id',
             'name' => 'required|string|max:255',
+            'description' => 'string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'price' => 'required|numeric|between:0,99999999.99',
@@ -35,6 +37,10 @@ class StorePromotionRequest extends FormRequest
     public function messages(): array
     {
         return [
+
+            'plan_id.required' => 'El Plan es obligatorio.',
+            'plan_id.exists' => 'El Plan seleccionado no existe.',
+
             'name.required' => 'El nombre es obligatorio.',
             'name.string' => 'El nombre debe ser una cadena de texto.',
             'name.max' => 'El nombre no debe exceder los 255 caracteres.',

@@ -22,7 +22,9 @@ class UpdatePromotionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'plan_id' => 'sometimes|exists:plans,id',
             'name' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string|max:255',
             'start_date' => 'sometimes|date',
             'end_date' => 'sometimes|date|after_or_equal:start_date',
             'price' => 'required|numeric|between:0,99999999.99',
@@ -34,6 +36,8 @@ class UpdatePromotionRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'plan_id.exists' => 'El Plan seleccionado no existe.',
+
             'name.string' => 'El nombre debe ser una cadena de texto.',
             'name.max' => 'El nombre no debe exceder los 255 caracteres.',
 

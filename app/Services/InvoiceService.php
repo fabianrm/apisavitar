@@ -186,11 +186,11 @@ class InvoiceService
     {
         $currentDate = Carbon::now();
         $overdueInvoices = Invoice::where('status', 'pendiente')
-            ->where('due_date', '<', $currentDate)
+            ->where('start_date', '<', $currentDate)
             ->get();
 
         foreach ($overdueInvoices as $invoice) {
-            Log::info("Updating invoice_id: {$invoice->id} to status 'vencida'");
+            Log::info("Actualizando invoice_id: {$invoice->id} to status 'vencida'");
             $invoice->update(['status' => 'vencida']);
         }
     }
