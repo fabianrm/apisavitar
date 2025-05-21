@@ -62,6 +62,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::get('by-customer/{customer_id}', [ServiceController::class, 'getServicesByCustomer']);
             Route::get('check-equipment', [ServiceController::class, 'checkServicesByEquipment']);
             Route::patch('{contract}/update-plan', [ServiceController::class, 'updatePlan']);
+            Route::patch('{contract}/add-promo', [ServiceController::class, 'updatePromo']);
             Route::patch('{id}/update-box-port', [ServiceController::class, 'updateBoxAndPort']);
             Route::patch('{id}/update-vlan', [ServiceController::class, 'updateVlan']);
             Route::patch('{id}/update-equipment', [ServiceController::class, 'updateEquipment']);

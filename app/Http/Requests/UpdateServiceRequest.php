@@ -115,6 +115,9 @@ class UpdateServiceRequest extends FormRequest
         if ($this->has('observation')) {
             $data['observation'] = $this->observation;
         }
+        if ($this->has('promotionId')) {
+            $data['promotionId'] = $this->promotionId;
+        }
 
         if (!empty($data)) {
             $this->merge($data);

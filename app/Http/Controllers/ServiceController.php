@@ -279,6 +279,46 @@ class ServiceController extends Controller
         return response()->json($contract, 200);
     }
 
+    /** Actualizar Promo */
+
+    public function updatePromo(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'promotionId' => 'required|exists:promotions,id',
+        ]);
+
+        $contract = Service::findOrFail($id);
+
+        try {
+            DB::beginTransaction();
+
+            // Verificar que el servicio esté activo
+            if ($contract->status !== 'activo') {
+                return response()->json([
+                    'message' => 'No se puede aplicar una promoción a un servicio que no está activo'
+                ], 400);
+            }
+
+            $contract->promotion_id = $validatedData['promotionId'];;
+            $contract->save();
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'La promoción se ha aplicado correctamente',
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Error al aplicar la promoción.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
 
     /**
      * Cambiar equipo y usuario
