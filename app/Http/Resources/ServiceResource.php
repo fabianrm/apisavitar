@@ -51,6 +51,10 @@ class ServiceResource extends JsonResource
             'userIptv' => $this->user_iptv,
             'passIptv' => $this->pass_iptv,
             'observation' => $this->observation,
+            'promotion' => [
+                'id' => $this->promotion ? $this->promotion->id : '-',
+                'name' => $this->promotion ? $this->promotion->name : '-',
+            ],
             'status' => $this->status,
 
         ];
