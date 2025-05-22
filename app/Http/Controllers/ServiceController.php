@@ -299,6 +299,13 @@ class ServiceController extends Controller
                 ], 400);
             }
 
+            // Verificar que el servicio no tenga promo aplicada
+            if ($contract->promotion_id !== null) {
+                return response()->json([
+                    'message' => 'El servicio ya tiene una promoción aplicada: ' . $contract->promotion->name
+                ], 400);
+            }
+
             $contract->promotion_id = $validatedData['promotionId'];;
             $contract->save();
 
