@@ -223,7 +223,6 @@ class InvoiceController extends Controller
                 $query->where('name', 'like', "%{$customerName}%");
             });
         }
-
         //return response()->json($invoices);
 
         // Usar la paginación de Laravel
@@ -231,7 +230,6 @@ class InvoiceController extends Controller
         return new InvoiceCollection($invoices);
         //       
     }
-
 
     //Funcion para listar invoices, con parametros de busqueda
     public function searchInvoices(Request $request)
@@ -245,8 +243,19 @@ class InvoiceController extends Controller
             ->select('invoices.*');
 
         // Filtrar por estado si se proporciona
-        if ($request->has('status') && $request->input('status') !== null) {
-            $query->where('invoices.status', $request->input('status'));
+        // if ($request->has('status') && $request->input('status') !== null) {
+        //     $query->where('invoices.status', $request->input('status'));
+        // }
+
+        if ($request->filled('status')) {
+            $statuses = $request->input('status');
+
+            // Asegúrate de que sea un array, ya sea directamente o desde una cadena separada por comas
+            if (!is_array($statuses)) {
+                $statuses = explode(',', $statuses); // Soporta status=pagadas,pendientes
+            }
+
+            $query->whereIn('invoices.status', $statuses);
         }
 
         // Filtrar por rango de fechas si se proporciona
