@@ -70,7 +70,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::patch('{id}/finish', [ServiceController::class, 'terminate']);
         });
         Route::apiResource('services', ServiceController::class);
-        Route::get('ports/{box_id}', [ServiceController::class, 'getPorts']);
+        Route::get('ports/{box_id}', [BoxController::class, 'getPorts']);
 
         // Módulo Facturación
         Route::prefix('invoices')->group(function () {

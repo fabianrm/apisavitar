@@ -31,14 +31,6 @@ class BoxController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreBoxRequest $request)
@@ -54,13 +46,6 @@ class BoxController extends Controller
         return new BoxResource($box);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Box $box)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -97,5 +82,14 @@ class BoxController extends Controller
                 'message' => 'Caja eliminada correctamente'
             ]
         ]);
+    }
+
+    /** 
+     * Obtiene los puertos disponibles
+     */
+    public function getPorts($box_id)
+    {
+        $box = Box::findOrFail($box_id);
+        return response()->json($box->availablePorts());
     }
 }
