@@ -151,10 +151,12 @@ class ServiceController extends Controller
     /**
      * Obtener los puertos disponibles en la caja.
      */
+
+    //TODO: Mover a Modelo Box
     public function getPorts($box_id)
     {
-        $results = DB::select('CALL obtenerPuertosDisponibles(?)', [$box_id]);
-        return response()->json($results);
+        $box = Box::findOrFail($box_id);
+        return response()->json($box->availablePorts());
     }
 
     /****

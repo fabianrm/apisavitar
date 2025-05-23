@@ -62,6 +62,25 @@ class Box extends Model
         $this->save();
     }
 
+    //Retorna los puertos disponibles
+    public function availablePorts()
+    {
+        // Genera todos los puertos posibles (del 1 hasta total_ports)
+        $todosLosPuertos = range(1, $this->total_ports);
+        // Obtiene los puertos ocupados en esta caja
+        $puertosOcupados = $this->services()->pluck('port_number')->toArray();
+        // Elimina los que ya están ocupados
+        $puertosDisponibles = array_diff($todosLosPuertos, $puertosOcupados);
+        // Devuelve los disponibles en el mismo formato que el procedimiento almacenado
+        return collect($puertosDisponibles)->map(function ($port) {
+            return [
+                'id' => $this->id,
+                'port_number' => $port
+            ];
+        })->values(); // reindexa
+    }
+
+
     /**
      * Setear id de empresa
      */
