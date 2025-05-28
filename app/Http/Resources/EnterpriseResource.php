@@ -18,11 +18,16 @@ class EnterpriseResource extends JsonResource
             'id' => $this->id,
             'ruc' => $this->ruc,
             'name' => $this->name,
-            'cityId' => $this->city_id,
-            'city' => $this->cities->name,
+            'city' => [
+                'id' => $this->city_id,
+                'name' => $this->cities->name,
+                'coordinates' => [$this->cities->latitude, $this->cities->longitude],
+            ],
             'address' => $this->address,
             'phone' => $this->phone,
-            'coordinates' => [$this->cities->latitude, $this->cities->longitude],
+            'logo' => asset('storage/' . $this->logo),
+            'status' => $this->status,
+            'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];
     }

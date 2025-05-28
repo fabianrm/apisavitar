@@ -23,17 +23,23 @@ class StoreEnterpriseRequest extends FormRequest
     {
         return [
             'name' => ['required'],
+            'ruc' => [
+                'required',
+                'string',
+                'regex:/^(10|20)\d{9}$/',
+            ],
             'cityId' => ['required'],
             'address' => ['required'],
             'phone' => [''],
-            'logo' => ['']
+            'logo' => 'nullable|image|mimes:jpeg,jpg|max:2048',
+            'status' => ['required'],
         ];
     }
 
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'city_id' => $this->cityID,
+            'city_id' => $this->cityId,
         ]);
     }
 }

@@ -11,8 +11,11 @@ class Enterprise extends Model
 
     protected $fillable = [
         'name',
+        'ruc',
+        'city_id',
         'address',
         'phone',
+        'logo',
         'status'
     ];
 
@@ -20,7 +23,6 @@ class Enterprise extends Model
     {
         return $this->hasMany(Customer::class);
     }
-
 
     public function cities()
     {
@@ -32,12 +34,6 @@ class Enterprise extends Model
     {
         return $this->hasMany(Promotion::class);
     }
-
-
-
-
-
-
 
     public function users()
     {
