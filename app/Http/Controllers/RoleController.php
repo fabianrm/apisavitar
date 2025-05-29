@@ -7,6 +7,9 @@ use App\Http\Requests\UpdateRoleRequest;
 use App\Http\Resources\RoleCollection;
 use App\Http\Resources\RoleResource;
 use App\Models\Role;
+use App\Models\RoleUser;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -62,22 +65,38 @@ class RoleController extends Controller
     {
         $role = Role::findOrFail($id);
         $role->update($request->all());
-
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Role $role)
+    public function destroy($id)
     {
-        $role->deleteOrFail();
+        try {
 
-        return response()->json([
-            'data' => [
+            $roleU = Role::findOrFail($id);
+
+            $roleUser = RoleUser::where('role_id', $roleU->id)->exists();
+
+            if ($roleUser) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No se puede eliminar el Rol. Tiene usuarios asociados.'
+                ], 400);
+            }
+
+            $roleU->deleteOrFail();
+
+            return response()->json([
                 'status' => true,
                 'message' => 'Rol eliminado correctamente'
-            ]
-        ]);
 
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error inesperado al eliminar el Rol.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

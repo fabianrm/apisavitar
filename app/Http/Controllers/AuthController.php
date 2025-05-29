@@ -9,11 +9,13 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\Enterprise;
+use App\Models\RoleUser;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
@@ -79,7 +81,34 @@ class AuthController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        return new UserResource(User::create($request->all()));
+        DB::beginTransaction();
+        try {
+            $user = User::create($request->all());
+
+            $roleUser = RoleUser::create([
+                'user_id' => $user->id,
+                'role_id' => $request->role_id,
+                'enterprise_id' => $request->enterprise_id
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 201,
+                'message' => 'Usuario creado correctamente',
+                'usuario' => $roleUser
+            ]);
+        } catch (\Exception $e) {
+            Log::info($e->getMessage());
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage(),
+                'error' => 'Error al crear al usuario'
+
+            ], 500);
+        }
+
+        //  return new UserResource();
     }
 
 

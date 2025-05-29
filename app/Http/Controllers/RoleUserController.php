@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateRoleUserRequest;
 use App\Http\Resources\RoleResource;
 use App\Http\Resources\RoleUserCollection;
 use App\Http\Resources\RoleUserResource;
 use App\Models\RoleUser;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class RoleUserController extends Controller
 {
@@ -33,7 +37,7 @@ class RoleUserController extends Controller
     public function store(Request $request)
     {
         RoleUser::create($request->all());
-     //   return new RoleUserResource(RoleUser::create($request->all()));
+        //   return new RoleUserResource(RoleUser::create($request->all()));
     }
 
     /**
@@ -69,5 +73,44 @@ class RoleUserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function addRoleUser(UpdateRoleUserRequest $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = User::findOrFail($request->user_id);
+
+            $roleUser = RoleUser::where('user_id', $user->id)->first();
+
+            if (!$roleUser) {
+                return response()->json([
+                    'message' => 'El usuario no tiene rol asignado previamente.',
+                ], 404);
+            }
+
+            //Actualizar usuario
+            $user->enterprise_id = $request->enterprise_id;
+            $user->save();
+
+            //Actualizar RoleUser
+            $roleUser->enterprise_id = $request->enterprise_id;
+            $roleUser->save();
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 201,
+                'message' => 'Administrador asignado correctamente',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Error al terminar el contrato.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

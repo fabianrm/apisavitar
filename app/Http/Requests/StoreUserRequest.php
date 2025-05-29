@@ -22,14 +22,30 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'dni' => 'required|string|max:255',
+            'dni' => 'required|string|unique:users|max:255',
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
             'address' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
             'position' => 'required|string|max:255',
             'status' => 'required|boolean',
+        ];
+    }
+
+
+    /**
+     * Mensajes de error personalizados para las validaciones.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'dni.required' => 'El DNI es requerido.',
+            'dni.unique' => 'El DNI ya se encuentra registrado.',
+            'email.unique' => 'El email ya se encuentra registrado.',
+            'password.min' => 'El password debe tener 6 caracteres o más.',
         ];
     }
 }
