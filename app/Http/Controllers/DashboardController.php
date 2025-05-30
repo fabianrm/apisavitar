@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Expense;
 use App\Models\Plan;
 use App\Models\Invoice;
 use Carbon\Carbon;
@@ -43,12 +44,23 @@ class DashboardController extends Controller
         $overduePaidSum = Invoice::whereIn('status', ['pendiente', 'vencida'])
             ->sum('price');
 
-
         // Número de facturas pendientes
         $pendingInvoices = Invoice::where('status', 'pendiente')->count();
 
         // Número de facturas vencidas
         $overdueInvoices = Invoice::where('status', 'vencida')->count();
+
+        // Número de Gastos del día
+        $expenseDaySum = Expense::whereDate('date', Carbon::today())
+            ->where('status', true)
+            ->sum('amount');
+
+        // Número de Gastos del mes
+        $expenseMonthSum = Expense::whereMonth('date', Carbon::now()->month) // Mes actual
+            ->whereYear('date', Carbon::now()->year)   // Año actual
+            ->where('status', true)
+            ->sum('amount');
+
 
         return response()->json([
             'data' => [
@@ -60,6 +72,9 @@ class DashboardController extends Controller
                 'paidDaySum' => $paidDaySum,
                 'paidMonthSum' => $paidMonthSum,
                 'overduePaidSum' => $overduePaidSum,
+                'expenseDaySum' => $expenseDaySum,
+                'expenseMonthSum' => $expenseMonthSum,
+
             ]
         ]);
     }

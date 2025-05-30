@@ -169,22 +169,6 @@ class InvoiceController extends Controller
         );
     }
 
-    /**
-     * Generar facturas de un contrato
-     */
-    function generateInvoicesByService($id)
-    {
-        $invoiceService = app(InvoiceService::class);
-        $totalInvoices = $invoiceService->generateInvoicesForService($id);
-
-        return response()->json(
-            [
-                'totalInvoices' => $totalInvoices,
-                'message' => $totalInvoices . ' facturas generadas'
-            ]
-        );
-    }
-
 
     /***
      * Retornar facturas con Nombre de cliente
@@ -543,7 +527,6 @@ class InvoiceController extends Controller
             $months[] = $monthNames[$item->month];
             $totals[] = floatval($item->total_amount);
         }
-
         // Formato de salida
         $result = [
             'data' => [
@@ -553,7 +536,6 @@ class InvoiceController extends Controller
                 ]
             ]
         ];
-
         return response()->json($result);
     }
 }

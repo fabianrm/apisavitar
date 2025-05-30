@@ -97,6 +97,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         // Módulo Gastos
         Route::prefix('expenses')->group(function () {
             Route::post('generate-next-month', [ExpenseController::class, 'generateNextMonthFixedExpenses']);
+            Route::get('resume-paid-expenses', [ExpenseController::class, 'getMonthlyPaidExpenses']);
             Route::get('report', [ExpenseController::class, 'expenseReport']);
         });
         Route::apiResource('expenses', ExpenseController::class);

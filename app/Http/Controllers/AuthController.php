@@ -33,7 +33,7 @@ class AuthController extends Controller
     {
         if (!Auth::attempt($request->only(['email', 'password']))) {
             return response()->json([
-                'errors' => 'Credenciales incorrectas.'
+                'message' => 'Credenciales incorrectas.'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -42,7 +42,7 @@ class AuthController extends Controller
         // Verificar si el usuario tiene el status 1
         if ($user->status !== 1) {
             return response()->json([
-                'errors' => 'Tu cuenta está desactivada. Contacta al administrador.'
+                'message' => 'Tu cuenta está desactivada. Contacta al administrador.'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -50,7 +50,7 @@ class AuthController extends Controller
         $enterpriseId = $request->enterprise_id;
         if (!$user->roles()->wherePivot('enterprise_id', $enterpriseId)->exists()) {
             return response()->json([
-                'errors' => 'No tienes permisos para acceder a esta sucursal.'
+                'message' => 'No tienes permisos para acceder a esta sucursal.'
             ], Response::HTTP_FORBIDDEN);
         }
 
