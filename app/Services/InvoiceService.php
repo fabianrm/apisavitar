@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\DB;
 class InvoiceService
 {
     //Implementado en el sistema
-    public function generateCurrentMonthInvoices($id = null)
+    public function generateCurrentMonthInvoices($id = null, $months = 0)
     {
         $serviceId = $id; // Puede ser null
         $currentDate = Carbon::now();
         $startOfLoop = $currentDate->copy()->startOfMonth();
-        $endOfLoop = $currentDate->copy()->endOfMonth();
+        //$endOfLoop = $currentDate->copy()->endOfMonth();
+        $endOfLoop = $currentDate->copy()->addMonths($months)->endOfMonth();
         $totalInvoices = 0;
 
         Log::info("#### Generando facturas desde {$startOfLoop->toDateString()} a {$endOfLoop->toDateString()} para {$serviceId}");

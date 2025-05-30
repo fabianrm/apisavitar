@@ -156,9 +156,10 @@ class InvoiceController extends Controller
     public function generateInvoicesMonth(Request $request)
     {
         $serviceId = $request->input('service_id');
+        $months = $request->input('months');
 
         $invoiceService = app(InvoiceService::class);
-        $totalInvoices = $invoiceService->generateCurrentMonthInvoices($serviceId);
+        $totalInvoices = $invoiceService->generateCurrentMonthInvoices($serviceId, $months);
 
         return response()->json(
             [
