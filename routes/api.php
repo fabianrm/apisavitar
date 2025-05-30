@@ -41,6 +41,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             return $request->user();
         });
         Route::delete('logout', [AuthController::class, 'logout']);
+        Route::patch('users/change-pass', [AuthController::class, 'updatePassword']);
+
         Route::apiResource('users', AuthController::class);
         Route::get('/user/permissions', [PermissionController::class, 'getUserPermissions']);
 

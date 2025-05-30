@@ -17,6 +17,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -122,7 +123,6 @@ class AuthController extends Controller
     }
 
 
-
     /**
      * Update the specified resource in storage.
      */
@@ -151,5 +151,31 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Se ha cerrado sesión correctamente.'
         ], Response::HTTP_OK);
+    }
+
+
+    //Actualizar Password
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8| confirmed',
+        ], [
+            'new_password.min' => 'La nueva contraseña debe tener al menos 8 caracteres.',
+            'new_password.confirmed' => 'La confirmación de la nueva contraseña no coincide.',
+        ]);
+
+
+        if (!Hash::check($request->current_password, Auth::user()->password)) {
+            return response()->json(['message' => 'La contraseña actual no es correcta.'], 422);
+        }
+
+        // Auth::logoutOtherDevices($request->current_password);
+
+        Auth::user()->update([
+            'password' => bcrypt($request->new_password),
+        ]);
+
+        return response()->json(['message' => 'Contraseña actualizada correctamente.']);
     }
 }
