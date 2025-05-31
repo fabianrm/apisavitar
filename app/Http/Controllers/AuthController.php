@@ -170,7 +170,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'La contraseña actual no es correcta.'], 422);
         }
 
-        Auth::logoutOtherDevices($request->current_password);
+        //Auth::logoutOtherDevices($request->current_password);
 
         Auth::user()->update([
             'password' => bcrypt($request->new_password),
