@@ -21,17 +21,16 @@ class OutputController extends Controller
      */
     public function index()
     {
-        $outputs = Output::with([    
-            'destination', 
-            'user', 
-            'outputDetails', 
+        $outputs = Output::with([
+            'destination',
+            'user',
+            'outputDetails',
             'outputDetails.material',
             'outputDetails.material.category',
             'outputDetails.material.presentation',
             'outputDetails.material.brand',
-            ])->get();
+        ])->get();
         return new OutputCollection($outputs);
-
     }
 
     /**
@@ -65,7 +64,7 @@ class OutputController extends Controller
                 'number' => $newNumber,
                 'date' => Carbon::parse($request->date),
                 'destination_id' => $request->destination_id,
-                'user_id' => $request->employee_id,
+                'user_id' => $request->user_id,
                 'total' => 0, // Se actualizará después
                 'comment' => $request->comment,
             ]);
@@ -76,7 +75,7 @@ class OutputController extends Controller
             foreach ($request->output_details as $detail) {
                 // Obtener el detalle de entrada correspondiente
                 $material = Material::findOrFail($detail['material_id']);
-                
+
                 // Calcular el subtotal
                 $subtotal = $detail['quantity'] * $material->price;
 
@@ -122,7 +121,10 @@ class OutputController extends Controller
             Log::info($e->getMessage());
             Log::info($e->getLine());
             DB::rollBack();
-            return response()->json(['error' => 'Failed to create output'], 500);
+            return response()->json([
+                'error' => 'Failed to create output',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -137,7 +139,7 @@ class OutputController extends Controller
             'outputDetails.entryDetail.material.category',
             'outputDetails.entryDetail.material.presentation',
             'outputDetails.entryDetail.material.brand',
-            ])->findOrFail($output->id);
+        ])->findOrFail($output->id);
         return new OutputResource($output);
     }
 
