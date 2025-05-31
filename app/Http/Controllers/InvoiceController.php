@@ -498,8 +498,10 @@ class InvoiceController extends Controller
     public function getMonthlyPaidAmounts()
     {
         $monthlyPaidAmounts = Invoice::where('status', 'pagada')
+            ->whereYear('paid_dated', now()->year)
             ->selectRaw('MONTH(paid_dated) as month, SUM(amount) as total_amount')
             ->groupBy('month')
+            ->orderBy('month')
             ->get();
 
         // Array de nombres de los meses

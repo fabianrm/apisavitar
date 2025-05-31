@@ -139,15 +139,15 @@ class ExpenseController extends Controller
         ]);
     }
 
-    //Resumen de Gastos por mes
     public function getMonthlyPaidExpenses()
     {
         $monthlyPaidAmounts = Expense::where('status', true)
+            ->whereYear('date', now()->year)
             ->selectRaw('MONTH(date) as month, SUM(amount) as total_amount')
             ->groupBy('month')
+            ->orderBy('month')
             ->get();
 
-        // Array de nombres de los meses
         $monthNames = [
             1 => 'Enero',
             2 => 'Febrero',
@@ -163,24 +163,21 @@ class ExpenseController extends Controller
             12 => 'Diciembre'
         ];
 
-        // Variables para almacenar los resultados finales
         $months = [];
         $totals = [];
 
-        // Organizar los resultados
         foreach ($monthlyPaidAmounts as $item) {
             $months[] = $monthNames[$item->month];
             $totals[] = floatval($item->total_amount);
         }
-        // Formato de salida
-        $result = [
+
+        return response()->json([
             'data' => [
                 [
                     'month' => $months,
                     'total_amount' => $totals,
                 ]
             ]
-        ];
-        return response()->json($result);
+        ]);
     }
 }
