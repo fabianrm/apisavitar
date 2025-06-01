@@ -123,8 +123,9 @@ class ExpenseController extends Controller
         $endDate = Carbon::parse($request->query('end_date'))->endOfDay();
 
         // Obtener los gastos en el rango de fechas
-        $expenses = Expense::whereBetween('date_paid', [$startDate, $endDate])
+        $expenses = Expense::whereBetween('date', [$startDate, $endDate])
             ->with('reasons') // Asegurarse de cargar la relación necesaria
+            ->orderBy('date', 'desc')
             ->get();
 
         // Calcular la suma de la columna amount
@@ -139,6 +140,7 @@ class ExpenseController extends Controller
         ]);
     }
 
+    //Resumen de gastos agrupados por mes, para el gráfico
     public function getMonthlyPaidExpenses()
     {
         $monthlyPaidAmounts = Expense::where('status', true)

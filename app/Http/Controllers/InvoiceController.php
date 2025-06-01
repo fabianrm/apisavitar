@@ -454,6 +454,7 @@ class InvoiceController extends Controller
         $invoices = Invoice::with(['service.customers'])
             ->where('status', 'pagada')
             ->whereBetween('paid_dated', [$startDate, $endDate])
+            ->orderBy('paid_dated', 'desc')
             ->get();
 
         // Calcular la suma de la columna amount
@@ -495,6 +496,7 @@ class InvoiceController extends Controller
         return $pdf->download('recibo_nro_' . $invoice->receipt . '.pdf');
     }
 
+    // Resumen de datos para mostrar gráfico
     public function getMonthlyPaidAmounts()
     {
         $monthlyPaidAmounts = Invoice::where('status', 'pagada')

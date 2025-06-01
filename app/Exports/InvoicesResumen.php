@@ -27,6 +27,9 @@ class InvoicesResumen implements FromQuery, WithHeadings, WithMapping
             $query->whereBetween('invoices.paid_dated', [$this->filters['start_date'], $this->filters['end_date']]);
         }
 
+        //Ordenar
+        $query->orderBy('invoices.paid_dated', 'desc');
+
         return $query;
     }
 
@@ -56,7 +59,7 @@ class InvoicesResumen implements FromQuery, WithHeadings, WithMapping
             $invoice->price,
             $invoice->discount,
             $invoice->amount,
-           
+
         ];
     }
 }
