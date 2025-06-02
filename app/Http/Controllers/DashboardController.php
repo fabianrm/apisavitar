@@ -61,6 +61,18 @@ class DashboardController extends Controller
             ->where('status', true)
             ->sum('amount');
 
+        // Ingresos acumulados del year
+        $paidYearSum = Invoice::whereYear('paid_dated', Carbon::now()->year) // Year actual
+            ->where('status', 'pagada')
+            ->sum('amount');
+
+        // Número de Gastos del mes
+        $expenseYearSum = Expense::whereYear('date', Carbon::now()->year) // Year actual
+            ->where('status', true)
+            ->sum('amount');
+
+        $resumeTotalYear = $paidYearSum - $expenseYearSum;
+
 
         return response()->json([
             'data' => [
@@ -74,7 +86,9 @@ class DashboardController extends Controller
                 'overduePaidSum' => $overduePaidSum,
                 'expenseDaySum' => $expenseDaySum,
                 'expenseMonthSum' => $expenseMonthSum,
-
+                'paidYearSum' => $paidYearSum,
+                'expenseYearSum' => $expenseYearSum,
+                'resumeTotalYear' => $resumeTotalYear,
             ]
         ]);
     }
