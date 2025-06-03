@@ -74,6 +74,10 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('services', ServiceController::class);
         Route::get('ports/{box_id}', [BoxController::class, 'getPorts']);
 
+        //Mikrotik
+        Route::post('mk/create', [MikrotikController::class, 'crearUsuario']);
+        Route::post('mk/cut-service', [MikrotikController::class, 'cortarUsuario']);
+
         // Módulo Facturación
         Route::prefix('invoices')->group(function () {
             Route::get('search', [InvoiceController::class, 'searchInvoices']);
