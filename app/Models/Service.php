@@ -132,6 +132,18 @@ class Service extends Model
         return $this->belongsTo(User::class, "created_by");
     }
 
+    //creado Por 
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    //Actualizado Por 
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     // Un servicio puede tener una promoción
     public function promotion()
     {

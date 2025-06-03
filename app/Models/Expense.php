@@ -43,6 +43,18 @@ class Expense extends Model
         return $this->belongsTo(Enterprise::class);
     }
 
+    //creado Por 
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    //Actualizado Por 
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     /**
      * Capturar usuario
      * @return void

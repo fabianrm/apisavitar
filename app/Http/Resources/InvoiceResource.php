@@ -39,7 +39,10 @@ class InvoiceResource extends JsonResource
             'tipoPago' => $this->tipo_pago,
             'note' => $this->note,
             'periodic' => $periodic,
-            'status' => $this->status
+            'status' => $this->status,
+            'updatedAt' => $this->updated_at,
+            'createdBy' => $this->createdBy->name,
+            'updatedBy' => $this->updatedBY->name
         ];
         // return parent::toArray($request);
     }

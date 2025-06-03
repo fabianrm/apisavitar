@@ -56,6 +56,9 @@ class ServiceResource extends JsonResource
                 'name' => $this->promotion ? $this->promotion->name : '-',
             ],
             'status' => $this->status,
+            'updatedAt' => $this->updated_at,
+            'createdBy' => $this->createdBy->name,
+            'updatedBy' => $this->updatedBY->name
 
         ];
 
