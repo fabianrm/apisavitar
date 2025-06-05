@@ -138,11 +138,18 @@ class InvoiceService
 
                         // Verificar si el servicio tiene una promoción activa
                         $note = null;
+
                         if ($service->promotion_id) {
                             $promotion = $service->promotion;
-                            $endDatePromotion = Carbon::parse($service->installation_date)->addMonths($promotion->duration_months);
 
-                            if (Carbon::now()->lte($endDatePromotion)) {
+                            // La promoción incluye el mes de instalación, por eso sumamos (duration - 1)
+                            $endDatePromotion = Carbon::parse($service->installation_date)->startOfMonth()->addMonths($promotion->duration_months - 1)->endOfMonth();
+                            $currentDate = Carbon::now()->endOfMonth(); // Fecha actual truncada a fin de mes, para evitar problemas de día
+
+                            Log::info("Fin promoción => $endDatePromotion");
+                            Log::info("Fecha actual => $currentDate");
+
+                            if ($currentDate->lte($endDatePromotion)) {
                                 $fullPrice = $promotion->price;
                                 $note = 'Promoción aplicada: ' . $promotion->name;
                             } else {

@@ -44,4 +44,10 @@ class MikrotikService
 
         return false;
     }
+
+    public function obtenerPerfilesPPP()
+    {
+        $query = new \RouterOS\Query('/ppp/profile/print');
+        return $this->client->query($query)->read();
+    }
 }

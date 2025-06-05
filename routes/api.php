@@ -77,6 +77,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         //Mikrotik
         Route::post('mk/create', [MikrotikController::class, 'crearUsuario']);
         Route::post('mk/cut-service', [MikrotikController::class, 'cortarUsuario']);
+        Route::get('mk/profiles', [MikrotikController::class, 'listarPerfiles']);
 
         // Módulo Facturación
         Route::prefix('invoices')->group(function () {
