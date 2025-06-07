@@ -10,6 +10,8 @@ use App\Models\Box;
 use App\Models\Invoice;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
+use App\Models\Router;
+use App\Services\MikrotikService;
 use App\Services\UtilService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -40,18 +42,69 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request)
     {
-        $contractService = app(UtilService::class);
-        // Genera un código único para el cliente
-        $uniqueCode = $contractService->generateUniqueCodeService('CT');
-        //Actualiza los puertos disponibles de las cajas
-        $service = new Service($request->all());
-        $service->service_code = $uniqueCode;
-        $service->save();
-        // Calcular los puertos disponibles
-        $box = Box::find($service->box_id);
-        $box->calculateAvailablePorts();
-        return new ServiceResource($service);
-        //return new ServiceResource(Service::create($request->all()));
+        try {
+
+            DB::beginTransaction();
+
+            $contractService = app(UtilService::class);
+            // Genera un código único para el cliente
+            $uniqueCode = $contractService->generateUniqueCodeService('CT');
+
+            //Crea el servicio
+            $service = new Service($request->all());
+            $service->service_code = $uniqueCode;
+            $service->save();
+
+            // Actualiza los puertos disponibles en la caja
+            $box = Box::find($service->box_id);
+            $box->calculateAvailablePorts();
+
+            //TODO: Validar si se debe guardar en mk
+            Log::info('¿Crea usuario en mk?: ' . ($request['mikrotik'] ? 'Sí' : 'No'));
+
+            if ($request['mikrotik']) {
+
+                //Agregar cliente a MK
+                $router = Router::where('id', $service->router_id)->firstOrFail();
+                Log::info("Router => $router->ip");
+
+                //Conectamos con el MK
+                $mkService = new MikrotikService([
+                    'host' => $router->ip,
+                    'user' => $router->usuario,
+                    'pass' => $router->password
+                ]);
+
+                // Verificar conexión antes de continuar
+                if (!$mkService->verificarConexion()) {
+                    throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+                }
+
+                //Creamos el usuario
+                $userMk = $mkService->crearUsuarioPPP(
+                    [
+                        'username' => $service->user_pppoe,
+                        'password' =>  $service->pass_pppoe,
+                        'service' => 'pppoe',
+                        'profile' => $service->plans->name,
+                        'comment' => $service->service_code . ' : ' . $service->customers->name,
+                    ]
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'service' => new ServiceResource($service),
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return response()->json([
+                'message' => 'Error al terminar el contrato.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

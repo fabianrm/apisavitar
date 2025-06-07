@@ -50,7 +50,8 @@ class StoreServiceRequest extends FormRequest
             'installationPayment' => [''],
             'installationAmount' => [''],
             'prepayment' => [''],
-            'status' => ['required']
+            'status' => ['required'],
+            'mikrotik' => ['nullable']
         ];
     }
 

@@ -4,50 +4,99 @@ namespace App\Services;
 
 use RouterOS\Client;
 use RouterOS\Query;
+use Illuminate\Support\Facades\Log;
+use App\Models\Connection;
 
 class MikrotikService
 {
     protected $client;
+    protected $connection;
 
-    public function __construct()
+    public function __construct(array $connectionConfig)
     {
-        $this->client = new Client([
-            'host' => '10.100.100.2', // IP de MikroTik dentro del túnel
-            'user' => 'fabianrm',        // cambia si tienes otro usuario
-            'pass' => '*binroot*',  // asegúrate de usar uno seguro
-            'port' => 8728,           // API puerto por defecto
-        ]);
-    }
-
-    public function crearUsuarioPPP($nombre, $password, $perfil = 'default')
-    {
-        $query = new Query('/ppp/secret/add');
-        $query->equal('name', $nombre)
-            ->equal('password', $password)
-            ->equal('service', 'pppoe')
-            ->equal('profile', $perfil);
-
-        return $this->client->query($query)->read();
-    }
-
-    public function deshabilitarUsuarioPPP($nombre)
-    {
-        // Primero obtener el ID del usuario
-        $query = (new Query('/ppp/secret/print'))->where('name', $nombre);
-        $result = $this->client->query($query)->read();
-
-        if (count($result)) {
-            $id = $result[0]['.id'];
-            $disable = (new Query('/ppp/secret/disable'))->equal('.id', $id);
-            return $this->client->query($disable)->read();
+        if ($connectionConfig) {
+            $this->initializeConnection($connectionConfig);
         }
-
-        return false;
     }
 
-    public function obtenerPerfilesPPP()
+    /**
+     * Inicializa la conexión con parámetros dinámicos
+     */
+    public function initializeConnection(array $config): void
     {
-        $query = new \RouterOS\Query('/ppp/profile/print');
-        return $this->client->query($query)->read();
+        try {
+            $this->connection = $config;
+
+            $this->client = new Client([
+                'host'    => $config['host'],
+                'user'    => $config['user'],
+                'pass'    => $config['pass'],
+                //'port'    => $config['port'] ?? 8728,
+                //'timeout' => $config['timeout'] ?? 10,
+                //'ssl'     => $config['ssl'] ?? false,
+                //'legacy'  => $config['legacy'] ?? false,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al conectar con MikroTik: ' . $e->getMessage());
+            throw new \RuntimeException('Error de conexión con MikroTik: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Crea un usuario PPPoE en el MikroTik
+     */
+    public function crearUsuarioPPP(array $userData): array
+    {
+        $this->validateConnection();
+
+        try {
+            return $this->ejecutarComando('/ppp/secret/add', [
+                'name'     => $userData['username'],
+                'password' => $userData['password'],
+                'service'  => 'pppoe',
+                'profile'  => $userData['profile'],
+                'comment'  => $userData['comment'] ?? 'Cliente ID: ' . $userData['customer_id']
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error creando usuario PPPoE: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    protected function validateConnection(): void
+    {
+        if (!$this->client) {
+            throw new \RuntimeException('Conexión a MikroTik no inicializada');
+        }
+    }
+
+    public function verificarConexion(): bool
+    {
+        try {
+            // Intenta ejecutar un comando simple
+            $resp = $this->ejecutarComando('/system/identity/print');
+            Log::info($resp);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error verificando conexión MikroTik: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    protected function ejecutarComando(string $path, array $params = []): array
+    {
+        $this->validateConnection();
+
+        try {
+            $query = new Query($path);
+            foreach ($params as $name => $value) {
+                $query->equal($name, $value);
+            }
+            return $this->client->query($query)->read();
+        } catch (\Exception $e) {
+            Log::error("Error ejecutando comando $path: " . $e->getMessage());
+            throw $e;
+        }
     }
 }

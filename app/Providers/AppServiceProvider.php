@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\ExpenseService;
 use App\Services\InvoiceService;
+use App\Services\MikrotikService;
 use App\Services\UtilService;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,7 +28,9 @@ class AppServiceProvider extends ServiceProvider
             return new ExpenseService();
         });
 
-
+        $this->app->singleton(MikrotikService::class, function ($app) {
+            return new MikrotikService();
+        });
     }
 
     /**
