@@ -8,47 +8,19 @@ use Illuminate\Http\Request;
 class MikrotikController extends Controller
 {
 
-    // protected $mikrotik;
-
-    // public function __construct(MikrotikService $mikrotik)
-    // {
-    //     $this->mikrotik = $mikrotik;
-    // }
-
-
-    //Crear usuario
-    public function crearUsuario()
+    public function checkConecction(): void
     {
 
-        // $response = $this->mikrotik->ejecutarComando('/ppp/secret/add', [
-        //     'name' => 'lunita',
-        //     'password' => 'lunita123',
-        //     'service' => 'pppoe',
-        //     'profile' => 'default'
-        // ]);
+        //Conectamos con el MK
+        $mkService = new MikrotikService([
+            'host' => '192.168.1.5',
+            'user' => 'fabianrm',
+            'pass' => '*binroot*'
+        ]);
 
-
-
-        //     $mikrotik = new MikrotikService();
-        //     $respuesta = $mikrotik->crearUsuarioPPP('lucas', 'lucas123', "PLAN HOGAR");
-
-        // return response()->json($response);
+        // Verificar conexión antes de continuar
+        if (!$mkService->verificarConexion()) {
+            throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+        }
     }
-
-    //Suspender usuario
-    // public function cortarUsuario()
-    // {
-    //     $mikrotik = new MikrotikService();
-    //     $respuesta = $mikrotik->deshabilitarUsuarioPPP('cliente123');
-
-    //     return response()->json($respuesta);
-    // }
-
-    //Obtener los perfiles (planes)
-    // public function listarPerfiles()
-    // {
-    // return 'Hola';
-    //     $perfiles = $this->mikrotik->obtenerPerfilesPPP();
-    //     return response()->json($perfiles);
-    // }
 }
