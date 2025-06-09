@@ -63,6 +63,62 @@ class MikrotikService
         }
     }
 
+    /**
+     * Desactiva un usuario PPPoE en el MikroTik
+     */
+    public function desactivarUsuario(string $username): array
+    {
+        $this->validateConnection();
+
+        try {
+            return $this->ejecutarComando('/ppp/secret/set', [
+                '.id' => $username,
+                'disabled' => 'yes'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error desactivando usuario PPPoE: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+
+    /**
+     * Desactiva un usuario PPPoE en el MikroTik
+     */
+    public function activarUsuario(string $username): array
+    {
+        $this->validateConnection();
+
+        try {
+            return $this->ejecutarComando('/ppp/secret/set', [
+                '.id' => $username,
+                'disabled' => 'no'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error activando usuario PPPoE: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Desactiva un usuario PPPoE en el MikroTik
+     */
+    public function cambiarPlan(string $username, string $profile): array
+    {
+        $this->validateConnection();
+
+        try {
+            return $this->ejecutarComando('/ppp/secret/set', [
+                '.id' => $username,
+                'profile' => $profile
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error activando usuario PPPoE: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+
     protected function validateConnection(): void
     {
         if (!$this->client) {

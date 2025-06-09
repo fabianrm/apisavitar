@@ -10,6 +10,7 @@ use App\Models\Box;
 use App\Models\Invoice;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
+use App\Models\Plan;
 use App\Models\Router;
 use App\Services\MikrotikService;
 use App\Services\UtilService;
@@ -87,7 +88,7 @@ class ServiceController extends Controller
                         'password' =>  $service->pass_pppoe,
                         'service' => 'pppoe',
                         'profile' => $service->plans->name,
-                        'comment' => $service->service_code . ' : ' . $service->customers->name,
+                        'comment' => $service->customers->name . ' - ' . $service->service_code,
                     ]
                 );
             }
@@ -260,6 +261,29 @@ class ServiceController extends Controller
             'prepayment' => $contract->prepayment,
             'status' => 'activo',
         ]);
+
+        //Obtener el nombre del Plan
+        $plan = Plan::findOrFail($request->plan_id);
+        Log::info("plan -> $plan->name");
+
+        //Cambiar Plan en Mikrotik
+        //Agregar cliente a MK
+        $router = Router::where('id', $newContract->router_id)->firstOrFail();
+        Log::info("Router => $router->ip");
+
+        //Conectamos con el MK
+        $mkService = new MikrotikService([
+            'host' => $router->ip,
+            'user' => $router->usuario,
+            'pass' => $router->password
+        ]);
+
+        // Verificar conexión antes de continuar
+        if (!$mkService->verificarConexion()) {
+            throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+        }
+        //Activamos el usuario en MK
+        $mkService->cambiarPlan($newContract->user_pppoe, $plan->name);
 
         return response()->json([
             'old_contract' => $contract,

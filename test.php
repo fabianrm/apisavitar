@@ -6,7 +6,7 @@ use RouterOS\Query;
 
 // Configura tu acceso al MikroTik
 $client = new Client([
-    'host' => '192.168.1.5',
+    'host' => '10.100.100.2', //Ip del servidor VPN si el test es en la nube, sino ip local
     'user' => 'fabianrm',
     'pass' => '*binroot*'
 ]);

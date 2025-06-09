@@ -7,8 +7,10 @@ use App\Http\Resources\SuspensionCollection;
 use App\Http\Resources\SuspensionResource;
 use Carbon\Carbon;
 use App\Models\Invoice;
+use App\Models\Router;
 use App\Models\Service;
 use App\Models\Suspension;
+use App\Services\MikrotikService;
 use App\Services\SuspensionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -87,12 +89,34 @@ class SuspensionController extends Controller
             // Cargar relación 'services' en la suspensión
             $suspension->load('service');
 
+            //Desactivar en MK
+            if ($request['mikrotik']) {
+                //Agregar cliente a MK
+                $router = Router::where('id', $contract->router_id)->firstOrFail();
+                Log::info("Router => $router->ip");
+
+                //Conectamos con el MK
+                $mkService = new MikrotikService([
+                    'host' => $router->ip,
+                    'user' => $router->usuario,
+                    'pass' => $router->password
+                ]);
+
+                // Verificar conexión antes de continuar
+                if (!$mkService->verificarConexion()) {
+                    throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+                }
+
+                //Desactivamos el usuario en MK
+                $mkService->desactivarUsuario($suspension->service->user_pppoe);
+            }
+
             DB::commit();
 
             return response()->json(
                 [
                     'message' => 'Suspensión registrada exitosamente',
-                    'suspension' => new SuspensionResource($suspension)
+                    'suspension' => new SuspensionResource($suspension),
                 ],
                 200
             );
@@ -132,7 +156,7 @@ class SuspensionController extends Controller
     }
 
     //reactivation suspension
-    public function reactivation(string $id)
+    public function reactivation(string $id, Request $request)
     {
         try {
             DB::beginTransaction();
@@ -157,6 +181,26 @@ class SuspensionController extends Controller
             $service = $suspension->service;
             $service->status = 'activo';
             $service->save();
+
+            if ($request['mikrotik']) {
+                //Agregar cliente a MK
+                $router = Router::where('id', $service->router_id)->firstOrFail();
+                Log::info("Router => $router->ip");
+
+                //Conectamos con el MK
+                $mkService = new MikrotikService([
+                    'host' => $router->ip,
+                    'user' => $router->usuario,
+                    'pass' => $router->password
+                ]);
+
+                // Verificar conexión antes de continuar
+                if (!$mkService->verificarConexion()) {
+                    throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+                }
+                //Activamos el usuario en MK
+                $mkService->activarUsuario($suspension->service->user_pppoe);
+            }
 
             DB::commit();
 
