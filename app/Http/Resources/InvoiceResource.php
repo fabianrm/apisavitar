@@ -41,8 +41,8 @@ class InvoiceResource extends JsonResource
             'periodic' => $periodic,
             'status' => $this->status,
             'updatedAt' => $this->updated_at,
-            'createdBy' => $this->createdBy->name,
-            'updatedBy' => $this->updatedBY->name
+            'createdBy' => $this->createdBy ? $this->createdBy->name : '-',
+            'updatedBy' => $this->updatedBY ? $this->updatedBY->name : '-'
         ];
         // return parent::toArray($request);
     }
