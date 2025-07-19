@@ -8,7 +8,9 @@ use App\Http\Resources\RouterResource;
 use App\Models\Router;
 use App\Http\Requests\StoreRouterRequest;
 use App\Http\Requests\UpdateRouterRequest;
+use App\Services\MikrotikService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class RouterController extends Controller
 {
@@ -24,7 +26,6 @@ class RouterController extends Controller
 
         $routers = Router::all();
         return new RouterCollection($routers);
-
     }
 
     /**
@@ -73,5 +74,34 @@ class RouterController extends Controller
     public function destroy(Router $router)
     {
         //
+    }
+
+
+    /**
+     * Test de Conexion al Mikrotik
+     */
+    public function test(Router $router)
+    {
+        Log::info("Testing router: $router->ip");
+
+        $mkService = new MikrotikService([
+            'host' => $router->ip,
+            'user' => $router->usuario,
+            'pass' => $router->password
+        ]);
+
+        if (!$mkService->verificarConexion()) {
+            return response()->json([
+                'error' => 'No se pudo establecer conexión con el router MikroTik'
+            ], 500);
+        }
+
+        return response()->json([
+            'ip' => $router->ip,
+            'usuario' => $router->usuario,
+            'conectado' => true,
+            'mensaje' => 'Conexión exitosa',
+            'system_info' => $mkService->getDataMK()
+        ]);
     }
 }

@@ -162,6 +162,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         //Equipos
 
         // Recursos generales
+        Route::get('routers/{router}/test', [RouterController::class, 'test']);
+
         Route::apiResource('brands', BrandController::class);
         Route::get('equipments/available', [EquipmentController::class, 'available']);
         Route::apiResource('equipments', EquipmentController::class);

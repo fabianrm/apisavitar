@@ -140,6 +140,23 @@ class MikrotikService
         }
     }
 
+
+
+    public function getDataMK()
+    {
+        try {
+            // Intenta ejecutar un comando simple
+            $resp = $this->ejecutarComando('/system/resource/print');
+            Log::info($resp);
+
+            return response()->json($resp);
+        } catch (\Exception $e) {
+            Log::error('Error verificando conexión MikroTik: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+
     protected function ejecutarComando(string $path, array $params = []): array
     {
         $this->validateConnection();
