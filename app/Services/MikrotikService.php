@@ -6,6 +6,7 @@ use RouterOS\Client;
 use RouterOS\Query;
 use Illuminate\Support\Facades\Log;
 use App\Models\Connection;
+use App\Models\Service;
 
 class MikrotikService
 {
@@ -173,6 +174,40 @@ class MikrotikService
         }
     }
 
+
+    /**
+     * Sincroniza el estado de los contratos con MikroTik
+     */
+    public function sincronizarEstadosContratos()
+    {
+        try {
+            $contratos = Service::whereIn('status', ['terminado', 'suspendido'])
+                ->whereNotNull('pppoe')
+                ->get();
+
+            foreach ($contratos as $contrato) {
+                try {
+                    $pppoeUser = $contrato->pppoe;
+
+                    if ($contrato->status === 'terminado') {
+                        $this->removeUsuario($pppoeUser);
+                        Log::info("Usuario PPPoE $pppoeUser eliminado por contrato terminado");
+                    } elseif ($contrato->status === 'suspendido') {
+                        $this->desactivarUsuario($pppoeUser);
+                        Log::info("Usuario PPPoE $pppoeUser suspendido");
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Error procesando contrato {$contrato->id}: " . $e->getMessage());
+                    continue;
+                }
+            }
+
+            return ['success' => true, 'processed' => $contratos->count()];
+        } catch (\Exception $e) {
+            Log::error("Error en sincronización: " . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
 
     protected function ejecutarComando(string $path, array $params = []): array
     {

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
-use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
