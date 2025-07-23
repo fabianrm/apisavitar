@@ -101,7 +101,24 @@ class MikrotikService
     }
 
     /**
-     * Desactiva un usuario PPPoE en el MikroTik
+     * Remueve un usuario PPPoE en el MikroTik
+     */
+    public function removeUsuario(string $username): array
+    {
+        $this->validateConnection();
+
+        try {
+            return $this->ejecutarComando('/ppp/secret/remove', [
+                '.id' => $username
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error removiendo usuario PPPoE: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Cambia el plan de un usuario PPPoE en el MikroTik
      */
     public function cambiarPlan(string $username, string $profile): array
     {

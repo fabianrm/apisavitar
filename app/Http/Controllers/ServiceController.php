@@ -185,6 +185,24 @@ class ServiceController extends Controller
 
             $service->save();
 
+            //Quitar el usuario del MK
+            $router = Router::where('id', $service->router_id)->firstOrFail();
+            Log::info("Router => $router->ip");
+
+            //Conectamos con el MK
+            $mkService = new MikrotikService([
+                'host' => $router->ip,
+                'user' => $router->usuario,
+                'pass' => $router->password
+            ]);
+
+            // Verificar conexión antes de continuar
+            if (!$mkService->verificarConexion()) {
+                throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+            }
+            //Remover del MK el usuario terminado
+            $mkService->removeUsuario($service->user_pppoe);
+
             return response()->json(
                 [
                     'message' => 'Contrato terminado exitosamente',
@@ -282,6 +300,10 @@ class ServiceController extends Controller
         if (!$mkService->verificarConexion()) {
             throw new \Exception('No se pudo establecer conexión con el router MikroTik');
         }
+
+        //Remover del MK el usuario terminado
+        $mkService->removeUsuario($contract->user_pppoe);
+
         //Activamos el usuario en MK
         $mkService->cambiarPlan($newContract->user_pppoe, $plan->name);
 
