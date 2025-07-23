@@ -5,9 +5,6 @@ namespace App\Services;
 use RouterOS\Client;
 use RouterOS\Query;
 use Illuminate\Support\Facades\Log;
-use App\Models\Connection;
-use App\Models\Router;
-use App\Models\Service;
 
 class MikrotikService
 {
@@ -68,6 +65,34 @@ class MikrotikService
     /**
      * Desactiva un usuario PPPoE en el MikroTik
      */
+    /**
+     * Obtiene usuarios PPPoE activos del MikroTik
+     */
+    public function getUsuariosActivos(): array
+    {
+        $this->validateConnection();
+        return $this->ejecutarComando('/ppp/secret/print', [
+            '?disabled' => 'no' //No funciona :(
+        ]);
+    }
+
+
+    public function getUsuariosConfigurados(): array
+    {
+        $this->validateConnection();
+        $secrets = $this->ejecutarComando('/ppp/secret/print');
+
+        $nombresUsuarios = [];
+        foreach ($secrets as $secret) {
+            if (isset($secret['name'])) {
+                $nombresUsuarios[] = $secret['name'];
+            }
+        }
+        return $nombresUsuarios;
+    }
+
+
+
     public function desactivarUsuario(string $username): array
     {
         $this->validateConnection();
@@ -179,50 +204,6 @@ class MikrotikService
     /**
      * Sincroniza el estado de los contratos con MikroTik
      */
-    public static function sincronizarEstadosContratos($id)
-    {
-        try {
-            $router = Router::findOrFail($id);
-            Log::info("Sincronizando contratos en router: {$router->ip}");
-
-            $mkService = new static([
-                'host' => $router->ip,
-                'user' => $router->usuario,
-                'pass' => $router->password
-            ]);
-
-            if (!$mkService->verificarConexion()) {
-                throw new \Exception('Conexión fallida con el router');
-            }
-
-            $contratos = Service::with(['routers', 'customers'])
-                ->where('router_id', $id)
-                ->whereIn('status', ['terminado', 'suspendido'])
-                ->whereNotNull('user_pppoe')
-                ->get();
-
-            foreach ($contratos as $contrato) {
-                try {
-                    $accion = $contrato->status === 'terminado' ? 'eliminación' : 'suspensión';
-                    Log::info("Procesando {$accion} para: {$contrato->user_pppoe}");
-
-                    $contrato->status === 'terminado'
-                        ? $mkService->removeUsuario($contrato->user_pppoe)
-                        : $mkService->desactivarUsuario($contrato->user_pppoe);
-
-                    Log::info("Operación {$accion} completada");
-                } catch (\Exception $e) {
-                    Log::error("Error procesando contrato {$contrato->id}: " . $e->getMessage());
-                    continue;
-                }
-            }
-
-            return ['success' => true, 'processed' => $contratos->count()];
-        } catch (\Exception $e) {
-            Log::error("Error en sincronización: " . $e->getMessage());
-            return ['success' => false, 'error' => $e->getMessage()];
-        }
-    }
 
     protected function ejecutarComando(string $path, array $params = []): array
     {

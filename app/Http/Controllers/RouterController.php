@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateRouterRequest;
 use App\Services\MikrotikService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\Service;
 
 class RouterController extends Controller
 {
@@ -111,12 +112,68 @@ class RouterController extends Controller
     public function sincronizarContratos(Router $router)
     {
         try {
-            $resultado = MikrotikService::sincronizarEstadosContratos($router->id);
-            return response()->json($resultado);
-        } catch (\Exception $e) {
+            Log::info("Iniciando sincronización para router: {$router->ip}");
+
+            // Crear instancia del servicio MikroTik
+            $mkService = new MikrotikService([
+                'host' => $router->ip,
+                'user' => $router->usuario,
+                'pass' => $router->password
+            ]);
+
+            if (!$mkService->verificarConexion()) {
+                throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+            }
+
+            // Obtener contratos a procesar
+            $contratos = Service::with(['customers', 'routers'])
+                ->where('router_id', $router->id)
+                ->whereIn('status', ['terminado', 'suspendido'])
+                ->whereNotNull('user_pppoe')
+                ->get();
+
+            $procesados = 0;
+            foreach ($contratos as $contrato) {
+                try {
+                    if ($contrato->status === 'terminado') {
+                        $mkService->removeUsuario($contrato->user_pppoe);
+                        Log::info("Usuario PPPoE eliminado: {$contrato->user_pppoe}");
+                    } else {
+                        $mkService->desactivarUsuario($contrato->user_pppoe);
+                        Log::info("Usuario PPPoE suspendido: {$contrato->user_pppoe}");
+                    }
+                    $procesados++;
+                } catch (\Exception $e) {
+                    Log::error("Error procesando contrato {$contrato->id}: " . $e->getMessage());
+                    continue;
+                }
+            }
+
+            // Obtener usuarios activos en MikroTik
+            $usuariosActivosMK = collect($mkService->getUsuariosConfigurados());
+
+            Log::info("Activos => " . $usuariosActivosMK);
+
+            // Identificar usuarios discrepantes
+            $discrepancias = Service::where('router_id', $router->id)
+                ->whereIn('status', ['terminado', 'suspendido'])
+                ->whereIn('user_pppoe', $usuariosActivosMK)
+                ->pluck('user_pppoe');
+
+            Log::info("Discrepancias => " . $discrepancias);
+
             return response()->json([
-                'error' => $e->getMessage(),
-                'success' => false
+                'success' => true,
+                'message' => "Sincronización completada",
+                'procesados' => $procesados,
+                'total' => $contratos->count(),
+                'usuarios_discrepantes' => $discrepancias
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error en sincronización: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
             ], 500);
         }
     }
