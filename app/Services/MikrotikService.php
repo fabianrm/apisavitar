@@ -6,6 +6,7 @@ use RouterOS\Client;
 use RouterOS\Query;
 use Illuminate\Support\Facades\Log;
 use App\Models\Connection;
+use App\Models\Router;
 use App\Models\Service;
 
 class MikrotikService
@@ -178,24 +179,38 @@ class MikrotikService
     /**
      * Sincroniza el estado de los contratos con MikroTik
      */
-    public function sincronizarEstadosContratos()
+    public static function sincronizarEstadosContratos($id)
     {
         try {
-            $contratos = Service::whereIn('status', ['terminado', 'suspendido'])
-                ->whereNotNull('pppoe')
+            $router = Router::findOrFail($id);
+            Log::info("Sincronizando contratos en router: {$router->ip}");
+
+            $mkService = new static([
+                'host' => $router->ip,
+                'user' => $router->usuario,
+                'pass' => $router->password
+            ]);
+
+            if (!$mkService->verificarConexion()) {
+                throw new \Exception('Conexión fallida con el router');
+            }
+
+            $contratos = Service::with(['routers', 'customers'])
+                ->where('router_id', $id)
+                ->whereIn('status', ['terminado', 'suspendido'])
+                ->whereNotNull('user_pppoe')
                 ->get();
 
             foreach ($contratos as $contrato) {
                 try {
-                    $pppoeUser = $contrato->pppoe;
+                    $accion = $contrato->status === 'terminado' ? 'eliminación' : 'suspensión';
+                    Log::info("Procesando {$accion} para: {$contrato->user_pppoe}");
 
-                    if ($contrato->status === 'terminado') {
-                        $this->removeUsuario($pppoeUser);
-                        Log::info("Usuario PPPoE $pppoeUser eliminado por contrato terminado");
-                    } elseif ($contrato->status === 'suspendido') {
-                        $this->desactivarUsuario($pppoeUser);
-                        Log::info("Usuario PPPoE $pppoeUser suspendido");
-                    }
+                    $contrato->status === 'terminado'
+                        ? $mkService->removeUsuario($contrato->user_pppoe)
+                        : $mkService->desactivarUsuario($contrato->user_pppoe);
+
+                    Log::info("Operación {$accion} completada");
                 } catch (\Exception $e) {
                     Log::error("Error procesando contrato {$contrato->id}: " . $e->getMessage());
                     continue;

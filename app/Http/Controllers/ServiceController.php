@@ -102,7 +102,7 @@ class ServiceController extends Controller
             DB::rollBack();
             Log::error($e->getMessage());
             return response()->json([
-                'message' => 'Error al terminar el contrato.',
+                'message' => 'Error al crear el contrato.',
                 'error' => $e->getMessage(),
             ], 500);
         }

@@ -161,6 +161,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
         // Recursos generales
         Route::get('routers/{router}/test', [RouterController::class, 'test']);
+        Route::post('routers/{router}/sync-contacts', [RouterController::class, 'sincronizarContratos']);
 
         Route::apiResource('brands', BrandController::class);
         Route::get('equipments/available', [EquipmentController::class, 'available']);

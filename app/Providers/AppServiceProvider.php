@@ -28,9 +28,9 @@ class AppServiceProvider extends ServiceProvider
             return new ExpenseService();
         });
 
-        $this->app->singleton(MikrotikService::class, function ($app) {
-            return new MikrotikService();
-        });
+        // $this->app->singleton(MikrotikService::class, function ($app) {
+        //     return new MikrotikService();
+        // });
     }
 
     /**

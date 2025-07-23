@@ -104,4 +104,20 @@ class RouterController extends Controller
             'system_info' => $mkService->getDataMK()
         ]);
     }
+
+    /**
+     * Sincroniza contratos con el router MikroTik
+     */
+    public function sincronizarContratos(Router $router)
+    {
+        try {
+            $resultado = MikrotikService::sincronizarEstadosContratos($router->id);
+            return response()->json($resultado);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'success' => false
+            ], 500);
+        }
+    }
 }
