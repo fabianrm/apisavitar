@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      * The Artisan commands provided by your application.
      */
     protected $commands = [
-        SincronizarMikrotikCommand::class,
+        //  SincronizarMikrotikCommand::class,
     ];
 
     /**
@@ -20,10 +20,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('mk:sync')
-            ->dailyAt('12:00')
-            ->timezone('America/Lima')
-            ->environments(['production']);
+        // $schedule->command('mk:sync')
+        //     ->dailyAt('12:00')
+        //     ->timezone('America/Lima')
+        //     ->environments(['production']);
     }
 
     /**
@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__ . '/Commands');
-        require base_path('routes/console.php');
+        // $this->load(__DIR__ . '/Commands');
+        // require base_path('routes/console.php');
     }
 }
