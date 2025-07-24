@@ -132,6 +132,12 @@ class RouterController extends Controller
                 ->whereNotNull('user_pppoe')
                 ->get();
 
+
+            // Obtener usuarios activos en MikroTik
+            $usuariosActivosMK = collect($mkService->getUsuariosConfigurados());
+
+            Log::info("Activos => " . $usuariosActivosMK);
+
             $procesados = 0;
             foreach ($contratos as $contrato) {
                 try {
@@ -149,10 +155,7 @@ class RouterController extends Controller
                 }
             }
 
-            // Obtener usuarios activos en MikroTik
-            $usuariosActivosMK = collect($mkService->getUsuariosConfigurados());
 
-            Log::info("Activos => " . $usuariosActivosMK);
 
             // Identificar usuarios discrepantes
             $discrepancias = Service::where('router_id', $router->id)

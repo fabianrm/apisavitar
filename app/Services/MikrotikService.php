@@ -63,24 +63,26 @@ class MikrotikService
     }
 
     /**
-     * Desactiva un usuario PPPoE en el MikroTik
-     */
-    /**
      * Obtiene usuarios PPPoE activos del MikroTik
      */
     public function getUsuariosActivos(): array
     {
         $this->validateConnection();
-        return $this->ejecutarComando('/ppp/secret/print', [
+        return $this->ejecutarComando('/ppp/active/print', [
             '?disabled' => 'no' //No funciona :(
         ]);
     }
 
 
+    /**
+     * Obtiene usuarios PPPoE configurados del MikroTik
+     */
     public function getUsuariosConfigurados(): array
     {
         $this->validateConnection();
-        $secrets = $this->ejecutarComando('/ppp/secret/print');
+        $secrets = $this->ejecutarComando('/ppp/secret/print', [
+            '?disabled' => 'no'
+        ]);
 
         $nombresUsuarios = [];
         foreach ($secrets as $secret) {
@@ -204,16 +206,21 @@ class MikrotikService
     /**
      * Sincroniza el estado de los contratos con MikroTik
      */
-
     protected function ejecutarComando(string $path, array $params = []): array
     {
         $this->validateConnection();
 
         try {
             $query = new Query($path);
+
             foreach ($params as $name => $value) {
-                $query->equal($name, $value);
+                if (str_starts_with($name, '?')) {
+                    $query->where(substr($name, 1), $value);
+                } else {
+                    $query->equal($name, $value);
+                }
             }
+
             return $this->client->query($query)->read();
         } catch (\Exception $e) {
             Log::error("Error ejecutando comando $path: " . $e->getMessage());
