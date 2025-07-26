@@ -302,7 +302,7 @@ class ServiceController extends Controller
         }
 
         //Remover del MK el usuario terminado
-        $mkService->removeUsuario($contract->user_pppoe);
+        //$mkService->removeUsuario($contract->user_pppoe);
 
         //Activamos el usuario en MK
         $mkService->cambiarPlan($newContract->user_pppoe, $plan->name);
