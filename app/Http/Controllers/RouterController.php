@@ -109,6 +109,7 @@ class RouterController extends Controller
     /**
      * Sincroniza contratos con el router MikroTik
      */
+
     public function sincronizarContratos(Router $router)
     {
         try {
@@ -125,52 +126,63 @@ class RouterController extends Controller
                 throw new \Exception('No se pudo establecer conexión con el router MikroTik');
             }
 
-            // Obtener contratos a procesar
-            $contratos = Service::with(['customers', 'routers'])
-                ->where('router_id', $router->id)
+            // 1. Obtener una lista de todos los user_pppoe que tienen al menos UN contrato activo.
+            // Estos usuarios NUNCA deben ser procesados.
+            $usuariosConContratoActivo = Service::where('router_id', $router->id)
+                ->where('status', 'activo')
+                ->whereNotNull('user_pppoe')
+                ->pluck('user_pppoe')
+                ->unique();
+
+            // 2. Obtener todos los contratos 'terminado' o 'suspendido' que no pertenezcan a usuarios activos.
+            $contratosAProcesar = Service::where('router_id', $router->id)
                 ->whereIn('status', ['terminado', 'suspendido'])
                 ->whereNotNull('user_pppoe')
+                ->whereNotIn('user_pppoe', $usuariosConContratoActivo)
                 ->get();
 
-
-            // Obtener usuarios activos en MikroTik
-            $usuariosActivosMK = collect($mkService->getUsuariosConfigurados());
-
-            Log::info("Activos => " . $usuariosActivosMK);
+            // Obtener usuarios configurados en MikroTik
+            $usuariosConfiguradosMK = collect($mkService->getUsuariosConfigurados());
+            Log::info("Usuarios configurados en MK: " . $usuariosConfiguradosMK->implode(', '));
 
             $procesados = 0;
-            foreach ($contratos as $contrato) {
+
+            // --- INICIO DE LA MODIFICACIÓN ---
+
+            // 3. Agrupar los contratos por usuario para tomar una única decisión por cada uno.
+            $contratosAgrupados = $contratosAProcesar->groupBy('user_pppoe');
+
+            foreach ($contratosAgrupados as $user_pppoe => $contratosDelUsuario) {
                 try {
-                    if ($contrato->status === 'terminado') {
-                        $mkService->removeUsuario($contrato->user_pppoe);
-                        Log::info("Usuario PPPoE eliminado: {$contrato->user_pppoe}");
+                    // Decisión: Si el usuario tiene al menos un contrato 'suspendido', se suspende.
+                    // La suspensión tiene prioridad sobre la terminación.
+                    if ($contratosDelUsuario->contains('status', 'suspendido')) {
+                        $mkService->desactivarUsuario($user_pppoe);
+                        Log::info("Usuario PPPoE suspendido: {$user_pppoe} (prioridad sobre terminados)");
                     } else {
-                        $mkService->desactivarUsuario($contrato->user_pppoe);
-                        Log::info("Usuario PPPoE suspendido: {$contrato->user_pppoe}");
+                        // Si no tiene 'suspendido', significa que todos sus contratos en este grupo son 'terminado'.
+                        $mkService->removeUsuario($user_pppoe);
+                        Log::info("Usuario PPPoE eliminado: {$user_pppoe}");
                     }
                     $procesados++;
                 } catch (\Exception $e) {
-                    Log::error("Error procesando contrato {$contrato->id}: " . $e->getMessage());
+                    Log::error("Error procesando usuario {$user_pppoe}: " . $e->getMessage());
                     continue;
                 }
             }
 
+            // --- FIN DE LA MODIFICACIÓN ---
 
-
-            // Identificar usuarios discrepantes
-            $discrepancias = Service::where('router_id', $router->id)
-                ->whereIn('status', ['terminado', 'suspendido'])
-                ->whereIn('user_pppoe', $usuariosActivosMK)
-                ->pluck('user_pppoe');
-
-            Log::info("Discrepancias => " . $discrepancias);
+            // 4. Identificar discrepancias: Usuarios que están en MikroTik pero no deberían estar activos.
+            $discrepancias = $usuariosConfiguradosMK->diff($usuariosConContratoActivo);
+            Log::info("Discrepancias encontradas => " . $discrepancias->implode(', '));
 
             return response()->json([
                 'success' => true,
                 'message' => "Sincronización completada",
                 'procesados' => $procesados,
-                'total' => $contratos->count(),
-                'usuarios_discrepantes' => $discrepancias
+                'total_usuarios_a_procesar' => $contratosAgrupados->count(),
+                'usuarios_discrepantes' => $discrepancias->values()
             ]);
         } catch (\Exception $e) {
             Log::error("Error en sincronización: " . $e->getMessage());
