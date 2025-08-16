@@ -16,6 +16,7 @@ use App\Exports\InvoicesResumen;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 
 class InvoiceController extends Controller
 {
@@ -100,6 +101,22 @@ class InvoiceController extends Controller
         ]);
 
         $invoice = Invoice::findOrFail($id);
+
+        // Verificar si es la factura más antigua pendiente para este servicio
+        $oldestPendingInvoice = Invoice::where('service_id', $invoice->service_id)
+            ->whereIn('status', ['pendiente', 'vencida'])
+            ->orderBy('start_date', 'asc')
+            ->first();
+
+        Log::info('Oldest pending invoice: ', ['invoice' => $oldestPendingInvoice]);
+
+        if ($oldestPendingInvoice && $oldestPendingInvoice->id != $invoice->id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No se puede pagar esta factura. Primero debe pagar la factura más antigua pendiente.',
+                'oldest_pending_invoice' => $oldestPendingInvoice
+            ], 422);
+        }
 
         $invoice->status = 'pagada';
         $invoice->tipo_pago = $request->input('tipo_pago');
