@@ -85,11 +85,28 @@ class InvoiceController extends Controller
 
 
     /**
-     * Remove the specified resource from storage.
+     * Reset the invoice.
      */
-    public function destroy(Invoice $invoice)
+    public function resetInvoice($id)
     {
-        //
+        Log::info('Resetting invoice: ID ' . $id);
+
+        $invoice = Invoice::findOrFail($id);
+        //Log::info('Resetting invoice: ', ['invoice' => $invoice]);
+
+        $invoice->status = 'pendiente';
+        $invoice->tipo_pago = null;
+        $invoice->amount = 0;
+        $invoice->discount = 0;
+        $invoice->paid_dated = null;
+        $invoice->note = null;
+        $invoice->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Factura reiniciada con éxito',
+            'invoice' => $invoice,
+        ], 200);
     }
 
     /* Paid Invoice */

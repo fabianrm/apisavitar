@@ -94,6 +94,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::get('paid-report', [InvoiceController::class, 'getPaidInvoicesReport']);
             Route::patch('{id}/paid-invoice', [InvoiceController::class, 'paidInvoice']);
             Route::patch('{id}/cancel-invoice', [InvoiceController::class, 'cancelInvoice']);
+            Route::patch('{id}/reset-invoice', [InvoiceController::class, 'resetInvoice']);
         });
         Route::apiResource('invoices', InvoiceController::class);
 
