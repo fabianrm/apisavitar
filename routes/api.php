@@ -53,6 +53,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::get('by-dni', [CustomerController::class, 'getCustomerActiveStatus']);
             Route::get('with-contracts', [CustomerController::class, 'getCustomersWithContracts']);
             Route::patch('{id}/suspend', [CustomerController::class, 'suspend']);
+            Route::patch('{id}/activate', [CustomerController::class, 'activate']);
             Route::get('export', [CustomerController::class, 'exportCustomers']);
         });
         Route::apiResource('customers', CustomerController::class);

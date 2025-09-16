@@ -171,6 +171,23 @@ class CustomerController extends Controller
         ], 200);
     }
 
+    /**
+     * Reactivar cliente
+     */
+    public function activate($id)
+    {
+        $customer = Customer::findOrFail($id);
+        $customer->status = true;
+        $customer->observation = null;
+        $customer->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cliente reactivado con éxito',
+            'customer' => $customer,
+        ], 200);
+    }
+
 
 
     /**
