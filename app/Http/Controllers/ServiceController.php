@@ -168,7 +168,7 @@ class ServiceController extends Controller
     }
 
     //Terminar Contrato
-    public function terminate(string $id)
+    public function terminate(string $id, Request $request)
     {
 
         try {
@@ -185,23 +185,26 @@ class ServiceController extends Controller
 
             $service->save();
 
-            //Quitar el usuario del MK
-            $router = Router::where('id', $service->router_id)->firstOrFail();
-            Log::info("Router => $router->ip");
+            if ($request['mikrotik']) {
+                //Quitar el usuario del MK
+                $router = Router::where('id', $service->router_id)->firstOrFail();
+                Log::info("Router => $router->ip");
 
-            //Conectamos con el MK
-            $mkService = new MikrotikService([
-                'host' => $router->ip,
-                'user' => $router->usuario,
-                'pass' => $router->password
-            ]);
+                //Conectamos con el MK
+                $mkService = new MikrotikService([
+                    'host' => $router->ip,
+                    'user' => $router->usuario,
+                    'pass' => $router->password
+                ]);
 
-            // Verificar conexión antes de continuar
-            if (!$mkService->verificarConexion()) {
-                throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+                // Verificar conexión antes de continuar
+                if (!$mkService->verificarConexion()) {
+                    throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+                }
+
+                //Remover del MK el usuario terminado
+                $mkService->removeUsuario($service->user_pppoe);
             }
-            //Remover del MK el usuario terminado
-            $mkService->removeUsuario($service->user_pppoe);
 
             return response()->json(
                 [
@@ -210,7 +213,7 @@ class ServiceController extends Controller
                 200
             );
         } catch (\Exception $e) {
-            DB::rollBack();
+            //DB::rollBack();
             Log::error($e->getMessage());
             return response()->json([
                 'message' => 'Error al terminar el contrato.',
