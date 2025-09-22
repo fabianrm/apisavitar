@@ -17,6 +17,7 @@ class Suspension extends Model
         'service_id',
         'start_date',
         'end_date',
+        'reactivation_date',
         'reason',
         'observation',
         'status',
