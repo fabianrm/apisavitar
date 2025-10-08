@@ -53,15 +53,19 @@ class InvoiceService
 
                     // Verificar suspensiones activas
                     $activeSuspensions = Suspension::where('service_id', $service->id)
-                        ->where('status', false)
-                        ->whereNotNull('reactivation_date') // Cambiado de end_date a reactivation_date
+                        //->where('status', false) // Asumiendo que 0 (false) = Reactivada (para contabilizar)
+                        ->whereNotNull('reactivation_date') // Mantenemos este filtro, pero te recomiendo verificar el dato
                         ->where(function ($query) use ($startDate, $endDate) {
-                            $query->where(function ($q) use ($startDate, $endDate) {
-                                $q->where('start_date', '<=', $startDate)
-                                    ->where('end_date', '>=', $endDate);
-                            })->orWhereBetween('start_date', [$startDate, $endDate])
-                                ->orWhereBetween('end_date', [$startDate, $endDate]);
+                            // Lógica de Solapamiento Optimizada:
+                            // La suspensión debe empezar antes o en la fecha de fin del período de facturación ($endDate)
+                            // Y debe terminar después o en la fecha de inicio del período de facturación ($startDate)
+                            $query->where('start_date', '<=', $endDate)
+                                ->where('reactivation_date', '>=', $startDate);
                         })->get();
+
+                    // Log de depuración (Mantenlo para confirmar si se encuentra el dato)
+                    Log::info("Suspensiones encontradas para {$startDate->toDateString()} a {$endDate->toDateString()}: " . $activeSuspensions->toJson());
+
 
                     // Calcular días activos y suspendidos
                     $totalDays = $startDate->diffInDays($endDate) + 1;
@@ -206,6 +210,7 @@ class InvoiceService
             $suspendEnd = min($endDate, Carbon::parse($suspension->reactivation_date));
             $suspendedDays += $suspendStart->diffInDays($suspendEnd) + 1;
         }
+        Log::info("Total de días suspendidos: {$suspendedDays}");
         return $suspendedDays;
     }
 
