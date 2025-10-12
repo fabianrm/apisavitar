@@ -92,4 +92,13 @@ class BoxController extends Controller
         $box = Box::findOrFail($box_id);
         return response()->json($box->availablePorts());
     }
+
+    /**
+     * Obtiene los servicios asociados a la caja
+     */
+    public function getServices($box_id)
+    {
+        $box = Box::findOrFail($box_id);
+        return response()->json($box->getServicesInfo());
+    }
 }

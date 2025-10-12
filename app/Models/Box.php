@@ -69,6 +69,11 @@ class Box extends Model
         $todosLosPuertos = range(1, $this->total_ports);
         // Obtiene los puertos ocupados en esta caja
         $puertosOcupados = $this->services()->pluck('port_number')->toArray();
+
+        Log::info("Todos los puertos: " . implode(", ", $todosLosPuertos));
+        Log::info("Puertos ocupados: " . implode(", ", $puertosOcupados));
+        Log::info("Puertos disponibles: " . implode(", ", array_diff($todosLosPuertos, $puertosOcupados)));
+
         // Elimina los que ya están ocupados
         $puertosDisponibles = array_diff($todosLosPuertos, $puertosOcupados);
         // Devuelve los disponibles en el mismo formato que el procedimiento almacenado
@@ -78,6 +83,25 @@ class Box extends Model
                 'port_number' => $port
             ];
         })->values(); // reindexa
+    }
+
+
+    /**
+     * Get contract code and status for all services in the box.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getServicesInfo()
+    {
+        return $this->services->map(function ($service) {
+            return [
+                'service_code' => $service->service_code,
+                'customer_name' => $service->customers ? $service->customers->name : null,
+                'plan_name' => $service->plans->name,
+                'port_number' => $service->port_number,
+                'status' => $service->status,
+            ];
+        });
     }
 
 
