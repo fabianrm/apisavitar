@@ -95,6 +95,7 @@ class Box extends Model
     {
         return $this->services->map(function ($service) {
             return [
+                'service_id' => $service->id,
                 'service_code' => $service->service_code,
                 'customer_name' => $service->customers ? $service->customers->name : null,
                 'plan_name' => $service->plans->name,
