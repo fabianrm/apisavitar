@@ -279,16 +279,40 @@ class InvoiceService
         }
     }
 
+    // private function getNextReceiptNumber()
+    // {
+    //     $lastInvoice = Invoice::orderBy('id', 'desc')->first();
+
+    //     if (!$lastInvoice) {
+    //         return 1;
+    //     }
+
+    // Extraer el número del último recibo (formato: '003-N°. 000001')
+    //     $lastNumber = (int) substr($lastInvoice->receipt, 7);
+    //     return $lastNumber + 1;
+    // }
+
+
     private function getNextReceiptNumber()
     {
-        $lastInvoice = Invoice::orderBy('id', 'desc')->first();
+        // 1. Buscar la factura que tenga el número de recibo MÁS ALTO
+        // Usamos orderByRaw para convertir la parte numérica del string en un número
+        // y ordenarlo descendientemente.
+        // SUBSTRING(receipt, 9) asume 8 caracteres de prefijo ('003-N°. ')
+        // y empieza en el 9no caracter (que es el número).
+        $lastInvoice = Invoice::where('receipt', 'LIKE', '003-N°. %')
+            ->orderByRaw('CAST(SUBSTRING(receipt, 9) AS UNSIGNED) DESC')
+            ->first();
 
         if (!$lastInvoice) {
+            // No se encontró ninguna factura con ese formato, empezar en 1
             return 1;
         }
 
-        // Extraer el número del último recibo (formato: '003-N°. 000001')
-        $lastNumber = (int) substr($lastInvoice->receipt, 7);
+        // 2. Extraer el número de forma segura (el prefijo '003-N°. ' tiene 8 chars)
+        $lastNumber = (int) substr($lastInvoice->receipt, 8);
+
+        // 3. Retornar el siguiente número
         return $lastNumber + 1;
     }
 }
