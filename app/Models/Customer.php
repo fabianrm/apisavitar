@@ -3,6 +3,11 @@
 namespace App\Models;
 
 use App\Helpers\CurrentEnterprise;
+use App\Http\Resources\CustomerResource;
+use App\Http\Resources\InvoiceResource;
+use App\Http\Resources\ServiceResource;
+use App\Http\Resources\SuspensionResource;
+use App\Http\Resources\TicketResource;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -71,6 +76,16 @@ class Customer extends Model
     }
 
     /**
+     * Get all of the tickets for the Customer
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    /**
      * Relación con enterprise
      */
     public function enterprise()
@@ -90,5 +105,28 @@ class Customer extends Model
     public static function withoutStoreScope()
     {
         return static::withoutGlobalScope(EnterpriseScope::class);
+    }
+
+    public function getHistoricalSummary()
+    {
+        $this->load([
+            'services.invoices',
+            'services.suspensions',
+            'tickets.history'
+        ]);
+
+        $services = $this->services->map(function ($service) {
+            return [
+                'service' => new ServiceResource($service),
+                'invoices' => InvoiceResource::collection($service->invoices),
+                'suspensions' => SuspensionResource::collection($service->suspensions),
+            ];
+        });
+
+        return [
+            'customer' => new CustomerResource($this),
+            'services' => $services,
+            'tickets' => TicketResource::collection($this->tickets),
+        ];
     }
 }

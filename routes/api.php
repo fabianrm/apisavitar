@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\CustomerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +56,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::patch('{id}/suspend', [CustomerController::class, 'suspend']);
             Route::patch('{id}/activate', [CustomerController::class, 'activate']);
             Route::get('export', [CustomerController::class, 'exportCustomers']);
+            Route::get('{id}/historical-summary', [CustomerController::class, 'getHistoricalSummary']);
         });
         Route::apiResource('customers', CustomerController::class);
 

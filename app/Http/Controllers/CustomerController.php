@@ -211,4 +211,11 @@ class CustomerController extends Controller
     {
         return Excel::download(new CustomersExport, 'customers.xlsx');
     }
+
+
+    public function getHistoricalSummary($id)
+    {
+        $customer = Customer::findOrFail($id);
+        return response()->json($customer->getHistoricalSummary());
+    }
 }
