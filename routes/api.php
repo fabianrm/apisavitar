@@ -57,6 +57,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::patch('{id}/activate', [CustomerController::class, 'activate']);
             Route::get('export', [CustomerController::class, 'exportCustomers']);
             Route::get('{id}/historical-summary', [CustomerController::class, 'getHistoricalSummary']);
+            Route::get('{id}/historical-summary/export', [CustomerController::class, 'exportHistoricalSummary']);
         });
         Route::apiResource('customers', CustomerController::class);
 

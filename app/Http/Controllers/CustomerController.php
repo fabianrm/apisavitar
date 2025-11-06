@@ -11,6 +11,8 @@ use App\Services\UtilService;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use App\Exports\CustomersExport;
+use App\Exports\CustomerHistoricalSummaryExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
@@ -217,5 +219,13 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($id);
         return response()->json($customer->getHistoricalSummary());
+    }
+
+    public function exportHistoricalSummary($id)
+    {
+        $customer = Customer::findOrFail($id);
+        $summary = $customer->getHistoricalSummary();
+        $pdf = Pdf::loadView('customers.historical_summary', compact('summary'));
+        return $pdf->download('historical-summary-' . $customer->id . '.pdf');
     }
 }
