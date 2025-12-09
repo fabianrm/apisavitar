@@ -13,6 +13,7 @@ use App\Filters\InvoiceFilter;
 use App\Services\InvoiceService;
 use App\Exports\InvoicesExport;
 use App\Exports\InvoicesResumen;
+use App\Scopes\EnterpriseScope;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -314,7 +315,7 @@ class InvoiceController extends Controller
         $today = Carbon::today();
         $limitDate = $today->copy()->addDays(7); // Change from 5 to 7 days
 
-        $invoices = Invoice::query()
+        $invoices = Invoice::withoutGlobalScope(EnterpriseScope::class)
             ->join('services', 'invoices.service_id', '=', 'services.id')
             ->join('customers', 'services.customer_id', '=', 'customers.id')
             ->select(
@@ -326,6 +327,7 @@ class InvoiceController extends Controller
                 'invoices.reminder_sent_at',
                 'invoices.reminder_count'
             )
+            ->whereIn('invoices.enterprise_id', [1, 2])
             ->where('services.status', 'activo')
             ->where('invoices.status', 'pendiente')
             ->where('invoices.start_date', '>=', $today)
@@ -344,7 +346,7 @@ class InvoiceController extends Controller
     {
         $today = Carbon::today();
 
-        $invoices = Invoice::query()
+        $invoices = Invoice::withoutGlobalScope(EnterpriseScope::class)
             ->join('services', 'invoices.service_id', '=', 'services.id')
             ->join('customers', 'services.customer_id', '=', 'customers.id')
             ->select(
@@ -357,6 +359,7 @@ class InvoiceController extends Controller
                 'invoices.reminder_sent_at',
                 'invoices.reminder_count'
             )
+            ->whereIn('invoices.enterprise_id', [1, 2])
             ->where('services.status', 'activo')
             ->where('invoices.status', 'vencida')
             ->where('invoices.start_date', '<=', $today) // Ya pasó la fecha de vencimiento
