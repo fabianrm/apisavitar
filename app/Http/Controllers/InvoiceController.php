@@ -377,10 +377,19 @@ class InvoiceController extends Controller
     // Marcar la respuesta de recordatorio x vencer
     public function markReminderSent($id)
     {
-        $invoice = Invoice::findOrFail($id);
+        $invoice = Invoice::withoutGlobalScope(EnterpriseScope::class)->findOrFail($id);
+
+        if (!in_array($invoice->enterprise_id, [1, 2])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invoice not allowed for this enterprise'
+            ], 403);
+        }
+
         $invoice->reminder_sent_at = now();
         $invoice->reminder_count = ($invoice->reminder_count ?? 0) + 1;
         $invoice->save();
+
         return response()->json(['success' => true]);
     }
 
@@ -388,18 +397,23 @@ class InvoiceController extends Controller
     //Marcar recordatorio de vencidas
     public function sendReminderOverdue($invoiceId)
     {
-        $invoice = Invoice::findOrFail($invoiceId);
+        $invoice = Invoice::withoutGlobalScope(EnterpriseScope::class)->findOrFail($invoiceId);
+
+        if (!in_array($invoice->enterprise_id, [1, 2])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invoice not allowed for this enterprise'
+            ], 403);
+        }
+
         $today = Carbon::today();
 
-        // Solo la fecha, sin hora
         $lastReminderDate = $invoice->overdue_reminder_sent_at
             ? Carbon::parse($invoice->overdue_reminder_sent_at)->toDateString()
             : null;
 
         $todayDate = $today->toDateString();
 
-        // Verifica si está dentro del rango permitido: después del vencimiento (start_date), antes del corte (due_date)
-        // Y además que no se haya enviado recordatorio hoy
         if (
             $invoice->start_date < $today &&
             $invoice->due_date >= $today &&
@@ -407,7 +421,7 @@ class InvoiceController extends Controller
         ) {
             $invoice->update([
                 'overdue_reminder_sent_at' => Carbon::now(),
-                'reminder_count' => $invoice->reminder_count + 1
+                'reminder_count' => ($invoice->reminder_count ?? 0) + 1
             ]);
 
             return response()->json([
