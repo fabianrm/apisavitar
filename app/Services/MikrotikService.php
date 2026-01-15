@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use RouterOS\Client;
 use RouterOS\Query;
-use Illuminate\Support\Facades\Log;
 
 class MikrotikService
 {
     protected $client;
+
     protected $connection;
 
     public function __construct(array $connectionConfig)
@@ -27,17 +28,17 @@ class MikrotikService
             $this->connection = $config;
 
             $this->client = new Client([
-                'host'    => $config['host'],
-                'user'    => $config['user'],
-                'pass'    => $config['pass'],
-                //'port'    => $config['port'] ?? 8728,
-                //'timeout' => $config['timeout'] ?? 10,
-                //'ssl'     => $config['ssl'] ?? false,
-                //'legacy'  => $config['legacy'] ?? false,
+                'host' => $config['host'],
+                'user' => $config['user'],
+                'pass' => $config['pass'],
+                // 'port'    => $config['port'] ?? 8728,
+                // 'timeout' => $config['timeout'] ?? 10,
+                // 'ssl'     => $config['ssl'] ?? false,
+                // 'legacy'  => $config['legacy'] ?? false,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al conectar con MikroTik: ' . $e->getMessage());
-            throw new \RuntimeException('Error de conexión con MikroTik: ' . $e->getMessage());
+            Log::error('Error al conectar con MikroTik: '.$e->getMessage());
+            throw new \RuntimeException('Error de conexión con MikroTik: '.$e->getMessage(), 0, $e);
         }
     }
 
@@ -50,14 +51,14 @@ class MikrotikService
 
         try {
             return $this->ejecutarComando('/ppp/secret/add', [
-                'name'     => $userData['username'],
+                'name' => $userData['username'],
                 'password' => $userData['password'],
-                'service'  => 'pppoe',
-                'profile'  => $userData['profile'],
-                'comment'  => $userData['comment'] ?? 'Cliente ID: ' . $userData['customer_id']
+                'service' => 'pppoe',
+                'profile' => $userData['profile'],
+                'comment' => $userData['comment'] ?? 'Cliente ID: '.$userData['customer_id'],
             ]);
         } catch (\Exception $e) {
-            Log::error('Error creando usuario PPPoE: ' . $e->getMessage());
+            Log::error('Error creando usuario PPPoE: '.$e->getMessage());
             throw $e;
         }
     }
@@ -68,11 +69,11 @@ class MikrotikService
     public function getUsuariosActivos(): array
     {
         $this->validateConnection();
+
         return $this->ejecutarComando('/ppp/active/print', [
-            '?disabled' => 'no' //No funciona :(
+            '?disabled' => 'no', // No funciona :(
         ]);
     }
-
 
     /**
      * Obtiene usuarios PPPoE configurados del MikroTik
@@ -81,7 +82,7 @@ class MikrotikService
     {
         $this->validateConnection();
         $secrets = $this->ejecutarComando('/ppp/secret/print', [
-            '?disabled' => 'no'
+            '?disabled' => 'no',
         ]);
 
         $nombresUsuarios = [];
@@ -90,10 +91,9 @@ class MikrotikService
                 $nombresUsuarios[] = $secret['name'];
             }
         }
+
         return $nombresUsuarios;
     }
-
-
 
     public function desactivarUsuario(string $username): array
     {
@@ -102,14 +102,13 @@ class MikrotikService
         try {
             return $this->ejecutarComando('/ppp/secret/set', [
                 '.id' => $username,
-                'disabled' => 'yes'
+                'disabled' => 'yes',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error desactivando usuario PPPoE: ' . $e->getMessage());
+            Log::error('Error desactivando usuario PPPoE: '.$e->getMessage());
             throw $e;
         }
     }
-
 
     /**
      * Desactiva un usuario PPPoE en el MikroTik
@@ -121,10 +120,10 @@ class MikrotikService
         try {
             return $this->ejecutarComando('/ppp/secret/set', [
                 '.id' => $username,
-                'disabled' => 'no'
+                'disabled' => 'no',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error activando usuario PPPoE: ' . $e->getMessage());
+            Log::error('Error activando usuario PPPoE: '.$e->getMessage());
             throw $e;
         }
     }
@@ -138,10 +137,10 @@ class MikrotikService
 
         try {
             return $this->ejecutarComando('/ppp/secret/remove', [
-                '.id' => $username
+                '.id' => $username,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error removiendo usuario PPPoE: ' . $e->getMessage());
+            Log::error('Error removiendo usuario PPPoE: '.$e->getMessage());
             throw $e;
         }
     }
@@ -156,18 +155,17 @@ class MikrotikService
         try {
             return $this->ejecutarComando('/ppp/secret/set', [
                 '.id' => $username,
-                'profile' => $profile
+                'profile' => $profile,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error activando usuario PPPoE: ' . $e->getMessage());
+            Log::error('Error activando usuario PPPoE: '.$e->getMessage());
             throw $e;
         }
     }
 
-
     protected function validateConnection(): void
     {
-        if (!$this->client) {
+        if (! $this->client) {
             throw new \RuntimeException('Conexión a MikroTik no inicializada');
         }
     }
@@ -175,18 +173,17 @@ class MikrotikService
     public function verificarConexion(): bool
     {
         try {
-            // Intenta ejecutar un comando simple
             $resp = $this->ejecutarComando('/system/identity/print');
             Log::info($resp);
 
             return true;
-        } catch (\Exception $e) {
-            Log::error('Error verificando conexión MikroTik: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            // Aquí se captura el "Unable to establish socket session, Operation timed out"
+            Log::error('Error verificando conexión MikroTik: '.$e->getMessage());
+
             return false;
         }
     }
-
-
 
     public function getDataMK()
     {
@@ -197,11 +194,11 @@ class MikrotikService
 
             return response()->json($resp);
         } catch (\Exception $e) {
-            Log::error('Error verificando conexión MikroTik: ' . $e->getMessage());
+            Log::error('Error verificando conexión MikroTik: '.$e->getMessage());
+
             return false;
         }
     }
-
 
     /**
      * Sincroniza el estado de los contratos con MikroTik
@@ -223,7 +220,7 @@ class MikrotikService
 
             return $this->client->query($query)->read();
         } catch (\Exception $e) {
-            Log::error("Error ejecutando comando $path: " . $e->getMessage());
+            Log::error("Error ejecutando comando $path: ".$e->getMessage());
             throw $e;
         }
     }

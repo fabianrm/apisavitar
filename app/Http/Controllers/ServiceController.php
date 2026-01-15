@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ModelNotFoundException;
-use App\Http\Resources\ServiceCollection;
-use App\Http\Resources\ServiceResource;
-use App\Models\Service;
-use App\Models\Box;
-use App\Models\Invoice;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
+use App\Http\Resources\ServiceCollection;
+use App\Http\Resources\ServiceResource;
+use App\Models\Box;
+use App\Models\Invoice;
 use App\Models\Plan;
 use App\Models\Router;
+use App\Models\Service;
 use App\Services\MikrotikService;
 use App\Services\UtilService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class ServiceController extends Controller
@@ -27,6 +27,7 @@ class ServiceController extends Controller
     public function index(Request $request)
     {
         $service = Service::with(['customers', 'routers', 'plans', 'cities'])->orderBy('created_at', 'desc')->get();
+
         return new ServiceCollection($service);
     }
 
@@ -51,7 +52,7 @@ class ServiceController extends Controller
             // Genera un código único para el cliente
             $uniqueCode = $contractService->generateUniqueCodeService('CT');
 
-            //Crea el servicio
+            // Crea el servicio
             $service = new Service($request->all());
             $service->service_code = $uniqueCode;
             $service->save();
@@ -60,35 +61,35 @@ class ServiceController extends Controller
             $box = Box::find($service->box_id);
             $box->calculateAvailablePorts();
 
-            //TODO: Validar si se debe guardar en mk
-            Log::info('¿Crea usuario en mk?: ' . ($request['mikrotik'] ? 'Sí' : 'No'));
+            // TODO: Validar si se debe guardar en mk
+            Log::info('¿Crea usuario en mk?: '.($request['mikrotik'] ? 'Sí' : 'No'));
 
             if ($request['mikrotik']) {
 
-                //Agregar cliente a MK
+                // Agregar cliente a MK
                 $router = Router::where('id', $service->router_id)->firstOrFail();
                 Log::info("Router => $router->ip");
 
-                //Conectamos con el MK
+                // Conectamos con el MK
                 $mkService = new MikrotikService([
                     'host' => $router->ip,
                     'user' => $router->usuario,
-                    'pass' => $router->password
+                    'pass' => $router->password,
                 ]);
 
                 // Verificar conexión antes de continuar
-                if (!$mkService->verificarConexion()) {
+                if (! $mkService->verificarConexion()) {
                     throw new \Exception('No se pudo establecer conexión con el router MikroTik');
                 }
 
-                //Creamos el usuario
+                // Creamos el usuario
                 $userMk = $mkService->crearUsuarioPPP(
                     [
                         'username' => $service->user_pppoe,
-                        'password' =>  $service->pass_pppoe,
+                        'password' => $service->pass_pppoe,
                         'service' => 'pppoe',
                         'profile' => $service->plans->name,
-                        'comment' => $service->customers->name . ' - ' . $service->service_code,
+                        'comment' => $service->customers->name.' - '.$service->service_code,
                     ]
                 );
             }
@@ -101,6 +102,7 @@ class ServiceController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
+
             return response()->json([
                 'message' => 'Error al crear el contrato.',
                 'error' => $e->getMessage(),
@@ -119,9 +121,10 @@ class ServiceController extends Controller
 
         $service = Service::find($service->id);
 
-        if (!$service) {
+        if (! $service) {
             throw new ModelNotFoundException('Service not found');
         }
+
         return new ServiceResource($service);
     }
 
@@ -139,7 +142,7 @@ class ServiceController extends Controller
     public function update(UpdateServiceRequest $request, Service $service)
     {
         $service->update($request->all());
-        //Log::info($request->all());
+        // Log::info($request->all());
     }
 
     /**
@@ -147,27 +150,26 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
-        //Buscamos que el contrato no tenga facturas
+        // Buscamos que el contrato no tenga facturas
         $hasInvoices = Invoice::where('service_id', $service->id)->exists();
 
         if ($hasInvoices) {
             return response()->json([
                 'status' => false,
-                'message' => 'No se puede eliminar el contrato. Tiene facturas asociadas.'
+                'message' => 'No se puede eliminar el contrato. Tiene facturas asociadas.',
             ], 400);
         }
 
-
-        //Eliminar el contrato
+        // Eliminar el contrato
         $service->deleteOrFail();
 
         return response()->json([
             'status' => true,
-            'message' => 'Contrato eliminado correctamente'
+            'message' => 'Contrato eliminado correctamente',
         ]);
     }
 
-    //Terminar Contrato
+    // Terminar Contrato
     public function terminate(string $id, Request $request)
     {
 
@@ -180,29 +182,29 @@ class ServiceController extends Controller
             $service->box_id = null;
             $service->port_number = null;
             $service->equipment_id = null;
-            $service->observation = 'Terminado por usuario con id #' . auth()->user()->id . ' el ' . $today;
+            $service->observation = 'Terminado por usuario con id #'.auth()->user()->id.' el '.$today;
             $service->end_date = $today;
 
             $service->save();
 
             if ($request['mikrotik']) {
-                //Quitar el usuario del MK
+                // Quitar el usuario del MK
                 $router = Router::where('id', $service->router_id)->firstOrFail();
                 Log::info("Router => $router->ip");
 
-                //Conectamos con el MK
+                // Conectamos con el MK
                 $mkService = new MikrotikService([
                     'host' => $router->ip,
                     'user' => $router->usuario,
-                    'pass' => $router->password
+                    'pass' => $router->password,
                 ]);
 
                 // Verificar conexión antes de continuar
-                if (!$mkService->verificarConexion()) {
+                if (! $mkService->verificarConexion()) {
                     throw new \Exception('No se pudo establecer conexión con el router MikroTik');
                 }
 
-                //Remover del MK el usuario terminado
+                // Remover del MK el usuario terminado
                 $mkService->removeUsuario($service->user_pppoe);
             }
 
@@ -213,15 +215,15 @@ class ServiceController extends Controller
                 200
             );
         } catch (\Exception $e) {
-            //DB::rollBack();
+            // DB::rollBack();
             Log::error($e->getMessage());
+
             return response()->json([
                 'message' => 'Error al terminar el contrato.',
                 'error' => $e->getMessage(),
             ], 500);
         }
     }
-
 
     /****
      * Cambiar de Plan
@@ -233,126 +235,115 @@ class ServiceController extends Controller
             'plan_id' => 'required|exists:plans,id',
         ]);
 
-        $equipo = $contract->equipment_id;
+        try {
+            $equipo = $contract->equipment_id;
 
-        // Finalizamos el contrato actual
-        $contract->update([
-            'status' => 'terminado',
-            'equipment_id' => NULL,
-            'end_date' => now(),
-        ]);
+            // 1) Finalizar contrato actual
+            $contract->update([
+                'status' => 'terminado',
+                'equipment_id' => null,
+                'end_date' => now(),
+            ]);
 
-        //Creamos un nuevo contrato con el nuevo plan
-        $contractService = app(UtilService::class);
+            // 2) Crear nuevo contrato
+            $contractService = app(UtilService::class);
+            $uniqueCode = $contractService->generateUniqueCodeService('CT');
 
-        // Genera un código único para el cliente
-        $uniqueCode = $contractService->generateUniqueCodeService('CT');
+            $newInstallationDate = Carbon::parse($contract->installation_date)
+                ->month(Carbon::now()->month)
+                ->toDateString();
 
-        // $service = new Service($request->all());
-        // $service->service_code = $uniqueCode;
+            $newContract = Service::create([
+                'service_code' => $uniqueCode,
+                'enterprise_id' => $contract->enterprise_id,
+                'customer_id' => $contract->customer_id,
+                'plan_id' => $request->plan_id,
+                'router_id' => $contract->router_id,
+                'box_id' => $contract->box_id,
+                'port_number' => $contract->port_number,
+                'equipment_id' => $equipo,
+                'city_id' => $contract->city_id,
+                'address_installation' => $contract->address_installation,
+                'reference' => $contract->reference,
+                'registration_date' => now(),
+                'installation_date' => $newInstallationDate,
+                'latitude' => $contract->latitude,
+                'longitude' => $contract->longitude,
+                'billing_date' => $contract->billing_date,
+                'due_date' => $contract->due_date,
+                'user_pppoe' => $contract->user_pppoe,
+                'pass_pppoe' => $contract->pass_pppoe,
+                'iptv' => $contract->iptv,
+                'user_iptv' => $contract->user_iptv,
+                'pass_iptv' => $contract->pass_iptv,
+                'observation' => $contract->observation,
+                'prepayment' => $contract->prepayment,
+                'status' => 'activo',
+            ]);
 
-        $newInstallationDate = Carbon::parse($contract->installation_date)
-            ->month(Carbon::now()->month)
-            ->toDateString();
+            // 3) Datos de plan y router
+            $plan = Plan::findOrFail($request->plan_id);
+            $router = Router::where('id', $newContract->router_id)->firstOrFail();
 
-        $newContract = Service::create([
-            'service_code' => $uniqueCode,
-            'enterprise_id' => $contract->enterprise_id,
-            'customer_id' => $contract->customer_id,
-            'plan_id' => $request->plan_id,
-            'router_id' => $contract->router_id,
-            'box_id' => $contract->box_id,
-            'port_number' => $contract->port_number,
-            'equipment_id' => $equipo,
-            'city_id' => $contract->city_id,
-            'address_installation' => $contract->address_installation,
-            'reference' => $contract->reference,
-            'registration_date' => now(),
-            'installation_date' => $newInstallationDate,
-            'latitude' => $contract->latitude,
-            'longitude' => $contract->longitude,
-            'billing_date' => $contract->billing_date,
-            'due_date' => $contract->due_date,
-            'user_pppoe' => $contract->user_pppoe,
-            'pass_pppoe' => $contract->pass_pppoe,
-            'iptv' => $contract->iptv,
-            'user_iptv' => $contract->user_iptv,
-            'pass_iptv' => $contract->pass_iptv,
-            'observation' => $contract->observation,
-            'prepayment' => $contract->prepayment,
-            'status' => 'activo',
-        ]);
+            Log::info("plan -> {$plan->name}");
+            Log::info("Router => {$router->ip}");
 
-        //Obtener el nombre del Plan
-        $plan = Plan::findOrFail($request->plan_id);
-        Log::info("plan -> $plan->name");
+            // 4) Intentar actualizar en Mikrotik, pero SIN romper el flujo
 
-        //Cambiar Plan en Mikrotik
-        //Agregar cliente a MK
-        $router = Router::where('id', $newContract->router_id)->firstOrFail();
-        Log::info("Router => $router->ip");
+            $mikrotikOk = false;
+            $mikrotikMsg = null;
 
-        //Conectamos con el MK
-        $mkService = new MikrotikService([
-            'host' => $router->ip,
-            'user' => $router->usuario,
-            'pass' => $router->password
-        ]);
+            try {
 
-        // Verificar conexión antes de continuar
-        if (!$mkService->verificarConexion()) {
-            throw new \Exception('No se pudo establecer conexión con el router MikroTik');
-        }
+                if ($request['mikrotik']) {
+                    // Quitar el usuario del MK
+                    $router = Router::where('id', $service->router_id)->firstOrFail();
+                    Log::info("Router => $router->ip");
 
-        //Remover del MK el usuario terminado
-        //$mkService->removeUsuario($contract->user_pppoe);
+                    // Conectamos con el MK
+                    $mkService = new MikrotikService([
+                        'host' => $router->ip,
+                        'user' => $router->usuario,
+                        'pass' => $router->password,
+                    ]);
 
-        //Activamos el usuario en MK
-        $mkService->cambiarPlan($newContract->user_pppoe, $plan->name);
+                    // Verificar conexión antes de continuar
+                    if (! $mkService->verificarConexion()) {
+                        throw new \Exception('No se pudo establecer conexión con el router MikroTik');
+                    }
 
-        return response()->json([
-            'old_contract' => $contract,
-            'new_contract' => $newContract,
-        ], 201);
-    }
-
-
-    /**
-     * Cambiar caja y puerto
-     */
-    public function updateBoxAndPort(Request $request, $id)
-    {
-        $validatedData = $request->validate([
-            'boxId' => 'required|exists:boxes,id',
-            'portNumber' => 'required|integer',
-        ]);
-
-        $contract = Service::findOrFail($id);
-        $oldBoxId = $contract->box_id;
-
-        // Actualizar el contrato con la nueva caja y puerto
-        $contract->box_id = $validatedData['boxId'];
-        $contract->port_number = $validatedData['portNumber'];
-        $contract->router_id = $request->routerId;
-        $contract->save();
-
-        // Actualizar los puertos disponibles en la caja antigua
-        if ($oldBoxId != $contract->box_id) {
-            $oldBox = Box::find($oldBoxId);
-            if ($oldBox) {
-                $oldBox->calculateAvailablePorts();
+                    // Remover del MK el usuario terminado
+                    $mkService->cambiarPlan($newContract->user_pppoe, $plan->name);
+                    $mikrotikOk = true;
+                }
+            } catch (\Throwable $e) {
+                // Aquí atrapamos cosas como "Unable to establish socket session, Operation timed out"
+                Log::error('Error Mikrotik updatePlan: '.$e->getMessage());
+                $mikrotikMsg = 'Error de conexión con MikroTik';
             }
-        }
 
-        // Actualizar los puertos disponibles en la nueva caja
-        $newBox = Box::find($contract->box_id);
-        if ($newBox) {
-            $newBox->calculateAvailablePorts();
-        }
+            return response()->json([
+                'success' => true,                      // contrato guardado OK
+                'message' => 'Plan actualizado correctamente',
+                'mikrotik_ok' => $mikrotikOk,              // true/false
+                'mikrotik_msg' => $mikrotikMsg,             // null o mensaje
+                'old_contract' => $contract,
+                'new_contract' => $newContract,
+            ], 200);
 
-        return response()->json($contract, 200);
+        } catch (\Throwable $e) {
+            Log::error('Error al actualizar plan: '.$e->getMessage(), [
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar plan: '.$e->getMessage(),
+            ], 500);
+        }
     }
-
 
     /**
      * Cambiar Vlan
@@ -366,14 +357,13 @@ class ServiceController extends Controller
         $contract = Service::findOrFail($id);
 
         // $contract->router_id = $request->routerId;
-        $contract->router_id = $validatedData['routerId'];;
+        $contract->router_id = $validatedData['routerId'];
         $contract->save();
 
         return response()->json($contract, 200);
     }
 
     /** Actualizar Promo */
-
     public function updatePromo(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -388,18 +378,18 @@ class ServiceController extends Controller
             // Verificar que el servicio esté activo
             if ($contract->status !== 'activo') {
                 return response()->json([
-                    'message' => 'No se puede aplicar una promoción a un servicio que no está activo'
+                    'message' => 'No se puede aplicar una promoción a un servicio que no está activo',
                 ], 400);
             }
 
             // Verificar que el servicio no tenga promo aplicada
             if ($contract->promotion_id !== null) {
                 return response()->json([
-                    'message' => 'El servicio ya tiene una promoción aplicada: ' . $contract->promotion->name
+                    'message' => 'El servicio ya tiene una promoción aplicada: '.$contract->promotion->name,
                 ], 400);
             }
 
-            $contract->promotion_id = $validatedData['promotionId'];;
+            $contract->promotion_id = $validatedData['promotionId'];
             $contract->save();
 
             DB::commit();
@@ -411,14 +401,13 @@ class ServiceController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
+
             return response()->json([
                 'message' => 'Error al aplicar la promoción.',
                 'error' => $e->getMessage(),
             ], 500);
         }
     }
-
-
 
     /**
      * Cambiar equipo y usuario
@@ -441,10 +430,9 @@ class ServiceController extends Controller
 
         return response()->json([
             'message' => 'Ok',
-            'contract' => $contract
+            'contract' => $contract,
         ], 200);
     }
-
 
     /**
      * Cambiar equipo y usuario
@@ -465,21 +453,19 @@ class ServiceController extends Controller
 
         return response()->json([
             'message' => 'Ok',
-            'contract' => $contract
+            'contract' => $contract,
         ], 200);
     }
-
 
     /**
      * Retrieve contracts by customer ID.
      *
-     * @param int $customer_id
-     * 
+     * @param  int  $customer_id
      */
     public function getServicesByCustomer($customer_id)
     {
         // Validar el ID del cliente
-        if (!is_numeric($customer_id)) {
+        if (! is_numeric($customer_id)) {
             return response()->json(['error' => 'Invalid customer ID'], 400);
         }
 
@@ -491,11 +477,9 @@ class ServiceController extends Controller
         // return response()->json($contracts, 200);
     }
 
-
     /**
      * Check if a equipment exists in Services.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function checkServicesByEquipment(Request $request)
@@ -508,7 +492,7 @@ class ServiceController extends Controller
 
         return response()->json(
             [
-                'exists' => $exists
+                'exists' => $exists,
             ]
         );
     }

@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Filters\RouterFilter;
+use App\Http\Requests\StoreRouterRequest;
+use App\Http\Requests\UpdateRouterRequest;
 use App\Http\Resources\RouterCollection;
 use App\Http\Resources\RouterResource;
 use App\Models\Router;
-use App\Http\Requests\StoreRouterRequest;
-use App\Http\Requests\UpdateRouterRequest;
+use App\Models\Service;
 use App\Services\MikrotikService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Models\Service;
 
 class RouterController extends Controller
 {
@@ -20,12 +20,13 @@ class RouterController extends Controller
      */
     public function index(Request $request)
     {
-        $filter = new RouterFilter();
+        $filter = new RouterFilter;
         $queryItems = $filter->transform($request);
 
         $routers = Router::where($queryItems);
 
         $routers = Router::all();
+
         return new RouterCollection($routers);
     }
 
@@ -77,39 +78,54 @@ class RouterController extends Controller
         //
     }
 
-
+    /**
+     * Test de Conexion al Mikrotik
+     */
     /**
      * Test de Conexion al Mikrotik
      */
     public function test(Router $router)
     {
-        Log::info("Testing router: $router->ip");
+        Log::info("Testing router: {$router->ip}");
 
-        $mkService = new MikrotikService([
-            'host' => $router->ip,
-            'user' => $router->usuario,
-            'pass' => $router->password
-        ]);
+        try {
+            $mkService = new MikrotikService([
+                'host' => $router->ip,
+                'user' => $router->usuario,
+                'pass' => $router->password,
+                // 'port' => 8728,
+                // 'timeout' => 5,
+            ]);
 
-        if (!$mkService->verificarConexion()) {
+            // Si lanzar aquí una excepción, la captura el catch de abajo
+            if (! $mkService->verificarConexion()) {
+                return response()->json([
+                    'conectado' => false,
+                    'mensaje' => 'No se pudo establecer conexión con el router MikroTik',
+                ], 200);
+            }
+
             return response()->json([
-                'error' => 'No se pudo establecer conexión con el router MikroTik'
-            ], 500);
-        }
+                'ip' => $router->ip,
+                'usuario' => $router->usuario,
+                'conectado' => true,
+                'mensaje' => 'Conexión exitosa',
+                'system_info' => $mkService->getDataMK(),
+            ], 200);
 
-        return response()->json([
-            'ip' => $router->ip,
-            'usuario' => $router->usuario,
-            'conectado' => true,
-            'mensaje' => 'Conexión exitosa',
-            'system_info' => $mkService->getDataMK()
-        ]);
+        } catch (\Throwable $e) {
+            Log::error('Error en test de Mikrotik: '.$e->getMessage());
+
+            return response()->json([
+                'conectado' => false,
+                'mensaje' => 'Error de conexión con MikroTik: '.$e->getMessage(),
+            ], 200); // o 500 si quieres tratarlo como error duro
+        }
     }
 
     /**
      * Sincroniza contratos con el router MikroTik
      */
-
     public function sincronizarContratos(Router $router)
     {
         try {
@@ -119,10 +135,10 @@ class RouterController extends Controller
             $mkService = new MikrotikService([
                 'host' => $router->ip,
                 'user' => $router->usuario,
-                'pass' => $router->password
+                'pass' => $router->password,
             ]);
 
-            if (!$mkService->verificarConexion()) {
+            if (! $mkService->verificarConexion()) {
                 throw new \Exception('No se pudo establecer conexión con el router MikroTik');
             }
 
@@ -143,7 +159,7 @@ class RouterController extends Controller
 
             // Obtener usuarios configurados en MikroTik
             $usuariosConfiguradosMK = collect($mkService->getUsuariosConfigurados());
-            Log::info("Usuarios configurados en MK: " . $usuariosConfiguradosMK->implode(', '));
+            Log::info('Usuarios configurados en MK: '.$usuariosConfiguradosMK->implode(', '));
 
             $procesados = 0;
 
@@ -166,7 +182,8 @@ class RouterController extends Controller
                     }
                     $procesados++;
                 } catch (\Exception $e) {
-                    Log::error("Error procesando usuario {$user_pppoe}: " . $e->getMessage());
+                    Log::error("Error procesando usuario {$user_pppoe}: ".$e->getMessage());
+
                     continue;
                 }
             }
@@ -175,20 +192,21 @@ class RouterController extends Controller
 
             // 4. Identificar discrepancias: Usuarios que están en MikroTik pero no deberían estar activos.
             $discrepancias = $usuariosConfiguradosMK->diff($usuariosConContratoActivo);
-            Log::info("Discrepancias encontradas => " . $discrepancias->implode(', '));
+            Log::info('Discrepancias encontradas => '.$discrepancias->implode(', '));
 
             return response()->json([
                 'success' => true,
-                'message' => "Sincronización completada",
+                'message' => 'Sincronización completada',
                 'procesados' => $procesados,
                 'total_usuarios_a_procesar' => $contratosAgrupados->count(),
-                'usuarios_discrepantes' => $discrepancias->values()
+                'usuarios_discrepantes' => $discrepancias->values(),
             ]);
         } catch (\Exception $e) {
-            Log::error("Error en sincronización: " . $e->getMessage());
+            Log::error('Error en sincronización: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
