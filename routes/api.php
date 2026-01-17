@@ -175,6 +175,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::get('equipments/available', [EquipmentController::class, 'available']);
         Route::apiResource('equipments', EquipmentController::class);
         Route::apiResource('boxs', BoxController::class);
+        Route::apiResource('box-routes', BoxRouteController::class);
         Route::apiResource('plans', PlanController::class);
         Route::apiResource('routers', RouterController::class);
         Route::apiResource('cities', CityController::class);
