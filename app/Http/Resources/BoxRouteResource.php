@@ -26,6 +26,7 @@ class BoxRouteResource extends JsonResource
             'updated_at' => $this->updated_at,
             'start_box' => new BoxResource($this->whenLoaded('startBox')),
             'end_box' => new BoxResource($this->whenLoaded('endBox')),
+            'city_id' => $this->start_box_id ? $this->startBox->city_id : null,
         ];
     }
 }
