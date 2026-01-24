@@ -21,6 +21,7 @@ class BoxRouteResource extends JsonResource
             'color' => $this->color,
             'points' => $this->points,
             'distance' => $this->distance,
+            'notes' => $this->notes,
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

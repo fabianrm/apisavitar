@@ -27,6 +27,7 @@ class StoreBoxRouteRequest extends FormRequest
             'color' => 'nullable|string|max:7',
             'points' => 'nullable|array',
             'distance' => 'nullable|numeric',
+            'notes' => 'nullable|string',
             'status' => 'nullable|string|in:active,inactive',
         ];
     }
