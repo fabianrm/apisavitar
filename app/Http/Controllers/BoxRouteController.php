@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BoxRoute;
 use App\Http\Requests\StoreBoxRouteRequest;
 use App\Http\Requests\UpdateBoxRouteRequest;
 use App\Http\Resources\BoxRouteResource;
-use Illuminate\Http\Request;
+use App\Models\BoxRoute;
 
 class BoxRouteController extends Controller
 {
@@ -15,7 +14,8 @@ class BoxRouteController extends Controller
      */
     public function index()
     {
-        $boxRoutes = BoxRoute::with(['startBox', 'endBox'])->paginate(20);
+        $boxRoutes = BoxRoute::with(['startBox', 'endBox'])->get();
+
         return BoxRouteResource::collection($boxRoutes);
     }
 
@@ -25,6 +25,7 @@ class BoxRouteController extends Controller
     public function store(StoreBoxRouteRequest $request)
     {
         $boxRoute = BoxRoute::create($request->validated());
+
         return new BoxRouteResource($boxRoute->load(['startBox', 'endBox']));
     }
 
@@ -42,6 +43,7 @@ class BoxRouteController extends Controller
     public function update(UpdateBoxRouteRequest $request, BoxRoute $boxRoute)
     {
         $boxRoute->update($request->validated());
+
         return new BoxRouteResource($boxRoute->load(['startBox', 'endBox']));
     }
 
@@ -51,6 +53,7 @@ class BoxRouteController extends Controller
     public function destroy(BoxRoute $boxRoute)
     {
         $boxRoute->delete();
+
         return response()->noContent();
     }
 }

@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\Log;
 class Box extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'id',
         'enterprise_id',
         'name',
         'city_id',
         'address',
+        'type',
         'reference',
         'latitude',
         'longitude',
@@ -36,7 +38,6 @@ class Box extends Model
         return $this->hasMany(Service::class);
     }
 
-
     /**
      * Relación con enterprise
      */
@@ -52,7 +53,7 @@ class Box extends Model
      */
     public function cities()
     {
-        return $this->belongsTo(City::class, "city_id");
+        return $this->belongsTo(City::class, 'city_id');
     }
 
     public function calculateAvailablePorts()
@@ -62,7 +63,7 @@ class Box extends Model
         $this->save();
     }
 
-    //Retorna los puertos disponibles
+    // Retorna los puertos disponibles
     public function availablePorts()
     {
         // Genera todos los puertos posibles (del 1 hasta total_ports)
@@ -70,21 +71,21 @@ class Box extends Model
         // Obtiene los puertos ocupados en esta caja
         $puertosOcupados = $this->services()->pluck('port_number')->toArray();
 
-        Log::info("Todos los puertos: " . implode(", ", $todosLosPuertos));
-        Log::info("Puertos ocupados: " . implode(", ", $puertosOcupados));
-        Log::info("Puertos disponibles: " . implode(", ", array_diff($todosLosPuertos, $puertosOcupados)));
+        Log::info('Todos los puertos: '.implode(', ', $todosLosPuertos));
+        Log::info('Puertos ocupados: '.implode(', ', $puertosOcupados));
+        Log::info('Puertos disponibles: '.implode(', ', array_diff($todosLosPuertos, $puertosOcupados)));
 
         // Elimina los que ya están ocupados
         $puertosDisponibles = array_diff($todosLosPuertos, $puertosOcupados);
+
         // Devuelve los disponibles en el mismo formato que el procedimiento almacenado
         return collect($puertosDisponibles)->map(function ($port) {
             return [
                 'id' => $this->id,
-                'port_number' => $port
+                'port_number' => $port,
             ];
         })->values(); // reindexa
     }
-
 
     /**
      * Get contract code and status for all services in the box.
@@ -105,7 +106,6 @@ class Box extends Model
         });
     }
 
-
     /**
      * Setear id de empresa
      */
@@ -119,7 +119,6 @@ class Box extends Model
             }
         });
     }
-
 
     /**
      * Scopes para filtro por tienda de usuario

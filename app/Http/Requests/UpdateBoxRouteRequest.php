@@ -27,6 +27,7 @@ class UpdateBoxRouteRequest extends FormRequest
             'color' => 'nullable|string|max:7',
             'points' => 'nullable|array',
             'distance' => 'nullable|numeric',
+            'type' => 'nullable|string|in:derivada,principal',
             'notes' => 'nullable|string',
             'status' => 'nullable|string|in:active,inactive',
         ];

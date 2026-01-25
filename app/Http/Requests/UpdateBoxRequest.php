@@ -22,11 +22,12 @@ class UpdateBoxRequest extends FormRequest
     public function rules(): array
     {
         $method = $this->method();
-        if ($method === "PUT") {
+        if ($method === 'PUT') {
             return [
                 'name' => ['required'],
                 'city_id' => ['required'],
                 'address' => ['required'],
+                'type' => ['required'],
                 'reference' => [''],
                 'latitude' => [''],
                 'longitude' => [''],
@@ -40,6 +41,7 @@ class UpdateBoxRequest extends FormRequest
                 'name' => ['sometimes', 'required'],
                 'city_id' => ['sometimes', 'required'],
                 'address' => ['sometimes', 'required'],
+                'type' => ['sometimes', 'required'],
                 'reference' => ['sometimes', 'required'],
                 'latitude' => ['sometimes', 'required'],
                 'longitude' => ['sometimes', 'required'],
@@ -55,7 +57,7 @@ class UpdateBoxRequest extends FormRequest
         if ($this->totalPorts || $this->availablePorts) {
             $this->merge([
                 'total_ports' => $this->totalPorts,
-                'available_ports' => $this->availablePorts
+                'available_ports' => $this->availablePorts,
             ]);
         }
     }

@@ -15,6 +15,7 @@ class BoxRoute extends Model
         'color',
         'points',
         'distance',
+        'type',
         'notes',
         'status',
     ];
