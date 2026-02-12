@@ -34,4 +34,9 @@ class BoxRoute extends Model
     {
         return $this->belongsTo(Box::class, 'end_box_id');
     }
+
+    public function photos()
+    {
+        return $this->hasMany(BoxRoutePhoto::class);
+    }
 }

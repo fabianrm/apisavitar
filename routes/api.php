@@ -176,6 +176,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('equipments', EquipmentController::class);
         Route::apiResource('boxs', BoxController::class);
         Route::apiResource('box-routes', BoxRouteController::class);
+        Route::get('box-routes/{boxRoute}/photos', [BoxRoutePhotoController::class, 'index']);
+        Route::post('box-routes/{boxRoute}/photos', [BoxRoutePhotoController::class, 'store']);
+        Route::delete('box-route-photos/{boxRoutePhoto}', [BoxRoutePhotoController::class, 'destroy']);
         Route::apiResource('plans', PlanController::class);
         Route::apiResource('routers', RouterController::class);
         Route::apiResource('cities', CityController::class);
