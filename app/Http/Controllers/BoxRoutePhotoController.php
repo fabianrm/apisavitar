@@ -52,4 +52,23 @@ class BoxRoutePhotoController extends Controller
 
         return response()->noContent();
     }
+
+    // En tu BoxRoutePhotoController.php
+
+    public function show($id)
+    {
+        $photo = BoxRoutePhoto::findOrFail($id);
+        $path = storage_path('app/public/'.$photo->path);
+
+        if (! file_exists($path)) {
+            abort(404);
+        }
+
+        $file = file_get_contents($path);
+        $type = mime_content_type($path);
+
+        return response($file, 200)
+            ->header('Content-Type', $type)
+            ->header('Cache-Control', 'public, max-age=31536000');
+    }
 }

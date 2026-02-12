@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\CustomerController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +28,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::get('check-time', function () {
         return [
             'php_time' => now()->format('Y-m-d H:i:s'),
-            'server_time' => DB::select('SELECT NOW() as time')[0]->time
+            'server_time' => DB::select('SELECT NOW() as time')[0]->time,
         ];
     });
 
@@ -76,7 +75,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('services', ServiceController::class);
         Route::get('ports/{box_id}', [BoxController::class, 'getPorts']);
 
-        //Mikrotik
+        // Mikrotik
         Route::post('mk/create', [MikrotikController::class, 'crearUsuario']);
         Route::post('mk/cut-service', [MikrotikController::class, 'cortarUsuario']);
         Route::get('mk/profiles', [MikrotikController::class, 'listarPerfiles']);
@@ -147,7 +146,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         });
         Route::apiResource('suspensions', SuspensionController::class);
 
-        //Módulo Promociones
+        // Módulo Promociones
         Route::prefix('promotions')->group(function () {});
         Route::apiResource('promotions', PromotionController::class);
 
@@ -162,13 +161,13 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::delete('{roleId}/permissions/{permissionId}', [PermissionRoleController::class, 'removePermissionFromRole']);
         });
 
-        //Equipos
+        // Equipos
 
         // Recursos generales
         Route::get('routers/{router}/test', [RouterController::class, 'test']);
         Route::post('routers/{router}/sync-contacts', [RouterController::class, 'sincronizarContratos']);
 
-        //Boxes
+        // Boxes
         Route::get('boxs/{id}/services', [BoxController::class, 'getServices']);
 
         Route::apiResource('brands', BrandController::class);
@@ -178,6 +177,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('box-routes', BoxRouteController::class);
         Route::get('box-routes/{boxRoute}/photos', [BoxRoutePhotoController::class, 'index']);
         Route::post('box-routes/{boxRoute}/photos', [BoxRoutePhotoController::class, 'store']);
+        Route::get('box-route-photos/{id}/view', [BoxRoutePhotoController::class, 'show']);
+
         Route::delete('box-route-photos/{boxRoutePhoto}', [BoxRoutePhotoController::class, 'destroy']);
         Route::apiResource('plans', PlanController::class);
         Route::apiResource('routers', RouterController::class);
