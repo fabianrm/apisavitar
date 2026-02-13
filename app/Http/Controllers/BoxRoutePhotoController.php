@@ -48,11 +48,24 @@ class BoxRoutePhotoController extends Controller
      */
     public function show($id)
     {
+        Log::info('BoxRoutePhoto show() called', ['photo_id' => $id]);
+
         try {
             $photo = BoxRoutePhoto::findOrFail($id);
 
+            Log::info('Photo found in database', [
+                'photo_id' => $id,
+                'path' => $photo->path,
+                'box_route_id' => $photo->box_route_id,
+            ]);
+
             // Construir la ruta completa del archivo
             $fullPath = storage_path('app/public/'.$photo->path);
+
+            Log::info('Full path constructed', [
+                'full_path' => $fullPath,
+                'file_exists' => file_exists($fullPath),
+            ]);
 
             // Verificar si el archivo existe
             if (! file_exists($fullPath)) {
@@ -61,7 +74,7 @@ class BoxRoutePhotoController extends Controller
                     'stored_path' => $photo->path,
                     'full_path' => $fullPath,
                 ]);
-                
+
                 return response()->json([
                     'error' => 'File not found',
                     'path' => $photo->path,
@@ -70,14 +83,25 @@ class BoxRoutePhotoController extends Controller
 
             // Detectar el MIME type del archivo
             $mimeType = mime_content_type($fullPath);
-            
+            $fileSize = filesize($fullPath);
+
+            Log::info('File details', [
+                'mime_type' => $mimeType,
+                'file_size' => $fileSize,
+                'file_extension' => pathinfo($fullPath, PATHINFO_EXTENSION),
+            ]);
+
             // Leer el contenido del archivo
             $fileContent = file_get_contents($fullPath);
+
+            Log::info('File content loaded', [
+                'content_length' => strlen($fileContent),
+            ]);
 
             // Devolver la imagen con los headers correctos
             return response($fileContent, 200)
                 ->header('Content-Type', $mimeType)
-                ->header('Content-Length', filesize($fullPath))
+                ->header('Content-Length', $fileSize)
                 ->header('Cache-Control', 'public, max-age=31536000')
                 ->header('Access-Control-Allow-Origin', '*')
                 ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
@@ -86,6 +110,7 @@ class BoxRoutePhotoController extends Controller
         } catch (\Exception $e) {
             Log::error('Error serving photo: '.$e->getMessage(), [
                 'photo_id' => $id,
+                'exception_class' => get_class($e),
                 'trace' => $e->getTraceAsString(),
             ]);
 
