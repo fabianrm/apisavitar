@@ -23,6 +23,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::apiResource('enterprises', EnterpriseController::class);
+    Route::get('box-route-photos/{id}/view', [BoxRoutePhotoController::class, 'show']);
 
     // Check server time
     Route::get('check-time', function () {
@@ -175,11 +176,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::apiResource('equipments', EquipmentController::class);
         Route::apiResource('boxs', BoxController::class);
         Route::apiResource('box-routes', BoxRouteController::class);
-        Route::get('box-routes/{boxRoute}/photos', [BoxRoutePhotoController::class, 'index']);
         Route::post('box-routes/{boxRoute}/photos', [BoxRoutePhotoController::class, 'store']);
-        Route::get('box-route-photos/{id}/view', [BoxRoutePhotoController::class, 'show']);
-
-        Route::delete('box-route-photos/{boxRoutePhoto}', [BoxRoutePhotoController::class, 'destroy']);
+        Route::get('box-routes/{boxRoute}/photos', [BoxRoutePhotoController::class, 'index']);
+        Route::delete('box-route-photos/{id}', [BoxRoutePhotoController::class, 'destroy']);
         Route::apiResource('plans', PlanController::class);
         Route::apiResource('routers', RouterController::class);
         Route::apiResource('cities', CityController::class);
