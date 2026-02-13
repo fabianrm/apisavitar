@@ -7,18 +7,9 @@ use App\Models\BoxRoutePhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\ImageManager;
 
 class BoxRoutePhotoController extends Controller
 {
-    protected $imageManager;
-
-    public function __construct()
-    {
-        $this->imageManager = new ImageManager(new Driver);
-    }
-
     /**
      * Store a newly created photo
      */
@@ -32,36 +23,9 @@ class BoxRoutePhotoController extends Controller
             if ($request->hasFile('photo')) {
                 $file = $request->file('photo');
                 $fileName = time().'_'.$file->getClientOriginalName();
-                $fileType = $file->getClientOriginalExtension();
 
-                // Verificar si es una imagen
-                if (in_array(strtolower($fileType), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                    // Comprimir imagen
-                    $image = $this->imageManager->read($file->getRealPath());
-
-                    // Redimensionar si la imagen es muy grande
-                    if ($image->width() > 1920) {
-                        $image->scale(width: 1920);
-                    }
-
-                    $filePath = 'box-routes/'.$boxRoute->id.'/'.$fileName;
-
-                    // Codificar y guardar la imagen con calidad específica
-                    if ($fileType === 'png') {
-                        $encodedImage = $image->toPng()->toFilePointer();
-                    } else {
-                        $encodedImage = $image->toJpeg(75)->toFilePointer();
-                    }
-
-                    // Guardar el archivo
-                    Storage::disk('public')->put($filePath, $encodedImage);
-
-                    // Liberar recursos
-                    fclose($encodedImage);
-                } else {
-                    // Si no es una imagen, guardar el archivo normal
-                    $filePath = $file->storeAs('box-routes/'.$boxRoute->id, $fileName, 'public');
-                }
+                // Guardar el archivo directamente
+                $filePath = $file->storeAs('box-routes/'.$boxRoute->id, $fileName, 'public');
 
                 $photo = $boxRoute->photos()->create([
                     'path' => $filePath,
