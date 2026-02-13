@@ -56,20 +56,38 @@ class BoxRoutePhotoController extends Controller
 
             // Verificar si el archivo existe
             if (! file_exists($fullPath)) {
+                Log::error('Photo file not found', [
+                    'photo_id' => $id,
+                    'stored_path' => $photo->path,
+                    'full_path' => $fullPath,
+                ]);
+                
                 return response()->json([
                     'error' => 'File not found',
                     'path' => $photo->path,
                 ], 404);
             }
 
-            // Devolver el archivo con el MIME type correcto
-            return response()->file($fullPath, [
-                'Cache-Control' => 'public, max-age=31536000',
-                'Access-Control-Allow-Origin' => '*',
-            ]);
+            // Detectar el MIME type del archivo
+            $mimeType = mime_content_type($fullPath);
+            
+            // Leer el contenido del archivo
+            $fileContent = file_get_contents($fullPath);
+
+            // Devolver la imagen con los headers correctos
+            return response($fileContent, 200)
+                ->header('Content-Type', $mimeType)
+                ->header('Content-Length', filesize($fullPath))
+                ->header('Cache-Control', 'public, max-age=31536000')
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
         } catch (\Exception $e) {
-            Log::error('Error serving photo: '.$e->getMessage());
+            Log::error('Error serving photo: '.$e->getMessage(), [
+                'photo_id' => $id,
+                'trace' => $e->getTraceAsString(),
+            ]);
 
             return response()->json(['error' => $e->getMessage()], 500);
         }
