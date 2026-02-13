@@ -51,24 +51,22 @@ class BoxRoutePhotoController extends Controller
         try {
             $photo = BoxRoutePhoto::findOrFail($id);
 
-            // Usar Storage para obtener el archivo
-            if (! Storage::disk('public')->exists($photo->path)) {
+            // Construir la ruta completa del archivo
+            $fullPath = storage_path('app/public/'.$photo->path);
+
+            // Verificar si el archivo existe
+            if (! file_exists($fullPath)) {
                 return response()->json([
                     'error' => 'File not found',
                     'path' => $photo->path,
                 ], 404);
             }
 
-            // Obtener el contenido del archivo
-            $file = Storage::disk('public')->get($photo->path);
-
-            // Obtener el tipo MIME
-            $mimeType = Storage::disk('public')->mimeType($photo->path);
-
-            return response($file, 200)
-                ->header('Content-Type', $mimeType)
-                ->header('Cache-Control', 'public, max-age=31536000')
-                ->header('Access-Control-Allow-Origin', '*');
+            // Devolver el archivo con el MIME type correcto
+            return response()->file($fullPath, [
+                'Cache-Control' => 'public, max-age=31536000',
+                'Access-Control-Allow-Origin' => '*',
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Error serving photo: '.$e->getMessage());
