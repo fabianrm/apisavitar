@@ -24,6 +24,11 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::post('register', [AuthController::class, 'register']);
     Route::apiResource('enterprises', EnterpriseController::class);
     Route::get('box-route-photos/{id}/view', [BoxRoutePhotoController::class, 'show']);
+    
+    // Ruta de prueba para diagnóstico
+    Route::get('test-photo-route', function() {
+        return response()->json(['message' => 'Route is working', 'timestamp' => now()]);
+    });
 
     // Check server time
     Route::get('check-time', function () {
