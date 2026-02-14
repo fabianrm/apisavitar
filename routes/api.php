@@ -24,7 +24,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::post('register', [AuthController::class, 'register']);
     Route::apiResource('enterprises', EnterpriseController::class);
     Route::get('box-route-photos/{id}/view', [BoxRoutePhotoController::class, 'show']);
-    Route::get('tickets/{id}/view', [TicketAttachmentController::class, 'show']);
+    Route::get('tickets/attachments/{id}/view', [TicketAttachmentController::class, 'show']);
 
     // Ruta de prueba para diagnóstico
     Route::get('test-photo-route', function () {
