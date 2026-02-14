@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ticket;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Http\Resources\TicketCollection;
 use App\Http\Resources\TicketResource;
+use App\Models\Ticket;
 use App\Models\TicketAttachment;
 use App\Models\TicketHistory;
 use App\Services\UtilService;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
 
 class TicketController extends Controller
 {
@@ -66,7 +65,6 @@ class TicketController extends Controller
         // Genera un código único para el cliente
         $uniqueCode = $clientService->generateUniqueCodeTicket('TK');
 
-
         $ticket = Ticket::create([
             'code' => $uniqueCode,
             'category_ticket_id' => $request->category_ticket_id,
@@ -96,6 +94,7 @@ class TicketController extends Controller
     public function show($id)
     {
         $ticket = Ticket::with(['categoryTicket', 'customer', 'admin', 'technician', 'history', 'history.user', 'project', 'attachments'])->findOrFail($id);
+
         return new TicketResource($ticket);
     }
 
@@ -145,7 +144,7 @@ class TicketController extends Controller
 
         // Si el estado es 'Solucionado', se guarda la fecha de resolución
         if ($request->status === 'solucionado') {
-            $note =  $request->comment;
+            $note = $request->comment;
             $ticket->resolved_at = now();
         }
 
@@ -172,10 +171,9 @@ class TicketController extends Controller
 
         return response()->json([
             'message' => 'El estado del ticket ha sido actualizado',
-            'ticket' => $ticket
+            'ticket' => $ticket,
         ], 200);
     }
-
 
     // Adjuntar documentos/imágenes al ticket
     public function addAttachment(Request $request, $ticketId)
@@ -186,14 +184,14 @@ class TicketController extends Controller
 
         $request->validate([
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf,docx|max:2048',
-            'filename' => 'required|string'
+            'filename' => 'required|string',
         ]);
 
         try {
 
             // Obtener el archivo y el nombre desde el request
             $file = $request->file('file');
-            $filename = date('His') . '-' . $request->input('filename');
+            $filename = date('His').'-'.$request->input('filename');
 
             // Buscar el ticket
             $ticket = Ticket::findOrFail($ticketId);
@@ -202,7 +200,7 @@ class TicketController extends Controller
             $filePath = $file->storeAs('attachments', $filename, 'public');
 
             // Verificar si la ruta del archivo fue generada correctamente
-            if (!$filePath) {
+            if (! $filePath) {
                 return response()->json(['error' => 'Error al almacenar el archivo'], 500);
             }
 
@@ -215,10 +213,10 @@ class TicketController extends Controller
             return response()->json(['message' => 'Archivo adjuntado con éxito'], 200);
         } catch (\Exception $e) {
             Log::info($e->getMessage());
+
             return response()->json(['error' => 'Error al adjuntar el archivo'], 500);
         }
     }
-
 
     // Ver el historial del ticket
     public function history(Ticket $ticket)
@@ -226,8 +224,7 @@ class TicketController extends Controller
         return response()->json($ticket->history);
     }
 
-
-    //Asignar Ticket
+    // Asignar Ticket
     public function assignTechnician(Request $request, $ticketId)
     {
         // Validar los datos de entrada
@@ -242,7 +239,7 @@ class TicketController extends Controller
         // Verificar si ya fue asignado a este mismo técnico
         if ($ticket->technician_id == $request->technician_id) {
             return response()->json([
-                'message' => 'Este técnico ya ha sido asignado a este ticket.'
+                'message' => 'Este técnico ya ha sido asignado a este ticket.',
             ], 400);
         }
 
@@ -250,7 +247,7 @@ class TicketController extends Controller
         $previousTechnician = $ticket->technician_id;
 
         // Si el ticket no tiene un técnico asignado, lo colocamos en 'Pending'
-        if (!$ticket->technician_id) {
+        if (! $ticket->technician_id) {
             $ticket->status = 'pendiente'; // Asignación inicial al estado 'Pending'
         }
 
@@ -267,7 +264,7 @@ class TicketController extends Controller
             'status' => $ticket->status, // El estado permanece igual (Pending)
             'changed_by' => $request->admin_id, // ID del administrador que hizo la asignación
             'comment' => $previousTechnician
-                ? 'Reasignado desde técnico ID ' . $previousTechnician
+                ? 'Reasignado desde técnico ID '.$previousTechnician
                 : 'Asignado a técnico', // Comentario sobre la asignación/reasignación
         ]);
 
@@ -275,12 +272,11 @@ class TicketController extends Controller
             'message' => $previousTechnician
                 ? 'Ticket reasiagnado al nuevo técnico correctamente'
                 : 'Ticket asignado al técnico correctamente',
-            'ticket' => $ticket
+            'ticket' => $ticket,
         ], 200);
     }
 
-
-    //Obtener adjuntos
+    // Obtener adjuntos
     public function getAttachments(Ticket $ticket)
     {
         // Obtener los archivos adjuntos relacionados con el ticket
@@ -289,7 +285,7 @@ class TicketController extends Controller
 
         // Retornar la lista de archivos adjuntos como un JSON
         return response()->json([
-            'data' => $attachments
+            'data' => $attachments,
         ]);
     }
 }

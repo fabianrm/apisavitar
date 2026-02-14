@@ -24,9 +24,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
     Route::post('register', [AuthController::class, 'register']);
     Route::apiResource('enterprises', EnterpriseController::class);
     Route::get('box-route-photos/{id}/view', [BoxRoutePhotoController::class, 'show']);
-    
+
     // Ruta de prueba para diagnóstico
-    Route::get('test-photo-route', function() {
+    Route::get('test-photo-route', function () {
         return response()->json(['message' => 'Route is working', 'timestamp' => now()]);
     });
 
@@ -140,6 +140,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::patch('{ticketId}/assign-technician', [TicketController::class, 'assignTechnician']);
             Route::patch('{ticketId}/update-status', [TicketController::class, 'updateStatus']);
             Route::post('{ticketId}/attachments', [TicketController::class, 'addAttachment']);
+            Route::get('{id}/attachments', [TicketAttachmentController::class, 'show']);
             Route::get('{ticketID}/attachments', [TicketController::class, 'getAttachments']);
         });
         Route::apiResource('support/update-status', TicketController::class);
