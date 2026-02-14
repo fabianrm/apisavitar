@@ -2,48 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreTicketAttachmentRequest;
-use App\Http\Requests\UpdateTicketAttachmentRequest;
 use App\Models\TicketAttachment;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TicketAttachmentController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreTicketAttachmentRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
+     * Serve ticket attachment file with proper Content-Type headers
      */
     public function show($id)
     {
         try {
             $attachment = TicketAttachment::findOrFail($id);
 
+            // Check if file exists in storage
             if (! Storage::disk('public')->exists($attachment->file_path)) {
-                return response()->json(['error' => 'File not found'], 404);
+                return response()->json([
+                    'error' => 'File not found',
+                    'path' => $attachment->file_path,
+                ], 404);
             }
 
+            // Get file content and mime type
             $file = Storage::disk('public')->get($attachment->file_path);
             $mimeType = Storage::disk('public')->mimeType($attachment->file_path);
 
@@ -54,33 +35,9 @@ class TicketAttachmentController extends Controller
                 ->header('Access-Control-Allow-Origin', '*');
 
         } catch (\Exception $e) {
-            \Log::error('Error serving attachment: '.$e->getMessage());
+            Log::error('Error serving ticket attachment: '.$e->getMessage());
 
             return response()->json(['error' => $e->getMessage()], 500);
         }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(TicketAttachment $ticketAttachment)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateTicketAttachmentRequest $request, TicketAttachment $ticketAttachment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(TicketAttachment $ticketAttachment)
-    {
-        //
     }
 }
