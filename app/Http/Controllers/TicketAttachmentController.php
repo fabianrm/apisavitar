@@ -40,4 +40,43 @@ class TicketAttachmentController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Delete ticket attachment from database and file system
+     */
+    public function destroy($id)
+    {
+        try {
+            $attachment = TicketAttachment::findOrFail($id);
+
+            // Delete physical file from storage
+            if (Storage::disk('public')->exists($attachment->file_path)) {
+                Storage::disk('public')->delete($attachment->file_path);
+                Log::info('File deleted from storage', [
+                    'attachment_id' => $id,
+                    'file_path' => $attachment->file_path,
+                ]);
+            } else {
+                Log::warning('File not found in storage, proceeding to delete database record', [
+                    'attachment_id' => $id,
+                    'file_path' => $attachment->file_path,
+                ]);
+            }
+
+            // Delete database record
+            $attachment->delete();
+
+            return response()->json([
+                'message' => 'Archivo adjunto eliminado correctamente',
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error deleting ticket attachment: '.$e->getMessage(), [
+                'attachment_id' => $id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

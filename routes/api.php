@@ -143,6 +143,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::post('{ticketId}/attachments', [TicketController::class, 'addAttachment']);
             // Route::get('{ticketID}/attachments', [TicketController::class, 'getAttachments']);
         });
+        Route::delete('ticket-attachments/{id}', [TicketAttachmentController::class, 'destroy']);
         Route::apiResource('support/update-status', TicketController::class);
         Route::apiResource('support', TicketController::class);
         Route::apiResource('categories-support', CategoryTicketController::class);
