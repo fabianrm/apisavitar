@@ -297,7 +297,7 @@ class ServiceController extends Controller
 
                 if ($request['mikrotik']) {
                     // Quitar el usuario del MK
-                    $router = Router::where('id', $service->router_id)->firstOrFail();
+                    $router = Router::where('id', $contract->router_id)->firstOrFail();
                     Log::info("Router => $router->ip");
 
                     // Conectamos con el MK
@@ -456,6 +456,33 @@ class ServiceController extends Controller
             'contract' => $contract,
         ], 200);
     }
+
+
+    /**
+     * Cambiar Usuario iptv
+     */
+    public function updateIptv(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'iptv' => 'boolean',
+            'userIptv' => 'nullable|string',
+            'passIptv' => 'nullable|string',
+        ]);
+
+        $contract = Service::findOrFail($id);
+
+        // Actualizar el contrato con los nuevos datos del usuario
+        $contract->iptv = $validatedData['iptv'];
+        $contract->user_iptv = $validatedData['userIptv'];
+        $contract->pass_iptv = $validatedData['passIptv'];
+        $contract->save();
+
+        return response()->json([
+            'message' => 'Ok',
+            'contract' => $contract,
+        ], 200);
+    }
+
 
     /**
      * Retrieve contracts by customer ID.

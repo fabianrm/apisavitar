@@ -77,6 +77,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::patch('{id}/update-vlan', [ServiceController::class, 'updateVlan']);
             Route::patch('{id}/update-equipment', [ServiceController::class, 'updateEquipment']);
             Route::patch('{id}/update-user', [ServiceController::class, 'updateUser']);
+            Route::patch('{id}/update-iptv', [ServiceController::class, 'updateIptv']);
             Route::patch('{id}/finish', [ServiceController::class, 'terminate']);
         });
         Route::apiResource('services', ServiceController::class);
