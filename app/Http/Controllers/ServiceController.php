@@ -249,8 +249,15 @@ class ServiceController extends Controller
             $contractService = app(UtilService::class);
             $uniqueCode = $contractService->generateUniqueCodeService('CT');
 
-            $newInstallationDate = Carbon::parse($contract->installation_date)
-                ->month(Carbon::now()->month)
+            // $newInstallationDate = Carbon::parse($contract->installation_date)
+            //     ->month(Carbon::now()->month)
+            //     ->toDateString();
+
+            // Copiamos la fecha, solo mantenemos el día
+            $originalDate = Carbon::parse($contract->installation_date);
+
+            $newInstallationDate = $originalDate
+                ->setDate(now()->year, now()->month, $originalDate->day)
                 ->toDateString();
 
             $newContract = Service::create([
@@ -457,7 +464,6 @@ class ServiceController extends Controller
         ], 200);
     }
 
-
     /**
      * Cambiar Usuario iptv
      */
@@ -482,7 +488,6 @@ class ServiceController extends Controller
             'contract' => $contract,
         ], 200);
     }
-
 
     /**
      * Retrieve contracts by customer ID.
