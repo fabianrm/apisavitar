@@ -54,6 +54,14 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         // Dashboard
         Route::get('summary', [DashboardController::class, 'getSummary']);
 
+        // Notificaciones
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index']);
+            Route::get('/unread', [NotificationController::class, 'unread']);
+            Route::patch('/{id}/read', [NotificationController::class, 'markAsRead']);
+            Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        });
+
         // Módulo Clientes
         Route::prefix('customers')->group(function () {
             Route::get('check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);

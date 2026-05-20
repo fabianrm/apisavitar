@@ -85,6 +85,18 @@ class TicketController extends Controller
             'changed_by' => auth()->id(),
         ]);
 
+        // 1. Obtener a todos los administradores
+        $admins = \App\Models\User::whereHas('roles', function($q) {
+            $q->whereIn('name', ['Admin', 'Administrador']);
+        })->get();
+
+        // 2. Incluir al usuario creador y asegurar que no haya duplicados (por si el creador es admin)
+        $usersToNotify = $admins->push(auth()->user())->unique('id');
+
+        if ($usersToNotify->count() > 0) {
+            \Illuminate\Support\Facades\Notification::send($usersToNotify, new \App\Notifications\TicketRegisteredNotification($ticket));
+        }
+
         return response()->json($ticket, 201);
     }
 
