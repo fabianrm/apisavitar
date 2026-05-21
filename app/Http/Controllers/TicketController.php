@@ -280,6 +280,12 @@ class TicketController extends Controller
                 : 'Asignado a técnico', // Comentario sobre la asignación/reasignación
         ]);
 
+        // Notificar al técnico asignado
+        $technician = \App\Models\User::find($request->technician_id);
+        if ($technician) {
+            $technician->notify(new \App\Notifications\TicketAssignedNotification($ticket));
+        }
+
         return response()->json([
             'message' => $previousTechnician
                 ? 'Ticket reasiagnado al nuevo técnico correctamente'
