@@ -86,8 +86,8 @@ class TicketController extends Controller
         ]);
 
         // 1. Obtener a todos los administradores
-        $admins = \App\Models\User::whereHas('roles', function($q) {
-            $q->whereIn('name', ['Admin', 'Administrador']);
+        $admins = \App\Models\User::whereHas('roles', function ($q) {
+            $q->whereIn('name', ['Super Admin', 'Admin', 'Administrador']);
         })->get();
 
         // 2. Incluir al usuario creador y asegurar que no haya duplicados (por si el creador es admin)
