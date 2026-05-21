@@ -38,13 +38,14 @@ class TicketAssignedNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'ticket_id'   => $this->ticket->id,
-            'subject'     => $this->ticket->subject,
+            'ticket_id' => $this->ticket->id,
+            'code' => $this->ticket->code,
+            'subject' => $this->ticket->subject,
             'description' => $this->ticket->description,
-            'priority'    => $this->ticket->priority,
-            'status'      => $this->ticket->status,
+            'priority' => $this->ticket->priority,
+            'status' => $this->ticket->status,
             'customer_id' => $this->ticket->customer_id ?? null,
-            'message'     => 'Se te ha asignado el ticket #' . $this->ticket->id . ': ' . $this->ticket->subject,
+            'message' => 'Se te ha asignado el ticket #'.$this->ticket->code.': '.$this->ticket->subject,
         ];
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -37,10 +36,10 @@ class TicketRegisteredNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->subject('Nuevo ticket de soporte registrado: #' . $this->ticket->id)
-                    ->line('Se ha registrado un nuevo ticket de soporte con el asunto: ' . $this->ticket->subject)
-                    ->action('Ver Ticket', url('/tickets/' . $this->ticket->id))
-                    ->line('Gracias por usar nuestra aplicación.');
+            ->subject('Nuevo ticket de soporte registrado: #'.$this->ticket->id)
+            ->line('Se ha registrado un nuevo ticket de soporte con el asunto: '.$this->ticket->subject)
+            ->action('Ver Ticket', url('/tickets/'.$this->ticket->id))
+            ->line('Gracias por usar nuestra aplicación.');
     }
 
     /**
@@ -52,11 +51,12 @@ class TicketRegisteredNotification extends Notification
     {
         return [
             'ticket_id' => $this->ticket->id,
+            'code' => $this->ticket->code,
             'subject' => $this->ticket->subject,
             'description' => $this->ticket->description,
             'status' => $this->ticket->status,
             'customer_id' => $this->ticket->customer_id ?? null,
-            'message' => 'Se ha registrado un nuevo ticket de soporte: #' . $this->ticket->id,
+            'message' => 'Se ha registrado un nuevo ticket de soporte: '.$this->ticket->code,
         ];
     }
 }
