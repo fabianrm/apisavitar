@@ -62,6 +62,10 @@ class MaterialController extends Controller
      */
     public function update(UpdateMaterialRequest $request, Material $material)
     {
+        Log::info('Update Material Request Data', [
+            'input' => $request->all(),
+            'validated' => $request->validated(),
+        ]);
         $material->update($request->validated());
         return new MaterialResource($material);
     }
