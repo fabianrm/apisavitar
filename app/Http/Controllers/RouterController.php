@@ -89,13 +89,7 @@ class RouterController extends Controller
         Log::info("Testing router: {$router->ip}");
 
         try {
-            $mkService = new MikrotikService([
-                'host' => $router->ip,
-                'user' => $router->usuario,
-                'pass' => $router->password,
-                // 'port' => 8728,
-                // 'timeout' => 5,
-            ]);
+            $mkService = MikrotikService::forRouter($router);
 
             // Si lanzar aquí una excepción, la captura el catch de abajo
             if (! $mkService->verificarConexion()) {
@@ -132,11 +126,7 @@ class RouterController extends Controller
             Log::info("Iniciando sincronización para router: {$router->ip}");
 
             // Crear instancia del servicio MikroTik
-            $mkService = new MikrotikService([
-                'host' => $router->ip,
-                'user' => $router->usuario,
-                'pass' => $router->password,
-            ]);
+            $mkService = MikrotikService::forRouter($router);
 
             if (! $mkService->verificarConexion()) {
                 throw new \Exception('No se pudo establecer conexión con el router MikroTik');

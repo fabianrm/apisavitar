@@ -27,8 +27,15 @@ class InvoicesExport implements FromQuery, WithHeadings, WithMapping
             ->select('invoices.*');
 
         // Filtrar por estado si se proporciona
-        if (isset($this->filters['status'])) {
-            $query->where('invoices.status', $this->filters['status']);
+        if (!empty($this->filters['status'])) {
+            $statuses = $this->filters['status'];
+
+            // Asegúrate de que sea un array, ya sea directamente o desde una cadena separada por comas
+            if (!is_array($statuses)) {
+                $statuses = explode(',', $statuses); // Soporta status=pagadas,pendientes
+            }
+
+            $query->whereIn('invoices.status', $statuses);
         }
 
         // Filtrar por rango de fechas si se proporciona

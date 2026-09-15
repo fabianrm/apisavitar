@@ -96,11 +96,7 @@ class SuspensionController extends Controller
                 Log::info("Router => $router->ip");
 
                 //Conectamos con el MK
-                $mkService = new MikrotikService([
-                    'host' => $router->ip,
-                    'user' => $router->usuario,
-                    'pass' => $router->password
-                ]);
+                $mkService = MikrotikService::forRouter($router);
 
                 // Verificar conexión antes de continuar
                 if (!$mkService->verificarConexion()) {
@@ -188,11 +184,7 @@ class SuspensionController extends Controller
                 Log::info("Router => $router->ip");
 
                 //Conectamos con el MK
-                $mkService = new MikrotikService([
-                    'host' => $router->ip,
-                    'user' => $router->usuario,
-                    'pass' => $router->password
-                ]);
+                $mkService = MikrotikService::forRouter($router);
 
                 // Verificar conexión antes de continuar
                 if (!$mkService->verificarConexion()) {

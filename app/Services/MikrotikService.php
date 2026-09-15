@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Router;
 use Illuminate\Support\Facades\Log;
 use RouterOS\Client;
 use RouterOS\Query;
@@ -20,6 +21,26 @@ class MikrotikService
     }
 
     /**
+     * Construye el servicio a partir de un Router de la BD, usando siempre
+     * el puerto guardado (antes se ignoraba y se usaba el 8728 por defecto
+     * para todos los routers) y timeouts cortos para fallar rápido en vez
+     * de colgar la petición ~100s cuando el router no responde.
+     */
+    public static function forRouter(Router $router): self
+    {
+        return new self([
+            'host' => $router->ip,
+            'user' => $router->usuario,
+            'pass' => $router->password,
+            'port' => (int) $router->port,
+            'timeout' => 5,
+            'socket_timeout' => 10,
+            'attempts' => 2,
+            'delay' => 1,
+        ]);
+    }
+
+    /**
      * Inicializa la conexión con parámetros dinámicos
      */
     public function initializeConnection(array $config): void
@@ -31,10 +52,13 @@ class MikrotikService
                 'host' => $config['host'],
                 'user' => $config['user'],
                 'pass' => $config['pass'],
-                // 'port'    => $config['port'] ?? 8728,
-                // 'timeout' => $config['timeout'] ?? 10,
-                // 'ssl'     => $config['ssl'] ?? false,
-                // 'legacy'  => $config['legacy'] ?? false,
+                'port' => $config['port'] ?? 8728,
+                'timeout' => $config['timeout'] ?? 5,
+                'socket_timeout' => $config['socket_timeout'] ?? 10,
+                'attempts' => $config['attempts'] ?? 2,
+                'delay' => $config['delay'] ?? 1,
+                'ssl' => $config['ssl'] ?? false,
+                'legacy' => $config['legacy'] ?? false,
             ]);
         } catch (\Exception $e) {
             Log::error('Error al conectar con MikroTik: '.$e->getMessage());
