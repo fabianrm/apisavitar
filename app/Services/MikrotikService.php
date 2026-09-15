@@ -119,15 +119,24 @@ class MikrotikService
         return $nombresUsuarios;
     }
 
+    /**
+     * Desactiva un usuario PPPoE en el MikroTik
+     */
     public function desactivarUsuario(string $username): array
     {
         $this->validateConnection();
 
         try {
-            return $this->ejecutarComando('/ppp/secret/set', [
+            $result = $this->ejecutarComando('/ppp/secret/set', [
                 '.id' => $username,
                 'disabled' => 'yes',
             ]);
+
+            // Deshabilitar el secret solo impide futuras conexiones; no corta
+            // una sesión PPPoE que ya esté activa. Hay que cortarla aparte.
+            $this->cortarSesionActiva($username);
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('Error desactivando usuario PPPoE: '.$e->getMessage());
             throw $e;
@@ -135,7 +144,36 @@ class MikrotikService
     }
 
     /**
-     * Desactiva un usuario PPPoE en el MikroTik
+     * Corta la sesión PPPoE activa de un usuario, si existe. /ppp/secret
+     * (credenciales) y /ppp/active (sesiones en curso) son tablas
+     * independientes en RouterOS: deshabilitar o borrar el secret no afecta
+     * una conexión ya establecida.
+     */
+    public function cortarSesionActiva(string $username): void
+    {
+        $this->validateConnection();
+
+        try {
+            $activas = $this->ejecutarComando('/ppp/active/print', [
+                '?name' => $username,
+            ]);
+
+            foreach ($activas as $sesion) {
+                if (isset($sesion['.id'])) {
+                    $this->ejecutarComando('/ppp/active/remove', [
+                        '.id' => $sesion['.id'],
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            // No relanzamos: el secret ya quedó deshabilitado/borrado, que es
+            // lo esencial; si no hay sesión activa esto es lo normal.
+            Log::error("Error cortando sesión activa de {$username}: ".$e->getMessage());
+        }
+    }
+
+    /**
+     * activa un usuario PPPoE en el MikroTik
      */
     public function activarUsuario(string $username): array
     {
@@ -160,9 +198,15 @@ class MikrotikService
         $this->validateConnection();
 
         try {
-            return $this->ejecutarComando('/ppp/secret/remove', [
+            $result = $this->ejecutarComando('/ppp/secret/remove', [
                 '.id' => $username,
             ]);
+
+            // Igual que al desactivar: borrar el secret no corta una sesión
+            // PPPoE ya activa.
+            $this->cortarSesionActiva($username);
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('Error removiendo usuario PPPoE: '.$e->getMessage());
             throw $e;
