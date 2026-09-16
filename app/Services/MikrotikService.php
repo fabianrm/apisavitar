@@ -254,6 +254,46 @@ class MikrotikService
     }
 
     /**
+     * Interfaces "de infraestructura" (puertos, bridges, VLANs, túneles), sin las
+     * decenas/cientos de sesiones pppoe-in de cada cliente conectado.
+     */
+    public function listInfrastructureInterfaces(): array
+    {
+        try {
+            $ifaces = $this->ejecutarComando('/interface/print');
+
+            return array_values(array_filter($ifaces, function ($i) {
+                $type = $i['type'] ?? '';
+
+                return ! in_array($type, ['pppoe-in', 'loopback'], true);
+            }));
+        } catch (\Throwable $e) {
+            Log::error('Error listando interfaces de MikroTik: '.$e->getMessage());
+
+            return [];
+        }
+    }
+
+    /**
+     * Lectura instantánea de throughput de una interfaz (/interface monitor-traffic ... once).
+     */
+    public function monitorTraffic(string $interface): ?array
+    {
+        try {
+            $resp = $this->ejecutarComando('/interface/monitor-traffic', [
+                'interface' => $interface,
+                'once' => '',
+            ]);
+
+            return $resp[0] ?? null;
+        } catch (\Throwable $e) {
+            Log::error('Error midiendo tráfico de MikroTik: '.$e->getMessage());
+
+            return null;
+        }
+    }
+
+    /**
      * Igual que getDataMK() pero devuelve el arreglo crudo de /system/resource/print
      * en vez de una JsonResponse, para consumo interno (ej. mk:monitor-connectivity).
      */
