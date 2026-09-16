@@ -296,6 +296,7 @@ class TicketController extends Controller
         $technician = \App\Models\User::find($request->technician_id);
         if ($technician) {
             $technician->notify(new \App\Notifications\TicketAssignedNotification($ticket));
+            app(\App\Services\WebPushNotifierService::class)->sendTicketAssigned($ticket, $technician);
         }
 
         return response()->json([

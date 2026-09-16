@@ -62,6 +62,12 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
         });
 
+        // Notificaciones push (PWA)
+        Route::prefix('push')->group(function () {
+            Route::get('public-key', [PushSubscriptionController::class, 'publicKey']);
+            Route::post('subscribe', [PushSubscriptionController::class, 'store']);
+        });
+
         // Módulo Clientes
         Route::prefix('customers')->group(function () {
             Route::get('check-exists', [CustomerController::class, 'checkIfExistsByDocumentNumber']);

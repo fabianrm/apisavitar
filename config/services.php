@@ -36,4 +36,10 @@ return [
         'ticket_chat_id' => env('TELEGRAM_TICKET_CHAT_ID'),
     ],
 
+    'vapid' => [
+        'public_key' => env('VAPID_PUBLIC_KEY'),
+        'private_key' => env('VAPID_PRIVATE_KEY'),
+        'subject' => env('VAPID_SUBJECT', 'mailto:soporte@savitarperu.com'),
+    ],
+
 ];
