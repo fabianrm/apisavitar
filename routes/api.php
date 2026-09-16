@@ -189,6 +189,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         // Recursos generales
         Route::get('routers/{router}/test', [RouterController::class, 'test']);
         Route::get('routers/{router}/metrics', [RouterMetricController::class, 'index']);
+        Route::get('routers/{router}/live', [RouterMetricController::class, 'live']);
         Route::get('routers/{router}/interfaces', [RouterTrafficController::class, 'interfaces']);
         Route::get('routers/{router}/traffic', [RouterTrafficController::class, 'traffic']);
         Route::post('routers/{router}/sync-contacts', [RouterController::class, 'sincronizarContratos']);
