@@ -33,6 +33,11 @@ class MonitorMikrotikConnectivityCommand extends Command
                 $isUp = false;
             }
 
+            Cache::put($router->connectivityCacheKey(), [
+                'up' => $isUp,
+                'checked_at' => now()->toIso8601String(),
+            ], now()->addHours(2));
+
             $failsKey = "mk_monitor_fails_{$router->id}";
             $alertedKey = "mk_monitor_alerted_{$router->id}";
 

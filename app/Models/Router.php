@@ -37,6 +37,16 @@ class Router extends Model
         return $this->belongsTo(Enterprise::class);
     }
 
+    public function connectivityCacheKey(): string
+    {
+        return "mk_status_{$this->id}";
+    }
+
+    public function isMonitored(): bool
+    {
+        return str_starts_with($this->ip, '10.100.100.');
+    }
+
     //Capturar y setear la empresa del usuario logueado
     protected static function boot()
     {

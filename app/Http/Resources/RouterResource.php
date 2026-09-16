@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Cache;
 
 class RouterResource extends JsonResource
 {
@@ -23,6 +24,29 @@ class RouterResource extends JsonResource
             'port' => $this->port,
             'api_connection' => $this->api_connection,
             'status' => $this->status,
+            'connectivity' => $this->connectivity(),
+        ];
+    }
+
+    /**
+     * Último estado conocido reportado por mk:monitor-connectivity (cada 5 min),
+     * solo para routers con túnel (ver Router::isMonitored). No es un chequeo en vivo.
+     */
+    private function connectivity(): array
+    {
+        if (! $this->isMonitored()) {
+            return ['status' => 'no_monitoreado', 'checked_at' => null];
+        }
+
+        $cached = Cache::get($this->connectivityCacheKey());
+
+        if (! $cached) {
+            return ['status' => 'desconocido', 'checked_at' => null];
+        }
+
+        return [
+            'status' => $cached['up'] ? 'online' : 'offline',
+            'checked_at' => $cached['checked_at'],
         ];
     }
 }
