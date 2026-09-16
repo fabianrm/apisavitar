@@ -97,6 +97,8 @@ class TicketController extends Controller
             \Illuminate\Support\Facades\Notification::send($usersToNotify, new \App\Notifications\TicketRegisteredNotification($ticket));
         }
 
+        app(\App\Services\TelegramNotifierService::class)->sendTicketRegistered($ticket);
+
         return response()->json($ticket, 201);
     }
 
