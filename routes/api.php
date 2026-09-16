@@ -188,6 +188,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
 
         // Recursos generales
         Route::get('routers/{router}/test', [RouterController::class, 'test']);
+        Route::get('routers/{router}/metrics', [RouterMetricController::class, 'index']);
         Route::post('routers/{router}/sync-contacts', [RouterController::class, 'sincronizarContratos']);
 
         // Boxes

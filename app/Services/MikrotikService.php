@@ -253,6 +253,23 @@ class MikrotikService
         }
     }
 
+    /**
+     * Igual que getDataMK() pero devuelve el arreglo crudo de /system/resource/print
+     * en vez de una JsonResponse, para consumo interno (ej. mk:monitor-connectivity).
+     */
+    public function getResourceInfo(): ?array
+    {
+        try {
+            $resp = $this->ejecutarComando('/system/resource/print');
+
+            return $resp[0] ?? null;
+        } catch (\Throwable $e) {
+            Log::error('Error obteniendo recursos de MikroTik: '.$e->getMessage());
+
+            return null;
+        }
+    }
+
     public function getDataMK()
     {
         try {

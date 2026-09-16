@@ -6,6 +6,7 @@ use App\Helpers\CurrentEnterprise;
 use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Router extends Model
 {
@@ -45,6 +46,33 @@ class Router extends Model
     public function isMonitored(): bool
     {
         return str_starts_with($this->ip, '10.100.100.');
+    }
+
+    /**
+     * Último estado conocido reportado por mk:monitor-connectivity (cada 5 min).
+     * No es un chequeo en vivo.
+     */
+    public function connectivityStatus(): array
+    {
+        if (! $this->isMonitored()) {
+            return ['status' => 'no_monitoreado', 'checked_at' => null];
+        }
+
+        $cached = Cache::get($this->connectivityCacheKey());
+
+        if (! $cached) {
+            return ['status' => 'desconocido', 'checked_at' => null];
+        }
+
+        return [
+            'status' => $cached['up'] ? 'online' : 'offline',
+            'checked_at' => $cached['checked_at'],
+        ];
+    }
+
+    public function metrics()
+    {
+        return $this->hasMany(RouterMetric::class);
     }
 
     //Capturar y setear la empresa del usuario logueado
