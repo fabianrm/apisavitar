@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Router;
 use App\Models\Ticket;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -59,6 +60,45 @@ class TelegramNotifierService
         }
 
         $this->send(implode("\n", $lines));
+    }
+
+    public function sendDailyServiceCutsSummary(Collection $suspended, Collection $terminated): void
+    {
+        $fecha = now()->format('d/m/Y');
+        $lines = ["📋 <b>Resumen de cortes/suspensiones — {$fecha}</b>"];
+
+        if ($suspended->isEmpty() && $terminated->isEmpty()) {
+            $lines[] = 'Sin cortes ni suspensiones hoy ✅';
+            $this->send(implode("\n", $lines));
+
+            return;
+        }
+
+        if ($suspended->isNotEmpty()) {
+            $lines[] = '';
+            $lines[] = "🟡 <b>Suspendidos ({$suspended->count()})</b>";
+            foreach ($suspended as $service) {
+                $lines[] = '• '.$this->serviceLine($service);
+            }
+        }
+
+        if ($terminated->isNotEmpty()) {
+            $lines[] = '';
+            $lines[] = "🔴 <b>Cortados ({$terminated->count()})</b>";
+            foreach ($terminated as $service) {
+                $lines[] = '• '.$this->serviceLine($service);
+            }
+        }
+
+        $this->send(implode("\n", $lines));
+    }
+
+    private function serviceLine($service): string
+    {
+        $customerName = $service->customers->name ?? 'Cliente desconocido';
+        $vlan = $service->routers->vlan ?? 'N/D';
+
+        return "{$customerName} — VLAN {$vlan}";
     }
 
     private function send(string $message): void
