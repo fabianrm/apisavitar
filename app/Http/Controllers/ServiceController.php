@@ -200,6 +200,8 @@ class ServiceController extends Controller
                 $mkService->removeUsuario($service->user_pppoe);
             }
 
+            app(\App\Services\WebPushNotifierService::class)->sendServiceTerminated($service);
+
             return response()->json(
                 [
                     'message' => 'Contrato terminado exitosamente',

@@ -109,6 +109,8 @@ class SuspensionController extends Controller
 
             DB::commit();
 
+            app(\App\Services\WebPushNotifierService::class)->sendServiceSuspended($suspension->service);
+
             return response()->json(
                 [
                     'message' => 'Suspensión registrada exitosamente',
