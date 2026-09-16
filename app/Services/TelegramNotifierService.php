@@ -2,23 +2,34 @@
 
 namespace App\Services;
 
+use App\Models\Router;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class TelegramNotifierService
 {
+    public function sendRouterConnectivity(Router $router, bool $isUp): void
+    {
+        $router->loadMissing('enterprise');
+
+        $lines = $isUp
+            ? ["🟢 <b>Mikrotik reconectado</b>"]
+            : ["🔴 <b>Mikrotik sin conexión</b>"];
+
+        $lines[] = "IP: {$router->ip}";
+        if ($router->enterprise) {
+            $lines[] = "Empresa: {$router->enterprise->name}";
+        }
+        $lines[] = $isUp
+            ? 'Se restableció la comunicación.'
+            : 'No responde desde hace varios minutos.';
+
+        $this->send(implode("\n", $lines));
+    }
+
     public function sendTicketRegistered(Ticket $ticket): void
     {
-        $token = config('services.telegram.bot_token');
-        $chatId = config('services.telegram.ticket_chat_id');
-
-        if (! $token || ! $chatId) {
-            Log::warning('Telegram no configurado (TELEGRAM_BOT_TOKEN / TELEGRAM_TICKET_CHAT_ID), se omite notificación de ticket.');
-
-            return;
-        }
-
         $ticket->loadMissing(['customer', 'categoryTicket']);
 
         $priorityIcon = match ($ticket->priority) {
@@ -47,7 +58,19 @@ class TelegramNotifierService
             $lines[] = "Descripción: {$ticket->description}";
         }
 
-        $message = implode("\n", $lines);
+        $this->send(implode("\n", $lines));
+    }
+
+    private function send(string $message): void
+    {
+        $token = config('services.telegram.bot_token');
+        $chatId = config('services.telegram.ticket_chat_id');
+
+        if (! $token || ! $chatId) {
+            Log::warning('Telegram no configurado (TELEGRAM_BOT_TOKEN / TELEGRAM_TICKET_CHAT_ID), se omite notificación.');
+
+            return;
+        }
 
         try {
             $response = Http::timeout(5)->post("https://api.telegram.org/bot{$token}/sendMessage", [
@@ -57,10 +80,10 @@ class TelegramNotifierService
             ]);
 
             if (! $response->successful()) {
-                Log::error('Fallo al enviar notificación de ticket a Telegram: '.$response->body());
+                Log::error('Fallo al enviar notificación a Telegram: '.$response->body());
             }
         } catch (\Throwable $e) {
-            Log::error('Excepción al enviar notificación de ticket a Telegram: '.$e->getMessage());
+            Log::error('Excepción al enviar notificación a Telegram: '.$e->getMessage());
         }
     }
 }

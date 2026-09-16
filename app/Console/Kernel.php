@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
+use App\Console\Commands\MonitorMikrotikConnectivityCommand;
 use App\Console\Commands\SincronizarMikrotikCommand;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -24,6 +25,11 @@ class Kernel extends ConsoleKernel
         //     ->dailyAt('12:00')
         //     ->timezone('America/Lima')
         //     ->environments(['production']);
+
+        $schedule->command(MonitorMikrotikConnectivityCommand::class)
+            ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->environments(['production']);
     }
 
     /**
@@ -31,7 +37,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        // $this->load(__DIR__ . '/Commands');
-        // require base_path('routes/console.php');
+        $this->load(__DIR__.'/Commands');
+        require base_path('routes/console.php');
     }
 }
