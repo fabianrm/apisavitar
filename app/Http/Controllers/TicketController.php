@@ -132,9 +132,19 @@ class TicketController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Ticket $ticket)
+    public function destroy($id)
     {
-        //
+        $ticket = Ticket::findOrFail($id);
+
+        if ($ticket->status !== 'registrado' || $ticket->technician_id !== null || $ticket->history()->count() > 1) {
+            return response()->json([
+                'message' => 'Solo se pueden eliminar tickets recién registrados, sin técnico asignado y sin historial de cambios.',
+            ], 422);
+        }
+
+        $ticket->delete();
+
+        return response()->json(['message' => 'Ticket eliminado correctamente'], 200);
     }
 
     public function updateStatus(Request $request, $ticketId)
