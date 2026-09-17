@@ -26,9 +26,45 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $service = Service::with(['customers', 'routers', 'plans', 'cities'])->orderBy('created_at', 'desc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        $perPage = $perPage > 0 ? min($perPage, 100) : 10;
 
-        return new ServiceCollection($service);
+        $query = Service::with(['customers', 'routers', 'plans', 'cities', 'promotion', 'createdBy', 'updatedBy']);
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('installation_date', '>=', $request->input('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('installation_date', '<=', $request->input('date_to'));
+        }
+
+        if ($request->filled('code')) {
+            $query->where('service_code', 'like', '%'.$request->input('code').'%');
+        }
+
+        if ($request->filled('customer')) {
+            $customer = $request->input('customer');
+            $query->whereHas('customers', function ($q) use ($customer) {
+                $q->where('name', 'like', '%'.$customer.'%');
+            });
+        }
+
+        if ($request->filled('plan_id')) {
+            $query->where('plan_id', $request->input('plan_id'));
+        }
+
+        if ($request->filled('city_id')) {
+            $query->where('city_id', $request->input('city_id'));
+        }
+
+        if ($request->filled('promotion_id')) {
+            $query->where('promotion_id', $request->input('promotion_id'));
+        }
+
+        $services = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+        return new ServiceCollection($services);
     }
 
     /**

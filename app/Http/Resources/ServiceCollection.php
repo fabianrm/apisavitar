@@ -18,7 +18,6 @@ class ServiceCollection extends ResourceCollection
 
         return [
             'data' => $this->collection,
-            'total' => count($this->collection)
         ];
 
         // return [
