@@ -16,8 +16,15 @@ class Enterprise extends Model
         'address',
         'phone',
         'logo',
-        'status'
+        'status',
+        'telegram_bot_token',
+        'telegram_chat_id',
     ];
+
+    public function hasTelegramConfigured(): bool
+    {
+        return ! empty($this->telegram_bot_token) && ! empty($this->telegram_chat_id);
+    }
 
     public function customers()
     {

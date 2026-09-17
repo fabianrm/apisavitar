@@ -27,6 +27,8 @@ class EnterpriseResource extends JsonResource
             'phone' => $this->phone,
             'logo' => asset('storage/' . $this->logo),
             'status' => $this->status,
+            'telegramBotToken' => $this->telegram_bot_token,
+            'telegramChatId' => $this->telegram_chat_id,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];

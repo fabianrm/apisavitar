@@ -33,6 +33,8 @@ class StoreEnterpriseRequest extends FormRequest
             'phone' => [''],
             'logo' => 'nullable|image|mimes:jpeg,jpg|max:2048',
             'status' => ['required'],
+            'telegramBotToken' => [''],
+            'telegramChatId' => [''],
         ];
     }
 
@@ -40,6 +42,8 @@ class StoreEnterpriseRequest extends FormRequest
     {
         $this->merge([
             'city_id' => $this->cityId,
+            'telegram_bot_token' => $this->telegramBotToken,
+            'telegram_chat_id' => $this->telegramChatId,
         ]);
     }
 }

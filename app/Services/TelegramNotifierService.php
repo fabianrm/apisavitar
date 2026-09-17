@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Enterprise;
 use App\Models\Router;
 use App\Models\Ticket;
 use Illuminate\Support\Collection;
@@ -13,6 +14,10 @@ class TelegramNotifierService
     public function sendRouterConnectivity(Router $router, bool $isUp): void
     {
         $router->loadMissing('enterprise');
+
+        if (! $router->enterprise) {
+            return;
+        }
 
         $lines = $isUp
             ? ["🟢 <b>Mikrotik reconectado</b>"]
@@ -26,12 +31,16 @@ class TelegramNotifierService
             ? 'Se restableció la comunicación.'
             : 'No responde desde hace varios minutos.';
 
-        $this->send(implode("\n", $lines));
+        $this->send($router->enterprise, implode("\n", $lines));
     }
 
     public function sendTicketRegistered(Ticket $ticket): void
     {
-        $ticket->loadMissing(['customer', 'categoryTicket']);
+        $ticket->loadMissing(['customer', 'categoryTicket', 'enterprise']);
+
+        if (! $ticket->enterprise) {
+            return;
+        }
 
         $priorityIcon = match ($ticket->priority) {
             'alta' => '🚨',
@@ -59,17 +68,17 @@ class TelegramNotifierService
             $lines[] = "Descripción: {$ticket->description}";
         }
 
-        $this->send(implode("\n", $lines));
+        $this->send($ticket->enterprise, implode("\n", $lines));
     }
 
-    public function sendDailyServiceCutsSummary(Collection $suspended, Collection $terminated): void
+    public function sendDailyServiceCutsSummary(Enterprise $enterprise, Collection $suspended, Collection $terminated): void
     {
         $fecha = now()->format('d/m/Y');
         $lines = ["📋 <b>Resumen de cortes/suspensiones — {$fecha}</b>"];
 
         if ($suspended->isEmpty() && $terminated->isEmpty()) {
             $lines[] = 'Sin cortes ni suspensiones hoy ✅';
-            $this->send(implode("\n", $lines));
+            $this->send($enterprise, implode("\n", $lines));
 
             return;
         }
@@ -90,7 +99,7 @@ class TelegramNotifierService
             }
         }
 
-        $this->send(implode("\n", $lines));
+        $this->send($enterprise, implode("\n", $lines));
     }
 
     private function serviceLine($service): string
@@ -101,13 +110,13 @@ class TelegramNotifierService
         return "{$customerName} — VLAN {$vlan}";
     }
 
-    private function send(string $message): void
+    private function send(Enterprise $enterprise, string $message): void
     {
-        $token = config('services.telegram.bot_token');
-        $chatId = config('services.telegram.ticket_chat_id');
+        $token = $enterprise->telegram_bot_token;
+        $chatId = $enterprise->telegram_chat_id;
 
         if (! $token || ! $chatId) {
-            Log::warning('Telegram no configurado (TELEGRAM_BOT_TOKEN / TELEGRAM_TICKET_CHAT_ID), se omite notificación.');
+            Log::warning("Telegram no configurado para la empresa {$enterprise->id} ({$enterprise->name}), se omite notificación.");
 
             return;
         }

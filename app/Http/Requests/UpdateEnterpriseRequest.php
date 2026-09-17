@@ -29,7 +29,9 @@ class UpdateEnterpriseRequest extends FormRequest
                 'cityId' => ['required'],
                 'address' => ['required'],
                 'phone' => [''],
-                'logo' => ['']
+                'logo' => [''],
+                'telegramBotToken' => [''],
+                'telegramChatId' => [''],
             ];
         } else {
             return [
@@ -37,7 +39,9 @@ class UpdateEnterpriseRequest extends FormRequest
                 'cityId' => ['sometimes'],
                 'address' => ['sometimes'],
                 'phone' => ['sometimes'],
-                'logo' => ['sometimes']
+                'logo' => ['sometimes'],
+                'telegramBotToken' => ['sometimes'],
+                'telegramChatId' => ['sometimes'],
             ];
         }
     }
@@ -48,6 +52,18 @@ class UpdateEnterpriseRequest extends FormRequest
         if ($this->cityId ) {
             $this->merge([
                 'city_id' => $this->cityId,
+            ]);
+        }
+
+        if ($this->has('telegramBotToken')) {
+            $this->merge([
+                'telegram_bot_token' => $this->telegramBotToken,
+            ]);
+        }
+
+        if ($this->has('telegramChatId')) {
+            $this->merge([
+                'telegram_chat_id' => $this->telegramChatId,
             ]);
         }
     }
