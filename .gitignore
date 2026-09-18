@@ -20,3 +20,5 @@ yarn-error.log
 /.vscode
 .nvm/
 **/.DS_Store
+/storage/db-backups
+*.sql.gz
