@@ -22,8 +22,9 @@ class StoreRouterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ip' => ['required'],
-            'usuario' => ['required'],
+            'vlan' => ['required'],
+            'ip' => [''],
+            'usuario' => [''],
             'password' => [''],
             'port' => [''],
             'apiConnection' => [''],

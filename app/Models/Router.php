@@ -49,7 +49,7 @@ class Router extends Model
 
     public function isMonitored(): bool
     {
-        return str_starts_with($this->ip, '10.100.100.');
+        return str_starts_with((string) $this->ip, '10.100.100.');
     }
 
     /**
