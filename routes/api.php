@@ -193,6 +193,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::get('routers/{router}/interfaces', [RouterTrafficController::class, 'interfaces']);
         Route::get('routers/{router}/traffic', [RouterTrafficController::class, 'traffic']);
         Route::post('routers/{router}/sync-contacts', [RouterController::class, 'sincronizarContratos']);
+        Route::post('routers/{router}/vpn/provision', [RouterVpnController::class, 'provision']);
+        Route::get('routers/{router}/vpn/script', [RouterVpnController::class, 'script']);
 
         // Boxes
         Route::get('boxs/{id}/services', [BoxController::class, 'getServices']);

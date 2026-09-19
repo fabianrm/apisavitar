@@ -24,6 +24,8 @@ class RouterResource extends JsonResource
             'api_connection' => $this->api_connection,
             'status' => $this->status,
             'connectivity' => $this->connectivityStatus(),
+            'wg_public_key' => $this->wg_public_key,
+            'wg_provisioned_at' => $this->wg_provisioned_at,
         ];
     }
 }

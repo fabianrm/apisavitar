@@ -55,6 +55,8 @@ class RouterMetricController extends Controller
             'router' => [
                 'id' => $router->id,
                 'ip' => $router->ip,
+                'wg_public_key' => $router->wg_public_key,
+                'wg_provisioned_at' => $router->wg_provisioned_at,
             ],
             'connectivity' => $router->connectivityStatus(),
             'latest' => $latest,

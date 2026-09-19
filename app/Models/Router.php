@@ -23,6 +23,10 @@ class Router extends Model
         'status',
     ];
 
+    protected $casts = [
+        'wg_private_key' => 'encrypted',
+    ];
+
     /**
      * Get all of the services for the Router
      *
