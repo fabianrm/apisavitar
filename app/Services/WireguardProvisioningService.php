@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Router;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class WireguardProvisioningService
@@ -52,6 +53,10 @@ class WireguardProvisioningService
         $router->wg_private_key = $privateKey;
         $router->wg_provisioned_at = now();
         $router->ip = $ip;
+        $router->usuario = config('wireguard.api_username');
+        $router->password = Str::random(24);
+        $router->port = config('wireguard.api_port');
+        $router->api_connection = 'API';
         $router->save();
 
         Log::info("VPN WireGuard provisionada para router {$router->id}: ip={$ip}");
@@ -116,11 +121,18 @@ class WireguardProvisioningService
         $endpointHost = config('wireguard.endpoint_host');
         $endpointPort = config('wireguard.endpoint_port');
         $cidr = config('wireguard.subnet_cidr');
+        $apiGroup = config('wireguard.api_group');
+        $apiUsername = $router->usuario;
+        $apiPassword = $router->password;
+        $apiPort = $router->port;
 
         return <<<SCRIPT
         /interface wireguard add name={$interfaceName} mtu=1420 private-key="{$privateKey}"
         /interface wireguard peers add interface={$interfaceName} public-key="{$serverPublicKey}" endpoint-address={$endpointHost} endpoint-port={$endpointPort} allowed-address=10.100.100.1/32 persistent-keepalive=25s
         /ip address add address={$ip}/{$cidr} interface={$interfaceName}
+        /user group add name={$apiGroup} policy=api,read,write
+        /user add name={$apiUsername} password="{$apiPassword}" group={$apiGroup}
+        /ip service set api port={$apiPort} address=10.100.100.1/32
         SCRIPT;
     }
 }
