@@ -77,7 +77,7 @@ class WireguardProvisioningService
 
     private function generatePrivateKey(): string
     {
-        $result = Process::run('wg genkey');
+        $result = Process::run([config('wireguard.wg_binary'), 'genkey']);
 
         if (! $result->successful()) {
             throw new RuntimeException('No se pudo generar la clave privada WireGuard: '.$result->errorOutput());
@@ -88,7 +88,7 @@ class WireguardProvisioningService
 
     private function derivePublicKey(string $privateKey): string
     {
-        $result = Process::input($privateKey)->run('wg pubkey');
+        $result = Process::input($privateKey)->run([config('wireguard.wg_binary'), 'pubkey']);
 
         if (! $result->successful()) {
             throw new RuntimeException('No se pudo derivar la clave pública WireGuard: '.$result->errorOutput());
