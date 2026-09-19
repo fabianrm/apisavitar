@@ -110,7 +110,16 @@ class TelegramNotifierService
         return "{$customerName} — VLAN {$vlan}";
     }
 
-    private function send(Enterprise $enterprise, string $message): void
+    /**
+     * Envía un mensaje de prueba para que el propio usuario pueda verificar
+     * su configuración de Telegram sin depender de que falle un evento real.
+     */
+    public function sendTest(Enterprise $enterprise): bool
+    {
+        return $this->send($enterprise, "✅ <b>Conexión de prueba</b>\nSi ves este mensaje, tu bot de Telegram está bien configurado.");
+    }
+
+    private function send(Enterprise $enterprise, string $message): bool
     {
         $token = $enterprise->telegram_bot_token;
         $chatId = $enterprise->telegram_chat_id;
@@ -118,7 +127,7 @@ class TelegramNotifierService
         if (! $token || ! $chatId) {
             Log::warning("Telegram no configurado para la empresa {$enterprise->id} ({$enterprise->name}), se omite notificación.");
 
-            return;
+            return false;
         }
 
         try {
@@ -130,9 +139,15 @@ class TelegramNotifierService
 
             if (! $response->successful()) {
                 Log::error('Fallo al enviar notificación a Telegram: '.$response->body());
+
+                return false;
             }
+
+            return true;
         } catch (\Throwable $e) {
             Log::error('Excepción al enviar notificación a Telegram: '.$e->getMessage());
+
+            return false;
         }
     }
 }
