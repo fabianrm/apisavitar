@@ -1,5 +1,6 @@
 # Instalado en producción como /etc/sudoers.d/savitar-wg (modo 440, validar con visudo -c).
-# Permite a www-data ejecutar EXCLUSIVAMENTE savitar-wg-add-peer como root, sin
-# contraseña. No ampliar a `wg` directo ni a otros comandos: el script ya valida
-# sus propios argumentos, este alcance acotado es lo que lo hace seguro.
+# Permite a www-data ejecutar EXCLUSIVAMENTE estos dos scripts como root, sin
+# contraseña. No ampliar a `wg` directo ni a otros comandos: los scripts ya
+# validan sus propios argumentos, este alcance acotado es lo que lo hace seguro.
 www-data ALL=(root) NOPASSWD: /usr/local/sbin/savitar-wg-add-peer
+www-data ALL=(root) NOPASSWD: /usr/local/sbin/savitar-wg-remove-peer

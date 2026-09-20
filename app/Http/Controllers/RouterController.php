@@ -10,6 +10,7 @@ use App\Http\Resources\RouterResource;
 use App\Models\Router;
 use App\Models\Service;
 use App\Services\MikrotikService;
+use App\Services\WireguardProvisioningService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -73,9 +74,38 @@ class RouterController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+     * Elimina el router. Si tiene contratos vinculados, se rechaza (borrar el
+     * router en cascada se llevaría esos contratos, ver services.router_id).
+     * Si tenía VPN configurada, se quita el peer del servidor y se devuelve
+     * el script para limpiar el equipo físico.
+     */
     public function destroy(Router $router)
     {
-        //
+        $servicesCount = Service::where('router_id', $router->id)->count();
+
+        if ($servicesCount > 0) {
+            return response()->json([
+                'message' => "No se puede eliminar: tiene {$servicesCount} contrato(s) vinculados a este router.",
+            ], 422);
+        }
+
+        try {
+            $script = app(WireguardProvisioningService::class)->deprovision($router);
+        } catch (\Throwable $e) {
+            Log::error("Error quitando VPN del router {$router->id} antes de eliminar: ".$e->getMessage());
+
+            return response()->json([
+                'message' => 'No se pudo quitar la VPN del servidor. El router no fue eliminado: '.$e->getMessage(),
+            ], 500);
+        }
+
+        $router->delete();
+
+        return response()->json([
+            'message' => 'Router eliminado correctamente',
+            'script' => $script,
+        ]);
     }
 
     /**

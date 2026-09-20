@@ -80,6 +80,23 @@ class WireguardProvisioningService
         return $this->buildScript($router, $router->wg_private_key, $router->ip);
     }
 
+    /**
+     * Quita el peer del servidor (si el router llegó a tener VPN configurada)
+     * y devuelve el script RouterOS para limpiar el equipo físico. Si el
+     * router nunca tuvo VPN, no hay nada que limpiar en el servidor y
+     * devuelve null.
+     */
+    public function deprovision(Router $router): ?string
+    {
+        if (! $router->wg_public_key) {
+            return null;
+        }
+
+        $this->removePeerFromServer($router->wg_public_key);
+
+        return $this->buildRemovalScript($router);
+    }
+
     private function generatePrivateKey(): string
     {
         $result = Process::run([config('wireguard.wg_binary'), 'genkey']);
@@ -112,6 +129,32 @@ class WireguardProvisioningService
         if (! $result->successful()) {
             throw new RuntimeException('No se pudo registrar el peer en el servidor WireGuard: '.$result->errorOutput());
         }
+    }
+
+    private function removePeerFromServer(string $publicKey): void
+    {
+        $command = config('wireguard.remove_peer_command');
+
+        $result = Process::run(['sudo', $command, $publicKey]);
+
+        if (! $result->successful()) {
+            throw new RuntimeException('No se pudo quitar el peer del servidor WireGuard: '.$result->errorOutput());
+        }
+    }
+
+    private function buildRemovalScript(Router $router): string
+    {
+        $interfaceName = 'wg'.$router->id;
+        $apiGroup = config('wireguard.api_group');
+        $apiUsername = $router->usuario;
+
+        return <<<SCRIPT
+        /interface wireguard peers remove [find interface={$interfaceName}]
+        /interface wireguard remove [find name={$interfaceName}]
+        /user remove [find name="{$apiUsername}"]
+        /user group remove [find name={$apiGroup}]
+        /ip service set api address=
+        SCRIPT;
     }
 
     private function buildScript(Router $router, string $privateKey, string $ip): string

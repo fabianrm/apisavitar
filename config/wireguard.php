@@ -8,6 +8,7 @@ return [
     'subnet_prefix' => env('WG_SUBNET_PREFIX', '10.100.100.'),
     'subnet_cidr' => env('WG_SUBNET_CIDR', 24),
     'add_peer_command' => env('WG_ADD_PEER_COMMAND', '/usr/local/sbin/savitar-wg-add-peer'),
+    'remove_peer_command' => env('WG_REMOVE_PEER_COMMAND', '/usr/local/sbin/savitar-wg-remove-peer'),
     'wg_binary' => env('WG_BINARY', '/usr/bin/wg'),
     'api_group' => env('WG_API_GROUP', 'savitar-api'),
     'api_username' => env('WG_API_USERNAME', 'savitarapi'),
