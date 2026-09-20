@@ -22,6 +22,16 @@ class WebPushNotifierService
         );
     }
 
+    public function sendServiceRegistered(Service $service): void
+    {
+        $this->send(
+            $this->adminSubscriptions(),
+            '📄 Nuevo contrato registrado',
+            $this->serviceBody($service),
+            '/dashboard/contract/contracts'
+        );
+    }
+
     public function sendServiceSuspended(Service $service): void
     {
         $this->send(
@@ -57,6 +67,15 @@ class WebPushNotifierService
         $technicianIds = User::whereHas('roles', fn ($q) => $q->where('name', 'Técnico'))->pluck('id');
 
         return PushSubscription::whereIn('user_id', $technicianIds)->get();
+    }
+
+    private function adminSubscriptions()
+    {
+        // "Super Admin" también cuenta como administrador -- ambos roles
+        // deben enterarse de una venta nueva.
+        $adminIds = User::whereHas('roles', fn ($q) => $q->whereIn('name', ['Administrador', 'Super Admin']))->pluck('id');
+
+        return PushSubscription::whereIn('user_id', $adminIds)->get();
     }
 
     private function send($subscriptions, string $title, string $body, string $url): void

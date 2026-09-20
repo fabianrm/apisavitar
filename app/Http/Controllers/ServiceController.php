@@ -128,6 +128,8 @@ class ServiceController extends Controller
 
             DB::commit();
 
+            app(\App\Services\WebPushNotifierService::class)->sendServiceRegistered($service);
+
             return response()->json([
                 'service' => new ServiceResource($service),
             ], 201);
