@@ -284,6 +284,15 @@ class InvoiceController extends Controller
                 $request->input('start_date'),
                 $request->input('end_date')
             ]);
+        } elseif ($request->boolean('current_period')) {
+            // Vista por defecto: solo las facturas cuyo período de facturación
+            // (start_date..end_date) incluye hoy -- evita traer las 10,000+
+            // facturas históricas en cada carga. Cada contrato factura en un
+            // ciclo propio (no alineado al mes calendario), así que esto no
+            // es lo mismo que "mes actual".
+            $today = Carbon::today()->toDateString();
+            $query->whereDate('invoices.start_date', '<=', $today)
+                ->whereDate('invoices.end_date', '>=', $today);
         }
 
         // Filtrar por nombre del cliente si se proporciona
