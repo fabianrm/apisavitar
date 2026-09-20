@@ -16,7 +16,6 @@ class EquipmentCollection extends ResourceCollection
     {
         return [
             'data' => $this->collection,
-            'total' => count($this->collection)
         ];
     }
 }

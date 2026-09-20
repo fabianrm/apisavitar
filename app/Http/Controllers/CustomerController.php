@@ -22,8 +22,11 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
+        // Tope más alto que el de Contratos porque el selector de clientes de
+        // Tickets (create-ticket/edit-ticket) sigue pidiendo la lista
+        // completa de una vez para su combo de búsqueda.
         $perPage = (int) $request->input('per_page', 10);
-        $perPage = $perPage > 0 ? min($perPage, 100) : 10;
+        $perPage = $perPage > 0 ? min($perPage, 2000) : 10;
 
         $query = Customer::withCount('services');
 
