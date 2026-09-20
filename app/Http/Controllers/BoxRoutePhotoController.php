@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Box;
 use App\Models\BoxRoute;
 use App\Models\BoxRoutePhoto;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -11,10 +13,24 @@ use Illuminate\Support\Facades\Storage;
 class BoxRoutePhotoController extends Controller
 {
     /**
+     * BoxRoute/BoxRoutePhoto no tienen scope propio de empresa; se confirma
+     * que la ruta conecta cajas de la empresa actual antes de dejar
+     * ver/subir/borrar sus fotos.
+     */
+    private function authorizeSameEnterprise(BoxRoute $boxRoute): void
+    {
+        if (! Box::where('id', $boxRoute->start_box_id)->exists()) {
+            throw new ModelNotFoundException;
+        }
+    }
+
+    /**
      * Store a newly created photo
      */
     public function store(Request $request, BoxRoute $boxRoute)
     {
+        $this->authorizeSameEnterprise($boxRoute);
+
         $request->validate([
             'photo' => 'required|image|max:10240', // 10MB max
         ]);
@@ -123,6 +139,8 @@ class BoxRoutePhotoController extends Controller
      */
     public function index(BoxRoute $boxRoute)
     {
+        $this->authorizeSameEnterprise($boxRoute);
+
         return response()->json($boxRoute->photos);
     }
 
@@ -133,6 +151,7 @@ class BoxRoutePhotoController extends Controller
     {
         try {
             $photo = BoxRoutePhoto::findOrFail($id);
+            $this->authorizeSameEnterprise($photo->boxRoute);
 
             // Eliminar el archivo del storage
             if (Storage::disk('public')->exists($photo->path)) {
