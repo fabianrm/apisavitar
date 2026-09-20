@@ -33,7 +33,7 @@ class CustomerResource extends JsonResource
             'email' => $this->email,
             'status' => $this->status,
             'updated_at' => $this->updated_at,
-            'totalContracts' => $this->services->count(),
+            'totalContracts' => $this->services_count ?? $this->services->count(),
             // 'service' => ServiceResource::collection($this->whenLoaded('services')),
         ];
 

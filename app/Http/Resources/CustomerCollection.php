@@ -16,7 +16,6 @@ class CustomerCollection extends ResourceCollection
     {
         return [
             'data' => $this->collection,
-            'total' => count($this->collection)
         ];
 
         // return $this->collection->map(function ($customer) {

@@ -22,11 +22,33 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        // Obtener los clientes junto con el total de contratos
-        // $customers = Customer::withCount('services')->get();
-        $customers = Customer::orderBy('created_at', 'desc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        $perPage = $perPage > 0 ? min($perPage, 100) : 10;
 
-        // Retornar la colección de clientes con el total de contratos
+        $query = Customer::withCount('services');
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->input('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->input('date_to'));
+        }
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%'.$request->input('name').'%');
+        }
+
+        if ($request->filled('city_id')) {
+            $query->where('city_id', $request->input('city_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $customers = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
         return new CustomerCollection($customers);
     }
 
