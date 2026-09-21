@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ModelNotFoundException;
+use App\Models\Enterprise;
 use App\Models\Invoice;
 use App\Http\Resources\InvoiceResource;
 use App\Http\Requests\StoreInvoiceRequest;
@@ -317,18 +318,39 @@ class InvoiceController extends Controller
     }
 
 
+    /**
+     * Empresas activas con recordatorios de WhatsApp habilitados, con los
+     * campos de configuración necesarios para armar y enviar el mensaje.
+     */
+    private function enterprisesWithReminders()
+    {
+        return Enterprise::where('whatsapp_reminders_enabled', true)
+            ->get([
+                'id', 'name', 'wa_instance', 'wa_api_key', 'wa_reminder_days_before',
+                'wa_payment_info', 'wa_message_template_due', 'wa_message_template_overdue',
+            ])
+            ->keyBy('id');
+    }
+
     //Funcion para envio de recordatorios por n8n
-    //Recuerda desde una semana antes, pasando un día.
+    //Recuerda desde N días antes (configurable por empresa), pasando un día.
     public function recordatory(Request $request)
     {
         $today = Carbon::today();
-        $limitDate = $today->copy()->addDays(7); // Change from 5 to 7 days
+        $enterprises = $this->enterprisesWithReminders();
+
+        if ($enterprises->isEmpty()) {
+            return response()->json([]);
+        }
+
+        $limitDate = $today->copy()->addDays($enterprises->max('wa_reminder_days_before'));
 
         $invoices = Invoice::withoutGlobalScope(EnterpriseScope::class)
             ->join('services', 'invoices.service_id', '=', 'services.id')
             ->join('customers', 'services.customer_id', '=', 'customers.id')
             ->select(
                 'invoices.id',
+                'invoices.enterprise_id',
                 'invoices.price',
                 'invoices.start_date',
                 'customers.name as customer_name',
@@ -336,7 +358,7 @@ class InvoiceController extends Controller
                 'invoices.reminder_sent_at',
                 'invoices.reminder_count'
             )
-            ->whereIn('invoices.enterprise_id', [1, 2])
+            ->whereIn('invoices.enterprise_id', $enterprises->keys())
             ->where('services.status', 'activo')
             ->where('invoices.status', 'pendiente')
             ->where('invoices.start_date', '>=', $today)
@@ -346,7 +368,33 @@ class InvoiceController extends Controller
                     ->orWhere('invoices.reminder_sent_at', '<=', $today->copy()->subDay());
             })
             ->orderBy('customers.name')
-            ->get();
+            ->get()
+            ->filter(function ($invoice) use ($enterprises, $today) {
+                $enterprise = $enterprises->get($invoice->enterprise_id);
+                return $enterprise && Carbon::parse($invoice->start_date)->lte($today->copy()->addDays($enterprise->wa_reminder_days_before));
+            })
+            ->map(function ($invoice) use ($enterprises) {
+                $enterprise = $enterprises->get($invoice->enterprise_id);
+                $vencimiento = Carbon::parse($invoice->start_date)->format('d/m/Y');
+
+                $invoice->enterprise_name = $enterprise->name;
+                $invoice->instance = $enterprise->wa_instance;
+                $invoice->api_key = $enterprise->wa_api_key;
+                $invoice->message = $enterprise->renderReminderMessage(
+                    $enterprise->wa_message_template_due ?: Enterprise::DEFAULT_WA_TEMPLATE_DUE,
+                    [
+                        'cliente' => $invoice->customer_name,
+                        'empresa' => $enterprise->name,
+                        'monto' => number_format($invoice->price, 2),
+                        'vencimiento' => $vencimiento,
+                        'pago' => $enterprise->wa_payment_info ?? '',
+                    ]
+                );
+
+                return $invoice;
+            })
+            ->values();
+
         return response()->json($invoices);
     }
 
@@ -354,12 +402,18 @@ class InvoiceController extends Controller
     public function recordatoryOverdue(Request $request)
     {
         $today = Carbon::today();
+        $enterprises = $this->enterprisesWithReminders();
+
+        if ($enterprises->isEmpty()) {
+            return response()->json([]);
+        }
 
         $invoices = Invoice::withoutGlobalScope(EnterpriseScope::class)
             ->join('services', 'invoices.service_id', '=', 'services.id')
             ->join('customers', 'services.customer_id', '=', 'customers.id')
             ->select(
                 'invoices.id',
+                'invoices.enterprise_id',
                 'invoices.price',
                 'invoices.start_date as due_date', // Mostramos start_date como fecha de vencimiento
                 'invoices.due_date as cutoff_date', // Mostramos la fecha límite de pago
@@ -368,7 +422,7 @@ class InvoiceController extends Controller
                 'invoices.reminder_sent_at',
                 'invoices.reminder_count'
             )
-            ->whereIn('invoices.enterprise_id', [1, 2])
+            ->whereIn('invoices.enterprise_id', $enterprises->keys())
             ->where('services.status', 'activo')
             ->where('invoices.status', 'vencida')
             ->where('invoices.start_date', '<=', $today) // Ya pasó la fecha de vencimiento
@@ -378,7 +432,29 @@ class InvoiceController extends Controller
                     ->orWhereDate('invoices.overdue_reminder_sent_at', '<=', $today->copy()->subDay());
             })
             ->orderBy('customers.name')
-            ->get();
+            ->get()
+            ->map(function ($invoice) use ($enterprises) {
+                $enterprise = $enterprises->get($invoice->enterprise_id);
+
+                $invoice->enterprise_name = $enterprise->name;
+                $invoice->instance = $enterprise->wa_instance;
+                $invoice->api_key = $enterprise->wa_api_key;
+                $invoice->message = $enterprise->renderReminderMessage(
+                    $enterprise->wa_message_template_overdue ?: Enterprise::DEFAULT_WA_TEMPLATE_OVERDUE,
+                    [
+                        'cliente' => $invoice->customer_name,
+                        'empresa' => $enterprise->name,
+                        'monto' => number_format($invoice->price, 2),
+                        'vencimiento' => Carbon::parse($invoice->due_date)->format('d/m/Y'),
+                        'corte' => Carbon::parse($invoice->cutoff_date)->format('d/m/Y'),
+                        'pago' => $enterprise->wa_payment_info ?? '',
+                    ]
+                );
+
+                return $invoice;
+            })
+            ->values();
+
         return response()->json($invoices);
     }
 
@@ -388,7 +464,7 @@ class InvoiceController extends Controller
     {
         $invoice = Invoice::withoutGlobalScope(EnterpriseScope::class)->findOrFail($id);
 
-        if (!in_array($invoice->enterprise_id, [1, 2])) {
+        if (!$this->enterpriseHasRemindersEnabled($invoice->enterprise_id)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invoice not allowed for this enterprise'
@@ -402,13 +478,17 @@ class InvoiceController extends Controller
         return response()->json(['success' => true]);
     }
 
+    private function enterpriseHasRemindersEnabled($enterpriseId): bool
+    {
+        return Enterprise::where('id', $enterpriseId)->where('whatsapp_reminders_enabled', true)->exists();
+    }
 
     //Marcar recordatorio de vencidas
     public function sendReminderOverdue($invoiceId)
     {
         $invoice = Invoice::withoutGlobalScope(EnterpriseScope::class)->findOrFail($invoiceId);
 
-        if (!in_array($invoice->enterprise_id, [1, 2])) {
+        if (!$this->enterpriseHasRemindersEnabled($invoice->enterprise_id)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invoice not allowed for this enterprise'

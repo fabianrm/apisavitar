@@ -32,6 +32,13 @@ class UpdateEnterpriseRequest extends FormRequest
                 'logo' => [''],
                 'telegramBotToken' => [''],
                 'telegramChatId' => [''],
+                'whatsappRemindersEnabled' => [''],
+                'waInstance' => [''],
+                'waApiKey' => [''],
+                'waReminderDaysBefore' => [''],
+                'waPaymentInfo' => [''],
+                'waMessageTemplateDue' => [''],
+                'waMessageTemplateOverdue' => [''],
             ];
         } else {
             return [
@@ -42,6 +49,13 @@ class UpdateEnterpriseRequest extends FormRequest
                 'logo' => ['sometimes'],
                 'telegramBotToken' => ['sometimes'],
                 'telegramChatId' => ['sometimes'],
+                'whatsappRemindersEnabled' => ['sometimes'],
+                'waInstance' => ['sometimes'],
+                'waApiKey' => ['sometimes'],
+                'waReminderDaysBefore' => ['sometimes', 'integer', 'min:1', 'max:30'],
+                'waPaymentInfo' => ['sometimes'],
+                'waMessageTemplateDue' => ['sometimes'],
+                'waMessageTemplateOverdue' => ['sometimes'],
             ];
         }
     }
@@ -65,6 +79,36 @@ class UpdateEnterpriseRequest extends FormRequest
             $this->merge([
                 'telegram_chat_id' => $this->telegramChatId,
             ]);
+        }
+
+        if ($this->has('whatsappRemindersEnabled')) {
+            $this->merge([
+                'whatsapp_reminders_enabled' => $this->boolean('whatsappRemindersEnabled'),
+            ]);
+        }
+
+        if ($this->has('waInstance')) {
+            $this->merge(['wa_instance' => $this->waInstance]);
+        }
+
+        if ($this->has('waApiKey')) {
+            $this->merge(['wa_api_key' => $this->waApiKey]);
+        }
+
+        if ($this->has('waReminderDaysBefore')) {
+            $this->merge(['wa_reminder_days_before' => $this->waReminderDaysBefore]);
+        }
+
+        if ($this->has('waPaymentInfo')) {
+            $this->merge(['wa_payment_info' => $this->waPaymentInfo]);
+        }
+
+        if ($this->has('waMessageTemplateDue')) {
+            $this->merge(['wa_message_template_due' => $this->waMessageTemplateDue]);
+        }
+
+        if ($this->has('waMessageTemplateOverdue')) {
+            $this->merge(['wa_message_template_overdue' => $this->waMessageTemplateOverdue]);
         }
     }
 }

@@ -29,6 +29,13 @@ class EnterpriseResource extends JsonResource
             'status' => $this->status,
             'telegramBotToken' => $this->telegram_bot_token,
             'telegramChatId' => $this->telegram_chat_id,
+            'whatsappRemindersEnabled' => $this->whatsapp_reminders_enabled,
+            'waInstance' => $this->wa_instance,
+            'waApiKey' => $this->wa_api_key,
+            'waReminderDaysBefore' => $this->wa_reminder_days_before,
+            'waPaymentInfo' => $this->wa_payment_info,
+            'waMessageTemplateDue' => $this->wa_message_template_due,
+            'waMessageTemplateOverdue' => $this->wa_message_template_overdue,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];

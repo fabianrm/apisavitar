@@ -42,4 +42,10 @@ return [
         'subject' => env('VAPID_SUBJECT', 'mailto:soporte@savitarperu.com'),
     ],
 
+    'evolution' => [
+        // Un solo servidor Evolution API; cada empresa solo aporta su propia
+        // instancia + api_key (ver enterprises.wa_instance / wa_api_key).
+        'base_url' => env('EVOLUTION_API_BASE_URL'),
+    ],
+
 ];

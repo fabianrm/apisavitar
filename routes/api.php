@@ -179,6 +179,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::patch('add-admin', [RoleUserController::class, 'addRoleUser']);
         Route::get('my-enterprise', [EnterpriseController::class, 'mine']);
         Route::post('my-enterprise/test-telegram', [EnterpriseController::class, 'testTelegram']);
+        Route::post('my-enterprise/test-whatsapp', [EnterpriseController::class, 'testWhatsapp']);
         Route::apiResource('role-user', RoleUserController::class);
         Route::prefix('roles')->group(function () {
             Route::post('{roleId}/permissions', [PermissionRoleController::class, 'assignPermissionsToRole']);

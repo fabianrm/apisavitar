@@ -9,6 +9,8 @@ use App\Http\Requests\UpdateEnterpriseRequest;
 use App\Http\Resources\EnterpriseCollection;
 use App\Http\Resources\EnterpriseResource;
 use App\Services\TelegramNotifierService;
+use App\Services\WhatsappReminderService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class EnterpriseController extends Controller
@@ -45,6 +47,33 @@ class EnterpriseController extends Controller
             'message' => $sent
                 ? 'Mensaje de prueba enviado. Revisa tu grupo de Telegram.'
                 : 'No se pudo enviar el mensaje. Verifica el token y el chat ID.',
+        ]);
+    }
+
+    /**
+     * Envía un WhatsApp de prueba a un número que escribe el propio admin,
+     * usando la instancia/api_key configurada de su empresa.
+     */
+    public function testWhatsapp(Request $request, WhatsappReminderService $whatsapp)
+    {
+        $request->validate(['phone' => ['required', 'string']]);
+
+        $enterprise = Enterprise::findOrFail(CurrentEnterprise::get());
+
+        if (! $enterprise->hasWhatsappReminderConfigured()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Completa la instancia y el api_key antes de probar.',
+            ], 422);
+        }
+
+        $sent = $whatsapp->sendTest($enterprise, $request->input('phone'));
+
+        return response()->json([
+            'success' => $sent,
+            'message' => $sent
+                ? 'Mensaje de prueba enviado. Revisa el WhatsApp indicado.'
+                : 'No se pudo enviar el mensaje. Verifica la instancia y el api_key.',
         ]);
     }
     /**
