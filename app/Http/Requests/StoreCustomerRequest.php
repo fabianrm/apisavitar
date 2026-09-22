@@ -36,6 +36,7 @@ class StoreCustomerRequest extends FormRequest
             'whatsapp' => ['required'],
             'email' => ['required', 'email'],
             'status' => ['required'],
+            'waRemindersEnabled' => ['sometimes', 'boolean'],
         ];
     }
     protected function prepareForValidation(): void
@@ -46,5 +47,9 @@ class StoreCustomerRequest extends FormRequest
             'city_id' => $this->cityId,
             'phone_number' => $this->phoneNumber
         ]);
+
+        if ($this->has('waRemindersEnabled')) {
+            $this->merge(['wa_reminders_enabled' => $this->boolean('waRemindersEnabled')]);
+        }
     }
 }

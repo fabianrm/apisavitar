@@ -360,6 +360,7 @@ class InvoiceController extends Controller
             )
             ->whereIn('invoices.enterprise_id', $enterprises->keys())
             ->where('services.status', 'activo')
+            ->where('customers.wa_reminders_enabled', true)
             ->where('invoices.status', 'pendiente')
             ->where('invoices.start_date', '>=', $today)
             ->where('invoices.start_date', '<=', $limitDate)
@@ -424,6 +425,7 @@ class InvoiceController extends Controller
             )
             ->whereIn('invoices.enterprise_id', $enterprises->keys())
             ->where('services.status', 'activo')
+            ->where('customers.wa_reminders_enabled', true)
             ->where('invoices.status', 'vencida')
             ->where('invoices.start_date', '<=', $today) // Ya pasó la fecha de vencimiento
             ->where('invoices.due_date', '>=', $today) // Aún no se corta el servicio

@@ -37,6 +37,7 @@ class UpdateCustomerRequest extends FormRequest
                 'whatsapp' => ['required'],
                 'email' => ['required', 'email'],
                 'status' => ['required'],
+                'waRemindersEnabled' => ['sometimes', 'boolean'],
             ];
         } else {
             return [
@@ -52,6 +53,7 @@ class UpdateCustomerRequest extends FormRequest
                 'whatsapp' => ['sometimes', 'required'],
                 'email' => ['sometimes', 'required', 'email'],
                 'status' => ['sometimes', 'required'],
+                'waRemindersEnabled' => ['sometimes', 'boolean'],
             ];
         }
     }
@@ -63,6 +65,10 @@ class UpdateCustomerRequest extends FormRequest
                 'phone_number' => $this->phoneNumber,
                 'city_id' => $this->cityId
             ]);
+        }
+
+        if ($this->has('waRemindersEnabled')) {
+            $this->merge(['wa_reminders_enabled' => $this->boolean('waRemindersEnabled')]);
         }
     }
 }

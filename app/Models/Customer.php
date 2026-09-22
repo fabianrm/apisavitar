@@ -29,9 +29,14 @@ class Customer extends Model
         'phone_number',
         'whatsapp',
         'email',
+        'wa_reminders_enabled',
         'status',
         'created_by',
         'updated_by',
+    ];
+
+    protected $casts = [
+        'wa_reminders_enabled' => 'boolean',
     ];
 
 

@@ -31,6 +31,7 @@ class CustomerResource extends JsonResource
             'phoneNumber' => $this->phone_number,
             'whatsapp' => $this->whatsapp,
             'email' => $this->email,
+            'waRemindersEnabled' => $this->wa_reminders_enabled,
             'status' => $this->status,
             'updated_at' => $this->updated_at,
             'totalContracts' => $this->services_count ?? $this->services->count(),
