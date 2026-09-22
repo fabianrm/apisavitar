@@ -155,6 +155,22 @@ class EnterpriseController extends Controller
     }
 
     /**
+     * Desvincula la instancia configurada de la empresa (ej. una compartida
+     * con otra empresa, como Corales soltando la de Savitar) para que pueda
+     * crear/conectar la suya propia. A diferencia de cancelWhatsappInstance,
+     * esto NUNCA toca Evolution API -- solo limpia la referencia local, así
+     * el número real sigue funcionando para quien lo siga usando.
+     */
+    public function unlinkWhatsappInstance()
+    {
+        $enterprise = Enterprise::findOrFail(CurrentEnterprise::get());
+
+        $enterprise->update(['wa_instance' => null, 'wa_api_key' => null]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()

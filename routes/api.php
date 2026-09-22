@@ -184,6 +184,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::post('my-enterprise/whatsapp/reconnect', [EnterpriseController::class, 'reconnectWhatsapp']);
         Route::get('my-enterprise/whatsapp/connection-state', [EnterpriseController::class, 'whatsappConnectionState']);
         Route::delete('my-enterprise/whatsapp/cancel-instance', [EnterpriseController::class, 'cancelWhatsappInstance']);
+        Route::delete('my-enterprise/whatsapp/unlink', [EnterpriseController::class, 'unlinkWhatsappInstance']);
         Route::apiResource('role-user', RoleUserController::class);
         Route::prefix('roles')->group(function () {
             Route::post('{roleId}/permissions', [PermissionRoleController::class, 'assignPermissionsToRole']);
