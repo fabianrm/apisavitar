@@ -76,6 +76,59 @@ class EnterpriseController extends Controller
                 : 'No se pudo enviar el mensaje. Verifica la instancia y el api_key.',
         ]);
     }
+
+    /**
+     * Crea la instancia de Evolution API para la empresa del usuario logueado
+     * y devuelve el QR para escanear -- self-service, sin tocar el panel de
+     * Evolution API a mano. Solo tiene sentido si todavía no tiene una.
+     */
+    public function createWhatsappInstance(WhatsappReminderService $whatsapp)
+    {
+        $enterprise = Enterprise::findOrFail(CurrentEnterprise::get());
+
+        if ($enterprise->hasWhatsappReminderConfigured()) {
+            return response()->json([
+                'message' => 'Esta empresa ya tiene una instancia configurada. Si necesitas reconectar, usa "Regenerar QR".',
+            ], 422);
+        }
+
+        try {
+            $result = $whatsapp->createInstance($enterprise);
+
+            return response()->json($result);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
+     * Regenera el QR de la instancia ya existente de la empresa (sesión
+     * vencida, o quiere reconectar desde otro celular).
+     */
+    public function reconnectWhatsapp(WhatsappReminderService $whatsapp)
+    {
+        $enterprise = Enterprise::findOrFail(CurrentEnterprise::get());
+
+        try {
+            $qrcode = $whatsapp->regenerateQrCode($enterprise);
+
+            return response()->json(['qrcode' => $qrcode]);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
+     * Estado de conexión de la instancia de WhatsApp de la empresa, para que
+     * el front haga polling mientras se muestra el QR.
+     */
+    public function whatsappConnectionState(WhatsappReminderService $whatsapp)
+    {
+        $enterprise = Enterprise::findOrFail(CurrentEnterprise::get());
+
+        return response()->json(['state' => $whatsapp->connectionState($enterprise)]);
+    }
+
     /**
      * Display a listing of the resource.
      */

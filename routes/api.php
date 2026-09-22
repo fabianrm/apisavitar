@@ -180,6 +180,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::get('my-enterprise', [EnterpriseController::class, 'mine']);
         Route::post('my-enterprise/test-telegram', [EnterpriseController::class, 'testTelegram']);
         Route::post('my-enterprise/test-whatsapp', [EnterpriseController::class, 'testWhatsapp']);
+        Route::post('my-enterprise/whatsapp/create-instance', [EnterpriseController::class, 'createWhatsappInstance']);
+        Route::post('my-enterprise/whatsapp/reconnect', [EnterpriseController::class, 'reconnectWhatsapp']);
+        Route::get('my-enterprise/whatsapp/connection-state', [EnterpriseController::class, 'whatsappConnectionState']);
         Route::apiResource('role-user', RoleUserController::class);
         Route::prefix('roles')->group(function () {
             Route::post('{roleId}/permissions', [PermissionRoleController::class, 'assignPermissionsToRole']);

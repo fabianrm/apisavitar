@@ -46,6 +46,10 @@ return [
         // Un solo servidor Evolution API; cada empresa solo aporta su propia
         // instancia + api_key (ver enterprises.wa_instance / wa_api_key).
         'base_url' => env('EVOLUTION_API_BASE_URL'),
+        // Token de administrador del servidor completo -- solo para crear/
+        // gestionar instancias (self-service desde Configuración). Nunca se
+        // expone al front ni se guarda por empresa.
+        'global_token' => env('EVOLUTION_API_GLOBAL_TOKEN'),
     ],
 
 ];
