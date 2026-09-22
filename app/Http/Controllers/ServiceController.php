@@ -50,6 +50,10 @@ class ServiceController extends Controller
             });
         }
 
+        if ($request->filled('user_pppoe')) {
+            $query->where('user_pppoe', 'like', '%'.$request->input('user_pppoe').'%');
+        }
+
         if ($request->filled('plan_id')) {
             $query->where('plan_id', $request->input('plan_id'));
         }
@@ -60,6 +64,14 @@ class ServiceController extends Controller
 
         if ($request->filled('promotion_id')) {
             $query->where('promotion_id', $request->input('promotion_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->boolean('iptv')) {
+            $query->where('iptv', true);
         }
 
         $services = $query->orderBy('created_at', 'desc')->paginate($perPage);
