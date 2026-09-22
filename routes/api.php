@@ -110,6 +110,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
             Route::get('expired-active-services', [InvoiceController::class, 'getExpiredActiveServices']);
             Route::post('reminder/{id}', [InvoiceController::class, 'markReminderSent']);
             Route::post('reminderoverdue/{id}', [InvoiceController::class, 'sendReminderOverdue']);
+            Route::post('report-whatsapp-failure', [WhatsappSendFailureController::class, 'store']);
             Route::get('export', [InvoiceController::class, 'exportInvoices']);
             Route::get('export-resumen', [InvoiceController::class, 'exportInvoicesResumen']);
             Route::get('{id}/receipt', [InvoiceController::class, 'generateReceiptPDF']);
@@ -185,6 +186,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers'], function
         Route::get('my-enterprise/whatsapp/connection-state', [EnterpriseController::class, 'whatsappConnectionState']);
         Route::delete('my-enterprise/whatsapp/cancel-instance', [EnterpriseController::class, 'cancelWhatsappInstance']);
         Route::delete('my-enterprise/whatsapp/unlink', [EnterpriseController::class, 'unlinkWhatsappInstance']);
+        Route::get('my-enterprise/whatsapp/failures', [WhatsappSendFailureController::class, 'index']);
+        Route::patch('my-enterprise/whatsapp/failures/{whatsappSendFailure}/resolve', [WhatsappSendFailureController::class, 'resolve']);
         Route::apiResource('role-user', RoleUserController::class);
         Route::prefix('roles')->group(function () {
             Route::post('{roleId}/permissions', [PermissionRoleController::class, 'assignPermissionsToRole']);
