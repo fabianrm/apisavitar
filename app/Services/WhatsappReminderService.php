@@ -107,15 +107,47 @@ class WhatsappReminderService
             return 'not_configured';
         }
 
-        $response = Http::timeout(10)
-            ->withHeaders(['apikey' => $enterprise->wa_api_key])
-            ->get($this->baseUrl() . "/instance/connectionState/{$enterprise->wa_instance}");
+        // El front hace polling a esto cada pocos segundos -- nunca debe
+        // dejar escapar una excepción (config faltante, red caída, etc.),
+        // porque eso mataría la suscripción de polling en el navegador.
+        try {
+            $response = Http::timeout(10)
+                ->withHeaders(['apikey' => $enterprise->wa_api_key])
+                ->get($this->baseUrl() . "/instance/connectionState/{$enterprise->wa_instance}");
 
-        if (! $response->successful()) {
+            if (! $response->successful()) {
+                return 'unknown';
+            }
+
+            return data_get($response->json(), 'instance.state') ?? data_get($response->json(), 'state') ?? 'unknown';
+        } catch (\Throwable $e) {
+            Log::warning('Fallo al consultar connectionState de Evolution API: ' . $e->getMessage());
+
             return 'unknown';
         }
+    }
 
-        return data_get($response->json(), 'instance.state') ?? data_get($response->json(), 'state') ?? 'unknown';
+    /**
+     * Borra en Evolution API una instancia recién creada que el admin
+     * decidió no conectar (canceló antes de escanear el QR), para no dejar
+     * instancias huérfanas acumulándose en el panel. Best-effort: si el
+     * borrado remoto falla igual se limpia la config local, porque lo que
+     * más importa es que el admin pueda volver a intentarlo sin quedar
+     * atascado.
+     */
+    public function deleteInstance(Enterprise $enterprise): void
+    {
+        try {
+            $response = Http::timeout(10)
+                ->withHeaders(['apikey' => $enterprise->wa_api_key])
+                ->delete($this->baseUrl() . "/instance/delete/{$enterprise->wa_instance}");
+
+            if (! $response->successful()) {
+                Log::warning('Evolution API rechazó el borrado de instancia (se limpia igual localmente): ' . $response->body());
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Excepción al borrar instancia en Evolution API (se limpia igual localmente): ' . $e->getMessage());
+        }
     }
 
     private function baseUrl(): string

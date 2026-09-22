@@ -130,6 +130,31 @@ class EnterpriseController extends Controller
     }
 
     /**
+     * Cancela una instancia recién creada que el admin decidió no conectar
+     * (desistió antes de escanear el QR) -- la borra en Evolution API y
+     * limpia wa_instance/wa_api_key para que pueda volver a intentarlo.
+     * No se puede cancelar una instancia que ya quedó conectada.
+     */
+    public function cancelWhatsappInstance(WhatsappReminderService $whatsapp)
+    {
+        $enterprise = Enterprise::findOrFail(CurrentEnterprise::get());
+
+        if (! $enterprise->hasWhatsappReminderConfigured()) {
+            return response()->json(['message' => 'No hay ninguna instancia pendiente para cancelar.'], 422);
+        }
+
+        if ($whatsapp->connectionState($enterprise) === 'open') {
+            return response()->json(['message' => 'Esta instancia ya está conectada, no se puede cancelar.'], 422);
+        }
+
+        $whatsapp->deleteInstance($enterprise);
+
+        $enterprise->update(['wa_instance' => null, 'wa_api_key' => null]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
