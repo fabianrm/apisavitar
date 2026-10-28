@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\PppoeUserAlreadyExistsException;
 use App\Models\Router;
 use Illuminate\Support\Facades\Log;
 use RouterOS\Client;
@@ -74,13 +75,29 @@ class MikrotikService
         $this->validateConnection();
 
         try {
-            return $this->ejecutarComando('/ppp/secret/add', [
+            $result = $this->ejecutarComando('/ppp/secret/add', [
                 'name' => $userData['username'],
                 'password' => $userData['password'],
                 'service' => 'pppoe',
                 'profile' => $userData['profile'],
                 'comment' => $userData['comment'] ?? 'Cliente ID: '.$userData['customer_id'],
             ]);
+
+            // Cuando RouterOS rechaza el comando (!trap) la librería NO lanza
+            // excepción: devuelve ['after' => ['message' => '...']]. Sin este
+            // chequeo el rechazo pasaba inadvertido y el contrato se guardaba
+            // aunque el usuario nunca se creara en el router.
+            $routerError = $result['after']['message'] ?? null;
+
+            if ($routerError !== null) {
+                if (stripos($routerError, 'already exists') !== false) {
+                    throw new PppoeUserAlreadyExistsException($userData['username'], $routerError);
+                }
+
+                throw new \RuntimeException("El MikroTik rechazó crear el usuario PPPoE: {$routerError}");
+            }
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('Error creando usuario PPPoE: '.$e->getMessage());
             throw $e;

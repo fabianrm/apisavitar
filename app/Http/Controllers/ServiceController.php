@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ModelNotFoundException;
+use App\Exceptions\PppoeUserAlreadyExistsException;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Http\Resources\ServiceCollection;
@@ -127,15 +128,24 @@ class ServiceController extends Controller
                 }
 
                 // Creamos el usuario
-                $userMk = $mkService->crearUsuarioPPP(
-                    [
-                        'username' => $service->user_pppoe,
-                        'password' => $service->pass_pppoe,
-                        'service' => 'pppoe',
-                        'profile' => $service->plans->name,
-                        'comment' => $service->customers->name.' - '.$service->service_code,
-                    ]
-                );
+                try {
+                    $userMk = $mkService->crearUsuarioPPP(
+                        [
+                            'username' => $service->user_pppoe,
+                            'password' => $service->pass_pppoe,
+                            'service' => 'pppoe',
+                            'profile' => $service->plans->name,
+                            'comment' => $service->customers->name.' - '.$service->service_code,
+                        ]
+                    );
+                } catch (PppoeUserAlreadyExistsException $e) {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'message' => "El usuario PPPoE '{$service->user_pppoe}' ya existe en el router {$router->ip}. Usa otro nombre de usuario.",
+                        'error' => $e->getMessage(),
+                    ], 422);
+                }
             }
 
             DB::commit();
